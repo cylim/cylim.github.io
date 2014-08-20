@@ -35,13 +35,6 @@ p {
   padding: 5px 0;
 }
 
-#list {
-	font-size: 18px;
-	font-weight: 300;
-	margin: 5px 40px;
-	padding: 5px 0;
-}
-
 #nav {
 	display: inline-block;
 	font-size: 1.2em;
