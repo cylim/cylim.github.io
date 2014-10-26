@@ -46,7 +46,7 @@ article::after {
 
 img {
   display: block;
-  margin: 30px auto;
+  margin: auto;
 }
 
 article.intro::before {
@@ -229,7 +229,7 @@ section .lollipop {
   height: 100%;
   width: 100%;
   position: absolute;
-  top: 0;
+  top: 0px;
   left: 0;
 }
 
