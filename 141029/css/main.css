@@ -234,12 +234,7 @@ section .lollipop {
   left: 0;
 }
 
-section .udacity {
-  height: 30%;
-  width: 30%;
-}
-
-section .gdays {
+section .udacity, .franz, .gdays {
   height: 30%;
   width: 30%;
 }
