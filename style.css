@@ -102,3 +102,7 @@ a:hover {
 	margin: 5px 40px;
 	padding: 5px 0;
 }
+
+td {
+	vertical-align: top;
+}
