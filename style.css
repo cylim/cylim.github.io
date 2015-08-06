@@ -103,6 +103,7 @@ a:hover {
 	padding: 5px 0;
 }
 
-td {
+#projects table, #projects tr, #projects td {
 	vertical-align: top;
+	border: 1px solid black;
 }
