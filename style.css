@@ -1,13 +1,9 @@
 body {
-
-	font-family: "Source Sans Pro", "Helvetica", "Hiragino Sans GB","Hiragino Sans GB W3",Arial,sans-serif;
 	width: 710px;
 	margin: auto;
 	padding: 50px 0;
 	background-image: url(bg.png);
 	background-attachment: fixed;
-
-
 }
 
 h1 {
@@ -103,7 +99,7 @@ a:hover {
 	padding: 5px 0;
 }
 
-#projects table, #projects tr, #projects td {
+table, tr, td {
 	vertical-align: top;
 	border: 1px solid black;
 }
