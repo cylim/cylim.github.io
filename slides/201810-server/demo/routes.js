@@ -1,9 +1,10 @@
-const express = require('express');
+const express = require('express')
 
-const router = express.Router();
+const router = express.Router()
+const emitter = require('./utils/emitter')
 
 // WARN:- Don't do this
-const data = [{ message: 'Hi', name: 'Alice' }, { message: 'Hello', name: 'Bob' }]
+const data = [{ message: 'Hi', name: 'Alice' }, {message: 'Hello', name: 'Bob' }]
 // more routes: routes2
 router
 .get('/messages', (_, res) => {
@@ -11,6 +12,7 @@ router
 })
 .post('/message', (req, res) => {
     data.push(req.body)
+emitter.emit('sendMessage', req.body)
     res.status(200).send({ success: true })
 })
 
@@ -19,6 +21,6 @@ router.use('*', function (_, res) {
         code: 'E_API_NOT_AVAILABLE',
         message: 'APIs Not Available.'
     })
-});
+})
 
-module.exports = router;
+module.exports = router

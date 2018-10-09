@@ -30,6 +30,9 @@ theme: Next, 8
 # RESTful APIs
 
 ^ Basic CRUD operations with HTTP request
+^ Flask vs Django
+^ Express vs Sailjs
+^ Rails
 
 ---
 
