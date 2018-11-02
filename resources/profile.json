@@ -1,45 +1,44 @@
 {
     "bio" : {
         "name" : "CY Lim",
-        "pic" : "profile.jpg",
-        "description" : "This is CY from Penang, Malaysia!",
+        "pic" : "profile.png",
+        "description" : "I am a full stack software engineer who recently decided to quit full-time jobs and start my digital nomad lifestyle.",
         "contact" : {
-            "email" : "me@cy.my",
+            "email" : "jobs@cy.my",
             "github" : "cylim",
-            "facebook" : "byronl94",
+            "facebook" : "cylim226",
             "twitter" : "@cylim226",
-            "googleplus" : "cylim",
-            "blog" : "http://blog.cy.my"
+            "talks" : "https://github.com/cylim/talks"
         }
     },
-    "education" : [
+    "educations" : [
         {
             "school" : "University of Wollongong",
             "course" : "Bachelor of Computer Science",
             "major" : "Digital System Security",
-            "year" : "July 2015 - present",
-            "link" : "http://www.uow.edu.au/"
+            "year" : "July 2015 - December 2016",
+            "link" : "https://www.uow.edu.au/"
         },
         {
             "school" : "INTI International College Subang",
             "course" : "Bachelor of Computer Science",
             "major" : "Digital System Security",
             "year" : "August 2014 - July 2015",
-            "link" : "http://newinti.edu.my/"
+            "link" : "https://newinti.edu.my/"
         },
         {
             "school" : "INTI International University",
             "course" : "Bsc of Computer Science(Honours)",
             "major" : "Software Engineering",
             "year" : "August 2013 - August 2014",
-            "link" : "http://newinti.edu.my/"
+            "link" : "https://newinti.edu.my/"
         },
         {
             "school" : "Chung Ling Private High School",
             "course" : "Unified Examination Certificate(UEC)",
             "major" : "Art and Business",
             "year" : "January 2007 - November 2012",
-            "link" : "http://clphs.edu.my/"
+            "link" : "https://clphs.edu.my/"
         },
         {
             "school" : "Chung Shan Primary School",
@@ -49,23 +48,72 @@
             "link" : "#"
         }
     ],
-    "work" : [
+    "jobs" : [
         {
-            "company" : "TABLEAPP",
-            "job" : "iOS Developer(intern)",
-            "description" : "N/A",
-            "date" : "April 2015 - July 2015",
-            "link" : "http://tableapp.com"
+            "company" : "N/A",
+            "job" : "Freelance Full Stack Software Engineer",
+            "date" : "May 2018 - Now",
+            "link" : "https://cy.my"
         },
         {
-            "company" : "GamePro International",
+            "company" : "TBSx3 Pty Ltd",
+            "job" : "Senior Software Engineer",
+            "date" : "July 2017 - March 2018",
+            "link" : "https://tbsx3.com"
+        },
+        {
+            "company" : "TABLEAPP SDN BHD",
+            "job" : "iOS Developer(intern)",
+            "date" : "April 2015 - July 2015",
+            "link" : "https://tableapp.com"
+        },
+        {
+            "company" : "GamePro International SDN BHD",
             "job" : "Customer Service",
-            "description" : "N/A",
             "date" : "November 2012 - February 2013",
-            "link" : "http://www.gamepro.com.my/"
+            "link" : "https://www.gamepro.com.my/"
         }
     ],
-    "activity" : [
+    "activities" : [
+        {
+            "name" : "JavaScript Malaysia",
+            "description" : "N/A",
+            "role" : [
+                {
+                    "title" : "Penang Monthly Meetup Organizer",
+                    "description" : "N/A",
+                    "date" : "November 2017 - Stopped"
+                }
+            ],
+            "date" : "November 2017 - Stopped",
+            "link" : "https://javascript.my"
+        },
+        {
+            "name" : "Python User Group Malaysia",
+            "description" : "N/A",
+            "role" : [
+                {
+                    "title" : "Facebook Group Admin",
+                    "description" : "N/A",
+                    "date" : "October 2013 - Now"
+                }
+            ],
+            "date" : "October 2013 - Now",
+            "link" : "https://www.facebook.com/groups/python.malaysia/"
+        },
+        {
+            "name" : "Malaysia Chinese Linux User Group",
+            "description" : "N/A",
+            "role" : [
+                {
+                    "title" : "Facebook Group Admin",
+                    "description" : "N/A",
+                    "date" : "September 2012 - Now"
+                }
+            ],
+            "date" : "September 2012 - Now",
+            "link" : "https://www.facebook.com/groups/myclug/"
+        },
         {
             "name" : "Google Student Ambassador",
             "description" : "N/A",
@@ -77,7 +125,7 @@
                 }
             ],
             "date" : "May 2014 - May 2015",
-            "link" : "http://www.google.com/edu/programs/student-ambassador-program/"
+            "link" : "https://www.google.com/edu/programs/student-ambassador-program/"
         },
         {
             "name" : "Leo Club of GeorgeTown Central",
@@ -100,27 +148,85 @@
                 }
             ],
             "date" : "June 2010 - June 2015",
-            "link" : "http://leogtcentral.wordpress.com/"
+            "link" : "https://leogtcentral.wordpress.com/"
         }
     ],
-    "project" : [
+    "projects" : [
+        {
+            "name" : "Pollen Stores",
+            "company": "Pollen Tech Pte Ltd",
+            "short" : "Spread Commerce Everywhere",
+            "link" : "https://pollenstores.co/",
+            "year": "March 2018 - April 2018",
+            "contribution": "1. Create staging and production environment;\n2. Submit Apps to Play Store and App Store;\n3. Revamp whole user interface and app flow;\n4. Third party integration - Branch, Zendesk, Typeform;\n5. Bug fixes"
+        },
+        {
+            "name" : "Bilingua",
+            "company": "Creatella Pte Ltd",
+            "short" : "Platform for users to exchange languages.",
+            "description": "Language exchange app for foreign language conversation practice. Chat, play and learn with native speakers. Find the best conversation exchange partners!",
+            "link" : "https://bilingua.io/",
+            "year": "March 2018 - April 2018",
+            "contribution": "My task in this project is to fix the Twilio Video WebRTC bugs for React Native app."
+        },
+        {
+            "name" : "TBSx3",
+            "company": "TBSx3 Pty Ltd",
+            "short" : "Blockchain for anti-counterfeit.",
+            "description": "Our blockchain technology and growing alliance of major supply chain companies will transform the logistics protecting exports, brand reputation, and consumers",
+            "link" : "https://tbsx3.com",
+            "year": "July 2017 - March 2018",
+            "contribution": "● In charge of Penang team hiring and development team project management;\n● Develop API services for Web app(Dashboard) and Mobile app;\n● Basic Gitlab CI/CD setup for testing and deploy apps into AWS, Rancher or Firebase."
+        },
+        {
+            "name" : "i-nie",
+            "company": "Lava X Technologies SDN BHD",
+            "short" : "social asset management app",
+            "description": "This app allows you to consolidate all your personal assets information and share it with your nominees. Keeping your nominees informed of the assets that you may have. Non Physical assets such as: - Banking accounts: Savings, Current or Fixed Deposits. - - Investments: Stocks, Mutual funds, etc - Insurance: General, Life, Medical, etc.",
+            "link" : "http://goo.gl/PdKYsf",
+            "year": "May 2017"
+        },
+        {
+            "name" : "Ryze Music",
+            "company": "Lava X Technologies SDN BHD",
+            "short" : "fundrasing platform for musician",
+            "description": "Ryze Music is a creative space for artists to pursue their musical passion and for fans to connect with the artists in their journey to the top. As an artist, share your story, your music, your vision. Get funding and produce your next single. Album. Concert. Tour.",
+            "link" : "https://ryzemusic.com",
+            "year": "March 2017",
+            "contribution": "It is a six weeks MVP project with mobile first responsive design requested by clients. The app is developed with MEAN(MongoDB, Express, AnuglarJS, Nodejs) stack with AgendaJS for the cronjob and MailGun for the mailing list."
+        },
+        {
+            "name" : "Superday",
+            "company": "Toggl OU",
+            "short" : "Categorise user daily activities and provide reports.",
+            "description": "Save time with this robust lifelogging app for iPhone that focuses on improving daily productivity. Superday shows where your time leaks and suggests fixes.",
+            "link" : "https://superday.toggl.com/",
+            "year": "March 2017",
+            "contribution": "The app developed in RxSwift and MVVM architecture for better code management and functionality. My tasks in the project are to fix bugs and improve user experiences. Besides that, I helped to implement a wheel system for choosing the category."
+        },
         {
             "name" : "TABLEAPP Merchant",
+            "company": "TABLEAPP SDN BHD",
             "description" : "A multi-languages iOS application for Restaurant Manager to manage reservations, rest time.",
-            "link" : "https://itunes.apple.com/us/app/tableapp-manager/id991599725?ls=1&mt=8"
+            "link" : "https://itunes.apple.com/us/app/tableapp-manager/id991599725?ls=1&mt=8",
+            "year": "April 2015 - July 2015"
         },
         {
             "name" : "ConnectIn.Events",
+            "company": "N/A",
             "description" : "A platform to connect people in events. It is my first try for iOS developemnt, there is a lot way to improve the app, basically I need to re-do the whole app due to the iniatiate way of building the app is a really bad practise.",
-            "link" : "http://connectin.events.cy.my"
+            "link" : "http://connectin.events.cy.my",
+            "discontinued": true
         },
         {
             "name" : "INTI.tk",
-            "description" : "Centralize websites for campus related information. Discontinued due to the website doesn't align with INTI strategies.",
-            "link" : "http://intechclub.blogspot.com"
+            "company": "N/A",
+            "description" : "Centralize websites for campus related information. Discontinued due to the website doesn't align with the campus strategies.",
+            "link" : "http://intechclub.blogspot.com",
+            "discontinued": true
         }
     ],
-    "award" : [
+    "awards" : [
         {
             "name" : "CPEH",
             "description" : "",
@@ -128,29 +234,25 @@
             "link" : "mile2.com"
         }
     ],
-    "skill" : [
-        "C/C++", "Python", "HTML", "CSS", "Javascript", "Game Development", "3D Modeling"
+    "skills" : [
+        "Python", "HTML", "CSS", "Javascript", "3D Modeling"
     ],
-    "language" : [
+    "spoken_languages" : [
         {
             "name" : "English",
-            "proficiency" : "Fluent",
-            "type": "language"
+            "proficiency" : "Fluent"
         },
         {
             "name" : "Chinese",
-            "proficiency" : "Native",
-            "type": "language"
+            "proficiency" : "Native"
         },
         {
             "name" : "Malay",
-            "proficiency" : "Communicatable",
-            "type": "language"
+            "proficiency" : "Beginner"
         },
         {
             "name" : "Japanese",
-            "proficiency" : "Beginner",
-            "type": "language"
+            "proficiency" : "Beginner"
         }
     ]
 }
