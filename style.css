@@ -1,42 +1,17 @@
 body {
+	display: flex;
+	flex-direction: column;
 	font-family: times;
-	width: 710px;
+	width: 100vw;
 	margin: auto;
 	padding: 50px 0;
-	background-image: url(bg.png);
+	background-image: url(resources/bg.png);
 	background-attachment: fixed;
+	overflow-x: hidden;
 }
 
-.img-circle {
-	margin: center;
-}
-
-.img-circle img {
-	border-radius: 50%;
-	box-shadow: 1px 1px 50px #888888;
-	width: 180px;
-    height: 180px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-h1 {
-	margin-top: 0;
-	font-size: 70px;
-	font-weight: 200;
-	font-family: 'Dancing Script', cursive;
-	text-align: center;
-	
-}
-
-h2 {
-	font-size: 30px;
-	text-transform: uppercase;
-	font-weight: 200;
-	border-left: 4px solid #fe57a1;
-	padding-left: 1.0em;
-	font-family: 'Text Me One', sans-serif;
+footer {
+	margin-top: 50px;
 }
 
 p {
@@ -46,12 +21,62 @@ p {
   padding: 5px 0;
 }
 
-#list {
-	font-size: 18px;
+h1 {
 	font-weight: 300;
-	margin: 5px 40px;
+  font-size: 18px;
 	padding: 5px 0;
-	padding-left: 5.0em;
+	text-align: center;
+}
+
+h2 {
+	font-size: 30px;
+	text-transform: uppercase;
+	font-weight: 200;
+	border-left: 4px solid #9370db;
+	padding-left: 1.0em;
+	font-family: 'Text Me One', sans-serif;
+}
+
+h3 {
+	margin-top: 0;
+	font-size: 70px;
+	font-weight: 200;
+	font-family: cursive;
+}
+
+.header, .main {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.header img {
+	border-radius: 50%;
+	box-shadow: 1px 1px 50px #888888;
+	width: 180px;
+	height: 180px;
+	display: block;
+}
+
+.main {
+	align-items: flex-start;
+}
+
+
+
+
+@media screen and (min-width: 400px) {
+  body {
+    margin-left: 0px;
+    margin-right: 0px;
+	}
+}
+
+@media screen and (min-width: 800px) {
+  body {
+    width: 800px;
+    margin: auto;
+	}
 }
 
 #nav {
@@ -89,34 +114,5 @@ p {
 
 #nav a:hover, #nav a.current:hover{
     color: #ffffff;
-    background: #408ad2;
-}
-
-a {
-	color: black;
-	text-decoration: none;
-	font-weight: 300;
-}
-
-a:visited {
-	color: black;
-}
-
-a:hover {
-	color: orange;
-}
-
-#projects {
-	font-size: 18px;
-	font-weight: 300;
-	margin: 5px 40px;
-	padding: 5px 0;
-}
-
-table {
-    border-collapse: collapse;
-}
-
-table, tr, td {
-	vertical-align: top;
+    background: #9370db;
 }
