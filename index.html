@@ -1,47 +1,163 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="thumbnail" content="resources/favicon.png">
-	<meta name="description" content="CY is a Full Stack JavaScript Software Engineer who is working remotely in South East Asia.">
-  <meta name="keywords" content="HTML,CSS,JavaScript,JS,Digital Nomad,Remote Working">
-	<meta name="author" content="CY Lim">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="p:domain_verify" content="006fe72c99b1a79d71240d11c25793aa"/>
-	<meta name="twitter:card" value="summary">
-	<meta property="og:title" content="Cy - Software Engineer, a digital nomad who working remotely." />
-	<meta property="og:type" content="article" />
-	<meta property="og:url" content="https://cy.my/" />
-	<meta property="og:image" content="https://cy.my/resources/profile.png" />
-	<meta property="og:description" content="CY is a Full Stack JavaScript Software Engineer who is working remotely in South East Asia." />
-	
-	<title>Cy - Software Engineer, a digital nomad who working remotely.</title>
-	
-	<link rel="shortcut icon" type="image/x-icon" href="resources/favicon.png">
-	<link rel="stylesheet" href="style.css">
-	<link href='http://fonts.googleapis.com/css?family=Text+Me+One' rel='stylesheet' type='text/css'>
-</head>
-<body>
-	<div class='header'>
-		<img src="resources/profile.png" />
-		<h3>CY Lim</h3>
-	</div>
-	
-	<div class="main">
-		<h2>About Me</h2>
-		<p>I am a full stack software engineer who recently decided to quit full-time jobs and start freelancing.</p>
-		<p>Primarily working with JavaScript, especially React and Node.js. I am also capable of building the Continuous Integration and Deployment pipelines and increasing the site reliability.</p>
-		
-	</div>
-</body>
+<!doctype html>
+<html lang="en" data-mode="static">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>CY Lim, software engineer in Penang</title>
+    <meta
+      name="description"
+      content="Software engineer in Penang, Malaysia. I build React and TypeScript web apps and web3 frontends, and practise fengshui and Qimen Dunjia."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://cy.my/" />
+    <!-- theme-color is tokens.color.paper; the DOM layer swaps it to night inside the cabin. -->
+    <meta name="theme-color" content="#EEE8DB" />
+    <meta name="color-scheme" content="light" />
+    <meta name="p:domain_verify" content="006fe72c99b1a79d71240d11c25793aa" />
 
-<footer>
-	<ul id="nav">
-		<li><a title="BLOG" href="https://cy.my/blog">Blog</a></li>
-		<li><a title="GitHub" href="https://l.cy.my/github">GitHub</a></li>
-		<li><a title="Twitter" href="https://l.cy.my/twitter">Twitter</a></li>
-		<li><a title="Linkedin" href="https://l.cy.my/in">Linkedin</a></li>
-	</ul>
-	<h1>Software Engineer, a digital nomad who working remotely.</h1>
-</footer>
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cy.my/" />
+    <meta property="og:title" content="CY Lim · A walk into the mist" />
+    <meta
+      property="og:description"
+      content="Scroll through an ink-wash forest. Selected work in a cabin, a live Qimen Dunjia chart in a grove, and a lantern at the end of the path."
+    />
+    <meta property="og:image" content="https://cy.my/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="CY Lim, with the line “The parts of software people touch. Web, mobile and web3, since 2017.”, under pine trees in ink-wash mist." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@seewhy" />
+
+    <link rel="me" href="https://github.com/cylim" />
+    <link rel="me" href="https://x.com/seewhy" />
+    <link rel="me" href="https://www.linkedin.com/in/cylim226" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!--
+      The two Latin faces the first screen draws are preloaded (design.md §3), but only on a tab's first
+      page load. A later load in the same tab (a deep link, the album switch, a reload) finds them in the
+      renderer's memory cache: the @font-face takes them from there straight away, so nothing swaps, and
+      a static preload would go unconsumed and log "preloaded but not used" (wave-2 L7). The rest swap in
+      later. With JavaScript off the stylesheet loads them as usual.
+      Every script here carries data-cfasync="false": Cloudflare's Rocket Loader, on for the cy.my zone,
+      would otherwise defer these pre-paint scripts and the album would paint before the walk (QM-D3).
+    -->
+    <script data-cfasync="false">
+      ;(function () {
+        try {
+          if (sessionStorage.getItem('cy.fontsPreloaded')) return
+          sessionStorage.setItem('cy.fontsPreloaded', '1')
+        } catch (e) {}
+        ;['cormorant-garamond-600', 'source-serif-4-400'].forEach(function (name) {
+          var l = document.createElement('link')
+          l.rel = 'preload'
+          l.as = 'font'
+          l.type = 'font/woff2'
+          l.crossOrigin = 'anonymous'
+          l.href = '/fonts/' + name + '.woff2'
+          document.head.appendChild(l)
+        })
+      })()
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "CY Lim",
+        "alternateName": "Chee Yeong Lim",
+        "jobTitle": "Software Engineer",
+        "url": "https://cy.my/",
+        "address": { "@type": "PostalAddress", "addressLocality": "Penang", "addressCountry": "MY" },
+        "alumniOf": { "@type": "CollegeOrUniversity", "name": "University of Wollongong" },
+        "knowsLanguage": ["English", "Chinese", "Cantonese", "Malay", "Japanese"],
+        "sameAs": ["https://github.com/cylim", "https://x.com/seewhy", "https://www.linkedin.com/in/cylim226"]
+      }
+    </script>
+
+    <!--
+      Render mode before first paint (stack.md §2, design.md §13.2, §14.1). The album is the CSS
+      default, so no-JS visitors get it for free. The album shows when there is no WebGL2, Save-Data is
+      on, deviceMemory ≤ 2, the visitor picked "Still version", or reduced motion is on without an
+      opt-in; "Walk the forest" (cy.prefs mode = immersive) opts back in everywhere WebGL2 exists.
+      The reason goes on <html data-static-reason> for the album banner. Keep the prefs key and shape
+      in sync with src/core/boot/prefs.ts.
+      A deep link into the walk starts in full paper and only emerges (design.md §6.2), so the veil goes
+      up here, before the section top can paint. src/dom/bindings.ts takes the veil over and clears
+      data-veil once the app runs; if it never does, the timeout lifts it so the page is never covered.
+    -->
+    <script data-cfasync="false">
+      ;(function () {
+        var d = document.documentElement
+        var r = ''
+        try {
+          var n = navigator
+          var prefs = JSON.parse(localStorage.getItem('cy.prefs') || '{}') || {}
+          var optIn = prefs.mode === 'immersive'
+          if (!('WebGL2RenderingContext' in window)) r = 'nowebgl'
+          else if (prefs.mode === 'static') r = 'pref'
+          else if (!optIn && n.connection && n.connection.saveData) r = 'saveData'
+          else if (!optIn && n.deviceMemory && n.deviceMemory <= 2) r = 'memory'
+          else if (!optIn && matchMedia('(prefers-reduced-motion: reduce)').matches) r = 'reduced'
+          var q = new URLSearchParams(location.search).get('mode')
+          if (q === 'immersive') r = ''
+          else if (q === 'static') r = r || 'param'
+        } catch (e) {
+          r = 'error'
+        }
+        d.setAttribute('data-mode', r ? 'static' : 'immersive')
+        if (r) d.setAttribute('data-static-reason', r)
+        if (!r && /^#(cabin|grove|contact)$/.test(location.hash)) {
+          d.setAttribute('data-veil', '')
+          setTimeout(function () {
+            d.removeAttribute('data-veil')
+          }, 4000)
+        }
+      })()
+    </script>
+    <!--
+      Album visits only: its largest paint is the first leaf's still, a lazy img (the walk prerenders
+      it too, hidden, and must not download it), so preload it at high priority as soon as the mode is
+      known (QM-P5). Same files and sizes as <Still id="T0" priority> (src/dom/album/Still.tsx,
+      src/content/stills.ts); src/dom/album/still.test.ts keeps them in step.
+    -->
+    <script data-cfasync="false">
+      ;(function () {
+        if (document.documentElement.getAttribute('data-mode') !== 'static') return
+        if (location.hash && location.hash !== '#threshold') return
+        try {
+          ;[
+            ['(max-width: 767.98px)', '/stills/T0-portrait-800.avif', ''],
+            ['(min-width: 768px)', '/stills/T0-800.avif 800w, /stills/T0-1600.avif 1600w', '(min-width: 768px) 55vw, 100vw'],
+          ].forEach(function (p) {
+            var l = document.createElement('link')
+            l.rel = 'preload'
+            l.as = 'image'
+            l.type = 'image/avif'
+            l.media = p[0]
+            l.setAttribute('imagesrcset', p[1])
+            if (p[2]) l.setAttribute('imagesizes', p[2])
+            l.setAttribute('fetchpriority', 'high')
+            document.head.appendChild(l)
+          })
+        } catch (e) {}
+      })()
+    </script>
+    <style>
+      html[data-veil] #veil {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage" aria-hidden="true"></div>
+    <!-- Before #root, so a pre-paint veil (data-veil) is parsed before any content can paint. -->
+    <div id="veil" aria-hidden="true"></div>
+    <div id="root"><!--content--></div>
+    <script type="module" src="/src/main.tsx" data-cfasync="false"></script>
+  </body>
 </html>

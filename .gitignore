@@ -1,3 +1,23 @@
 node_modules
-
+dist
+dist-ssr
+.fonts-src
+shots
+test-results
+playwright-report
+blob-report
+/tmp
+*.tsbuildinfo
+.vite
 .DS_Store
+
+# Planning material kept local; the committed docs are design.md, stack.md, contracts.md,
+# calendar.md, qimen-spec.md, qimen-vectors.json and deploy-runbook.md.
+/docs/plan/content.md
+/docs/plan/content.draft.ts
+/docs/plan/design-cinematic.md
+/docs/plan/design-craft.md
+/docs/plan/design-usable.md
+/docs/plan/qimen-spec-A.md
+/docs/plan/qimen-spec-B.md
+/docs/plan/wave*-status.md

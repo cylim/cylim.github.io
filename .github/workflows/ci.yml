@@ -1,0 +1,81 @@
+name: CI
+
+# Same gates as deploy.yml on every pull request, plus the Playwright suite (stack.md §10, §12).
+# Smoke assertions gate the PR. Visual diffs (tests tagged @visual) are advisory until baselines
+# from this runner's bundled Chromium are committed.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test -- --run
+      - run: npm run check:glyphs
+      - run: npm run build
+      - run: npm run check:budget
+      # Keep the maps for debugging failures, then test exactly what deploy.yml would publish.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sourcemaps
+          path: dist/**/*.map
+          retention-days: 7
+      - run: npm run prune:dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+
+  e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - run: npx playwright install --with-deps chromium
+      - name: Smoke (gating)
+        run: npm run e2e -- --grep-invert @visual --output test-results/smoke
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/smoke
+      - name: Visual diffs (advisory)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: npm run e2e -- --grep @visual --output test-results/visual
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/visual
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          # The snapshot folders carry baselines written by this runner's Chromium: commit them from here.
+          path: |
+            playwright-report
+            test-results
+            tests/e2e/*-snapshots
+          retention-days: 14

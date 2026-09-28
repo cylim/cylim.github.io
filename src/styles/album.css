@@ -1,0 +1,249 @@
+/*
+ * The album (design.md §14.1): the static version, and the layout no-JS visitors get. Same HTML and
+ * order as the walk. One leaf per section on paper, mounted on paper-mount with a 1 px ink-dan
+ * hairline; desktop leaves alternate painting and text 55/45, phones stack the painting over the text.
+ * The cabin leaf is the only dark one.
+ */
+
+html[data-mode='static'] {
+  background: var(--paper-mount);
+}
+
+html[data-mode='static'] main {
+  padding: var(--header-block) 0 3rem;
+}
+
+.card-track,
+.card-frame {
+  display: contents;
+}
+
+.album-only {
+  margin-bottom: 1.25rem;
+}
+
+html[data-mode='static'] .card-extra,
+html[data-mode='static'] .finale-seal ~ .scroll-cue {
+  display: none;
+}
+
+.leaf {
+  display: grid;
+  grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  width: min(76rem, 94vw);
+  margin: 2.5rem auto 0;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  border: 1px solid var(--ink-dan);
+  background: var(--paper);
+  scroll-margin-top: var(--header-block);
+}
+
+.leaf:nth-of-type(even) .leaf-art {
+  order: 2;
+}
+
+.leaf-art {
+  position: sticky;
+  top: calc(var(--header-block) + 1.5rem);
+  align-self: start;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.leaf-text {
+  display: grid;
+  /* One track that never grows past the leaf: a wide child (the live terminal's input, a long link)
+     wraps or shrinks instead of widening the page (§15, WCAG 1.4.10 at 320 px and at 200% text). */
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 2.25rem;
+}
+
+html[data-mode='static'] .leaf-text > .beat:empty {
+  display: none;
+}
+
+.leaf-inscription .inscription-zh {
+  font-family: var(--font-cjk-display);
+  font-size: var(--fs-section-cjk);
+  line-height: var(--lh-section-cjk);
+}
+
+.leaf-inscription {
+  opacity: var(--alpha-inscription);
+}
+
+/* Stills: a fixed aspect ratio, painted mist until the image arrives or if it never does. */
+.still {
+  margin: 0;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--ink-dan);
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 62%, var(--paper-light), transparent 70%),
+    linear-gradient(to bottom, var(--paper) 0%, var(--paper-shade) 55%, var(--ink-qing) 100%);
+}
+
+/* With JS off a missing still can't swap to the mist; at least hide the broken-image alt rendering. */
+.still img {
+  color: transparent;
+  font-size: 0;
+}
+
+.still img,
+.still-mist {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-hero .hero-mark {
+  margin-top: 0.25rem;
+}
+
+html[data-mode='static'] .card-hero {
+  padding-top: 0.5rem;
+}
+
+/* ------------------------------------------------------------------ the dark cabin leaf */
+
+html[data-mode='static'] .leaf-cabin {
+  border-color: var(--cyan-ghost);
+  background-color: var(--night);
+  /* A faint trace pattern: grain lines and 45° runs, never a grid. */
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 57px, color-mix(in srgb, var(--cyan-ghost) 40%, transparent) 57px 58px, transparent 58px 131px),
+    repeating-linear-gradient(45deg, transparent 0 89px, color-mix(in srgb, var(--cyan-ghost) 25%, transparent) 89px 90px, transparent 90px 211px);
+  color: var(--cyan-soft);
+}
+
+html[data-mode='static'] .leaf-cabin .still {
+  border-color: var(--cyan-ghost);
+  background: linear-gradient(to bottom, var(--night-panel), var(--night));
+}
+
+html[data-mode='static'] .leaf-cabin .leaf-inscription,
+html[data-mode='static'] .leaf-cabin h2,
+html[data-mode='static'] .leaf-cabin h3,
+html[data-mode='static'] .leaf-cabin .timeline caption,
+.card-night h2,
+.card-night h3,
+.card-night .timeline caption {
+  color: var(--cyan-line);
+}
+
+html[data-mode='static'] .leaf-cabin .label,
+html[data-mode='static'] .leaf-cabin .work-meta,
+html[data-mode='static'] .leaf-cabin .tags,
+.card-night .label,
+.card-night .tags {
+  color: var(--cyan-dim);
+}
+
+html[data-mode='static'] .leaf-cabin .work-meta,
+.card-night .work-meta,
+.card-night {
+  color: var(--cyan-soft);
+}
+
+html[data-mode='static'] .leaf-cabin a,
+.card-night a,
+.card-night .work-more summary {
+  color: var(--cyan-bright);
+}
+
+html[data-mode='static'] .leaf-cabin .zh,
+.card-night .zh {
+  text-decoration-color: var(--cyan-dim);
+}
+
+html[data-mode='static'] .leaf-cabin .term-open,
+.card-night .term-open {
+  border-color: var(--cyan-dim);
+  color: var(--cyan-line);
+}
+
+html[data-mode='static'] .leaf-cabin .term-open:hover,
+.card-night .term-open:hover {
+  background: var(--night-panel);
+}
+
+.card-night .timeline th {
+  color: var(--cyan-line);
+}
+
+/* ------------------------------------------------------------------ grove leaf */
+
+.album-chart-frame {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+/* ------------------------------------------------------------------ finale leaf */
+
+html[data-mode='static'] .card-finale {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0 1.5rem;
+  align-items: start;
+}
+
+html[data-mode='static'] .card-finale > .album-only {
+  grid-column: 1 / -1;
+}
+
+html[data-mode='static'] .card-finale .colophon {
+  display: contents;
+}
+
+html[data-mode='static'] .finale-seal {
+  grid-column: 1 / -1;
+  justify-self: end;
+}
+
+html[data-mode='static'] .site-footer {
+  width: min(76rem, 94vw);
+  margin: 1.5rem auto 0;
+  padding-bottom: 2rem;
+}
+
+/* ------------------------------------------------------------------ phones: the painting over the text */
+
+@media (max-width: 767.98px) {
+  html[data-mode='static'] main {
+    padding-top: 0;
+  }
+
+  html[data-mode='static'] body {
+    padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+  }
+
+  .leaf {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    margin-top: 0;
+    border-width: 0 0 1px;
+    padding: 2rem 5vw;
+    /* No header bar on phones (the nav is the bottom bar), so a jump lands the leaf at the very top. */
+    scroll-margin-top: 0;
+  }
+
+  .leaf:nth-of-type(even) .leaf-art {
+    order: 0;
+  }
+
+  .leaf-art {
+    position: static;
+  }
+
+  .still {
+    aspect-ratio: 4 / 5;
+  }
+
+  .album-banner {
+    margin-top: calc(env(safe-area-inset-top) + 60px);
+  }
+}

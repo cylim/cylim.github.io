@@ -1,0 +1,1003 @@
+/*
+ * The walk (html[data-mode='immersive']), design.md §6.2 and §6.4: each section is its jvh length in
+ * svh; each beat is a div of its jvh length whose card sits in a sticky one-viewport frame (see
+ * src/dom/cards.ts for the track maths). Card opacity is written per frame by src/dom/bindings.ts.
+ * Zones: L and R are 30rem columns 6vw in, vertically centred; pane is the terminal; panel is the grove
+ * chart on the right third; mount is the finale's left mount. Under 768 px every zone is B.
+ */
+
+/* The scroll position is the camera; the browser must never nudge it when late content lays out. */
+html[data-mode='immersive'] {
+  overflow-anchor: none;
+  /* Inscription glyph size: the token, capped by height so cards below it keep their room. */
+  --insc: min(var(--fs-section-cjk), 9svh);
+  /* One paper-mount panel beside the finale's centred 3:4 window (§8.7 E2). */
+  --mount-w: max(0px, calc(50vw - 37.5svh));
+}
+
+html[data-mode='immersive'] main > section {
+  position: relative;
+  display: block;
+  width: auto;
+  height: calc(var(--h) * 1svh);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+html[data-mode='immersive'] .leaf-text {
+  display: block;
+}
+
+html[data-mode='immersive'] .leaf-art,
+html[data-mode='immersive'] .album-only {
+  display: none;
+}
+
+html[data-mode='immersive'] .beat {
+  position: relative;
+  height: calc(var(--span) * 1svh);
+}
+
+html[data-mode='immersive'] .card-track {
+  position: absolute;
+  display: block;
+  inset: 0 0 auto;
+  height: calc((var(--track) + 100) * 1svh);
+  pointer-events: none;
+}
+
+html[data-mode='immersive'] .card-frame {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  height: 100svh;
+  padding: calc(var(--header-block) + 1.5rem) var(--zone-inset) 2.5rem;
+}
+
+html[data-mode='immersive'] .card-frame.zone-R,
+html[data-mode='immersive'] .card-frame.zone-panel {
+  align-items: flex-end;
+}
+
+html[data-mode='immersive'] .card-frame.zone-pane {
+  align-items: center;
+}
+
+/* The colophon writes itself in the empty upper left, on the left mount (§8.7 E3). */
+html[data-mode='immersive'] .card-frame.zone-mount {
+  justify-content: flex-start;
+  padding-left: 1.5rem;
+}
+
+/* The section inscription stands above these cards (§4.1); centre them in the space below it. */
+html[data-mode='immersive'] .card-frame[data-under] {
+  padding-top: calc(var(--header-block) + 1.25rem + 2 * var(--insc) + 1.25rem);
+}
+
+html[data-mode='immersive'] .card {
+  position: relative;
+  isolation: isolate;
+  width: min(var(--zone-w), 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: auto;
+  pointer-events: auto;
+  transition: opacity 120ms linear;
+}
+
+html[data-mode='immersive'] .card[data-off],
+html[data-mode='immersive'] .card-extra[data-off] {
+  pointer-events: none;
+}
+
+/*
+ * Keyboard focus in a hidden card glides the walk to where the card shows (bindings.ts
+ * bindFocusFollow), and the card fades in with the scroll. Should focus stay in a card the walk can't
+ * show (the visitor scrolled the glide away), it reveals the card whatever the scroll says; not during
+ * the glide itself, or the card would float over the one being left. A dive hides them all (§11.1).
+ * A jump's programmatic focus on a section heading (tabindex -1) doesn't count: #cabin lands on I1,
+ * and the heading's C1 card must not light up over it. Nor does a control that glides the walk
+ * somewhere else ("Read the chart", "Open the door"): its card fades with the glide instead of riding
+ * along over the plan view or through the door.
+ */
+html[data-mode='immersive']:not([data-focus-glide])
+  .card:focus-within:not(:has([tabindex='-1']:focus, [data-scroll-jvh]:focus)) {
+  opacity: 1 !important;
+}
+
+html[data-mode='immersive'][data-dive] .card,
+html[data-mode='immersive'][data-dive] .card-extra {
+  opacity: 0 !important;
+  transition: opacity var(--dur-card-fade) ease;
+}
+
+/*
+ * Mist pocket (§4.3): paper at 85% behind every exterior card, feathered out by a spread shadow, and
+ * drawn further toward the scene so it thins out like a mist band instead of ending in an edge. A
+ * shadow is never clipped by the card's own overflow, so a card that outgrows its frame (large text)
+ * scrolls inside itself and keeps its mist. With the paper text-shadow body text stays above 4.5:1.
+ */
+html[data-mode='immersive'] .card:not(.card-night, .card-panel) {
+  --mist: color-mix(in srgb, var(--paper) calc(var(--alpha-mist-pocket) * 100%), transparent);
+  --mist-thin: color-mix(in srgb, var(--paper) 45%, transparent);
+  --toward-scene: 1;
+  padding: 1.5rem 1.75rem;
+  border-radius: var(--mist-pocket-feather);
+  background: var(--mist);
+  /* Spread equal to the blur keeps the shadow at the card's own opacity where they meet: no seam. */
+  box-shadow:
+    0 0 var(--mist-pocket-feather) var(--mist-pocket-feather) var(--mist),
+    calc(var(--toward-scene) * var(--mist-pocket-feather) * 2) 0 calc(var(--mist-pocket-feather) * 2.5)
+      var(--mist-pocket-feather) var(--mist-thin);
+  text-shadow: 0 0 14px var(--paper);
+}
+
+html[data-mode='immersive'] .zone-R > .card:not(.card-night, .card-panel) {
+  --toward-scene: -1;
+}
+
+html[data-mode='immersive'] main {
+  overflow-x: clip;
+}
+
+html[data-mode='immersive'] .card-hero {
+  width: min(calc(var(--zone-w) + var(--fs-hero-cjk) + 3rem), 100%);
+}
+
+html[data-mode='immersive'] .card-extra {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ cabin interior cards (§4.3, §8.4) */
+
+html[data-mode='immersive'] .beat[data-beat='I2d'] .card {
+  width: min(36rem, 100%);
+}
+
+html[data-mode='immersive'] .card-night {
+  padding: 1.25rem 1.5rem 1rem;
+  border: 1px solid var(--cyan-ghost);
+  border-radius: var(--cabin-card-radius);
+  background: color-mix(in srgb, var(--night-panel) calc(var(--alpha-night-panel) * 100%), transparent);
+}
+
+/* The timeline rolls up through zone R like end credits (§8.4 I4); --roll is 0..1 across its window. */
+html[data-mode='immersive'] .card-credits {
+  max-height: none;
+  overflow: visible;
+  transform: translateY(calc((1 - var(--roll, 0)) * 60svh + var(--roll, 0) * (35svh - 100%)));
+}
+
+html[data-mode='immersive'] .card-terminal {
+  width: min(44rem, 100%);
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* Over the pane the terminal is its own label; the heading stays for screen readers. */
+@media (min-width: 768px) {
+  html[data-mode='immersive'] .card-terminal .terminal-section > h3 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ------------------------------------------------------------------ grove chart panel (§8.6 G3) */
+
+html[data-mode='immersive'] .card-panel {
+  width: min(34rem, 36vw);
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--ink-qing);
+  border-radius: var(--cabin-card-radius);
+  background: color-mix(in srgb, var(--paper-light) 94%, transparent);
+}
+
+html[data-mode='immersive'] .card-frame.zone-panel {
+  padding-right: calc(var(--progress-inset) + 1.75rem);
+}
+
+html[data-mode='immersive'] .read-chart {
+  margin: 0.25rem 0 0.75rem;
+}
+
+html[data-mode='static'] .read-chart {
+  display: none;
+}
+
+/* C1's quiet twin of the door click (§8.3, §15): a text button, so the card stays one line and a
+   heading. The album has no door to open. */
+.open-door {
+  display: none;
+}
+
+html[data-mode='immersive'] .open-door {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-target);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 600;
+  color: var(--ink-jiao);
+  text-decoration: underline;
+  text-decoration-color: var(--ink-dan);
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+html[data-mode='immersive'] .open-door:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ------------------------------------------------------------------ finale (§8.7 E2–E3) */
+
+html[data-mode='immersive'] .card-finale {
+  width: min(calc(50vw - 37.5svh - 3rem), var(--zone-w));
+  min-width: 14rem;
+}
+
+/* The colophon writes itself once per visit (§8.7 E3): Finale.tsx sets html[data-colophon]. */
+html[data-mode='immersive'] .colophon {
+  visibility: hidden;
+}
+
+html[data-mode='immersive'][data-colophon] .colophon {
+  visibility: visible;
+}
+
+html[data-mode='immersive'][data-colophon] .colophon-ch {
+  animation: ink-in var(--dur-inscription) ease-out calc(var(--i) * 90ms) both;
+}
+
+html[data-mode='immersive'][data-colophon] .colophon-en {
+  animation: ink-in var(--dur-inscription) ease-out calc(var(--n) * 90ms) both;
+}
+
+@keyframes ink-in {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+
+/* WebGL context lost: the stretch's still stands where the canvas was (§13.3, LostStill.tsx). */
+.lost-still {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.lost-still .still {
+  height: 100%;
+  aspect-ratio: auto;
+  border: 0;
+}
+
+.lost-still .still[data-still='I1'] {
+  background: linear-gradient(to bottom, var(--night-panel), var(--night));
+}
+
+.finale,
+.map-pins {
+  display: none;
+}
+
+html[data-mode='immersive'] .finale {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+}
+
+/* The map pins' layer: the viewport, from inside the E3 card (Finale.tsx portals the pins here). */
+html[data-mode='immersive'] .map-pins {
+  position: fixed;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+/* Paper-mount panels slide in from both sides and leave a centred 3:4 window, an album leaf. */
+html[data-mode='immersive'] .mount {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--mount-w);
+  background: var(--paper-mount);
+  transition: transform 900ms var(--ease-out-cubic);
+}
+
+html[data-mode='immersive'] .mount-l {
+  left: 0;
+  border-right: 1px solid var(--ink-dan);
+  transform: translateX(-101%);
+}
+
+html[data-mode='immersive'] .mount-r {
+  right: 0;
+  border-left: 1px solid var(--ink-dan);
+  transform: translateX(101%);
+}
+
+html[data-mode='immersive'] .finale[data-open] .mount {
+  transform: none;
+}
+
+/*
+ * A map pin is an ink dot on the projected point and a label pill beside it, so a pin never covers
+ * what it names: the cabin's cyan speck is just below the Work point at E3. The dot is ink-jiao with a
+ * paper halo, not cinnabar: the finished painting holds exactly three points of colour, amber, cyan
+ * and the seal (design.md §2.5, §8.7; CD-7). The link itself is
+ * a zero-size box on the point; Finale.tsx places the label (--dx, --dy, from pins.ts) clear of the
+ * other pins and the speck, and a hairline leader ties each label to its own dot.
+ */
+.map-pin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  width: 0;
+  height: 0;
+  color: var(--ink-jiao);
+  text-decoration: none;
+  pointer-events: none;
+}
+
+.map-pin[data-visible] {
+  display: block;
+}
+
+.map-pin-label {
+  position: absolute;
+  top: var(--dy, calc(-1 * var(--min-target) - 6px));
+  left: var(--dx, 6px);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-target);
+  padding: 0 0.7rem;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--paper-light) 90%, transparent);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.map-pin:hover .map-pin-label {
+  background: var(--paper-light);
+  text-decoration: underline;
+}
+
+.map-pin:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.map-pin:focus-visible .map-pin-label {
+  outline: var(--focus-ring) solid var(--cinnabar);
+  outline-offset: var(--focus-offset);
+}
+
+.map-pin-dot {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  background: var(--ink-jiao);
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--paper-light) 85%, transparent);
+}
+
+.map-pin-leader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  width: var(--leader, 0px);
+  height: 1px;
+  background: var(--ink-zhong);
+  transform-origin: 0 50%;
+  transform: rotate(var(--leader-angle, 0deg));
+}
+
+.map-pin[data-side] .map-pin-leader {
+  display: block;
+}
+
+/*
+ * The seal stamps into the window's lower-right corner once per visit (§4.4, §8.7): Finale.tsx sets
+ * html[data-seal] and it never animates again. It lands from 1.06 and 1.5° onto its resting angle
+ * (baked into the file), darkens for a 120 ms press, 220 ms in all, then bleeds a 2 px ring of ink
+ * into the paper over 400 ms. No bounce.
+ */
+html[data-mode='immersive'] .finale-seal {
+  position: fixed;
+  right: calc(50vw - 37.5svh + 1.5rem);
+  bottom: 1.5rem;
+  visibility: hidden;
+}
+
+html[data-mode='immersive'][data-seal] .finale-seal {
+  visibility: visible;
+  animation: seal-bleed var(--dur-seal-bleed) ease-out var(--dur-seal) both;
+}
+
+html[data-mode='immersive'][data-seal] .finale-seal .seal {
+  animation: stamp var(--dur-seal) linear both;
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(1.06) rotate(1.5deg);
+    animation-timing-function: var(--ease-out-cubic);
+  }
+  45% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  75% {
+    filter: brightness(0.78);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes seal-bleed {
+  from {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  to {
+    filter: drop-shadow(0 0 2px color-mix(in srgb, var(--cinnabar) 45%, transparent));
+  }
+}
+
+/* At E3 the stele card moves onto the right mount with the link rows, Walk again and the footer.
+   Contact.tsx renders Walk again twice; a phone's finale uses the copy under the colophon. */
+.finale-links {
+  display: none;
+}
+
+html[data-mode='static'] .finale-links-card,
+html[data-mode='immersive'] .finale-links-card {
+  display: flex;
+}
+
+/* Before E3 they wait out of sight under the rows, still the next Tab after Blog, and show while
+   they have focus, so a keyboard walk reaches them before the footer (§15: tab order is reading
+   order). */
+html[data-mode='immersive']:not([data-beat='E3']) .finale-links-card:not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) and (min-aspect-ratio: 1/1) {
+  /* On the mounts the cards sit on paper-mount, not on the painting: no mist pocket. The stele card
+     moves onto the right mount as soon as the mounts slide in (Finale.tsx sets html[data-mounts]
+     from E2), not at E3, or it straddles the left mount and the window in between. */
+  html[data-mode='immersive']:is([data-beat='E3'], [data-mounts]) .card-contact,
+  html[data-mode='immersive'] .card.card-finale:not(.card-night) {
+    background: none;
+    box-shadow: none;
+    text-shadow: none;
+  }
+
+  /*
+   * Both cards stay on their mount at any text size (§15: 200% text, A11Y-5): the column is the mount
+   * less 24 px either side (px, like the mount), its padding gives way first, and a card that still
+   * doesn't fit scrolls inside itself. It never reaches into the painting, and the stele card stops
+   * above the footer (Finale.tsx measures --footer-h). At 100% on 1280 × 800 nothing moves.
+   */
+  html[data-mode='immersive']:is([data-beat='E3'], [data-mounts]) .beat[data-beat='E1'] .card-frame {
+    justify-content: flex-start;
+    padding-top: calc(var(--header-block) + 32px);
+    padding-bottom: max(6rem, calc(20px + var(--min-target) + 0.75rem + var(--footer-h, 0px) + 0.5rem));
+  }
+
+  /* The footer keeps to the right mount too (its padding and alignment are the base rule's below). */
+  html[data-mode='immersive'] .site-footer {
+    width: var(--mount-w);
+  }
+
+  html[data-mode='immersive']:is([data-beat='E3'], [data-mounts]) .card-contact .social-display {
+    padding-left: 0;
+    text-align: left;
+    flex-basis: 100%;
+  }
+
+  html[data-mode='immersive']:is([data-beat='E3'], [data-mounts]) .card-contact {
+    width: min(calc(var(--mount-w) - 48px), var(--zone-w));
+    min-width: 0;
+    padding-inline: clamp(0px, calc(var(--mount-w) - 48px - 15rem), 28px);
+    padding-bottom: 0;
+    margin-left: auto;
+    transform: translateX(calc(var(--zone-inset) - 24px));
+  }
+
+  html[data-mode='immersive'] .card-frame.zone-mount {
+    padding-left: 24px;
+  }
+
+  html[data-mode='immersive'] .card.card-finale:not(.card-night) {
+    width: min(calc(var(--mount-w) - 48px), var(--zone-w));
+    min-width: 0;
+    padding-inline: clamp(0px, calc(var(--mount-w) - 48px - 14rem), 28px);
+  }
+}
+
+/* Clear of the sound and settings cluster (bottom 20px, 44 px tall); phones put it above the bar. */
+html[data-mode='immersive'] .site-footer {
+  position: absolute;
+  right: 0;
+  bottom: calc(20px + var(--min-target) + 0.75rem);
+  z-index: 2;
+  padding: 0 calc(var(--progress-inset) + 1.75rem) 0.25rem;
+  text-align: right;
+}
+
+/* The E3 hold starts 15 jvh short of the page end, so an absolute footer sits lower than the offsets
+   above and runs under the cluster (or the phone bar). Pin it to the viewport for the hold. */
+html[data-mode='immersive'][data-beat='E3'] .site-footer {
+  position: fixed;
+}
+
+/* ------------------------------------------------------------------ zone B (§4.2, §6.4) */
+
+@media (max-width: 767.98px) {
+  html[data-mode='immersive'] .card-frame,
+  html[data-mode='immersive'] .card-frame[data-under] {
+    justify-content: flex-end;
+    align-items: center;
+    padding: calc(env(safe-area-inset-top) + 56px) 4vw calc(var(--bar-h) + env(safe-area-inset-bottom) + 14px);
+  }
+
+  /*
+   * Zone B: at most 45% of the height (§6.4; the view offset keeps the subject in the top 55%). The
+   * spacing tightens so most cards fit whole on a 390 × 844 phone; a card that still can't (a project
+   * card and its "Also" list, the grove's lead, anything on a 360 × 740 phone) scrolls inside itself,
+   * and the page takes the scroll back at its end. The hero, the chart sheet and the finale size
+   * themselves below.
+   */
+  html[data-mode='immersive'] .card,
+  html[data-mode='immersive'] .card-hero,
+  html[data-mode='immersive'] .card-panel,
+  html[data-mode='immersive'] .card-terminal,
+  html[data-mode='immersive'] .card-finale {
+    width: var(--zone-b-w);
+    max-height: 45svh;
+    min-width: 0;
+  }
+
+  html[data-mode='immersive'] .card-frame.zone-panel {
+    padding-right: 4vw;
+  }
+
+  html[data-mode='immersive'] .card:not(.card-night, .card-panel) {
+    --toward-scene: 0;
+    padding: 0.875rem 1rem;
+    border-radius: calc(var(--mist-pocket-feather) / 2);
+  }
+
+  html[data-mode='immersive'] .card-night {
+    padding: 0.875rem 1rem 0.375rem;
+  }
+
+  html[data-mode='immersive'] .card .service + .service h3 {
+    margin-top: 0.9rem;
+  }
+
+  html[data-mode='immersive'] .card h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  html[data-mode='immersive'] .card .tags {
+    margin-bottom: 0.25rem;
+  }
+
+  /*
+   * G1: the rings turn and the lit glyphs fly into their palaces right behind this card while the
+   * chart casts, and at 85% they flicker through the text (wave-2 M4). Here the pocket is nearly
+   * opaque, and its feather is tighter so it doesn't grow into a wall over the board.
+   */
+  html[data-mode='immersive'] .beat[data-beat='G1'] .card {
+    --mist: color-mix(in srgb, var(--paper) 96%, transparent);
+    box-shadow:
+      0 0 28px 10px var(--mist),
+      0 0 64px 24px var(--mist-thin);
+  }
+
+  /* T0 portrait: the accent sits top-left at 18vw; name, role, pitch and links in zone B. */
+  html[data-mode='immersive'] .card-hero {
+    position: static;
+    display: block;
+    max-height: none;
+    overflow: visible;
+  }
+
+  html[data-mode='immersive'] .card-hero h1 {
+    margin-top: 0;
+  }
+
+  html[data-mode='immersive'] .card-hero .hero-role {
+    margin: 0.5rem 0 0.35rem;
+  }
+
+  html[data-mode='immersive'] .card-hero .hero-subline {
+    margin-bottom: 0.25rem;
+  }
+
+  /* The four links fit one line on phones from 360 px, spread across the card; else they wrap. */
+  html[data-mode='immersive'] .card-hero .socials-row {
+    justify-content: space-between;
+    gap: 0;
+    margin-top: 0.25rem;
+  }
+
+  html[data-mode='immersive'] .card-hero .socials-row a {
+    gap: 0.45em;
+    min-width: var(--min-target);
+  }
+
+  /* 360 px phones: a little less side padding keeps the role line on one line. */
+  @media (max-width: 380px) {
+    html[data-mode='immersive'] .card.card-hero {
+      padding-inline: 0.75rem;
+    }
+  }
+
+
+  html[data-mode='immersive'] .card-hero > :not(.hero-mark) {
+    position: relative;
+  }
+
+  html[data-mode='immersive'] .hero-mark {
+    position: absolute;
+    top: calc(env(safe-area-inset-top) + 64px);
+    left: 4vw;
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  html[data-mode='immersive'] .hero-accent.zh {
+    --glyph: 18vw;
+  }
+
+  html[data-mode='immersive'] .card-extra {
+    display: none;
+  }
+
+  html[data-mode='immersive'] .card-frame.zone-mount {
+    justify-content: flex-start;
+    padding-left: 4vw;
+  }
+
+  html[data-mode='immersive'] .card-terminal {
+    padding: 0.75rem 1rem 1rem;
+    border: 1px solid var(--cyan-ghost);
+    border-radius: var(--cabin-card-radius);
+    background: color-mix(in srgb, var(--night-panel) calc(var(--alpha-night-panel) * 100%), transparent);
+  }
+
+  /* The chart sheet peeks at 30% and opens to 85%; dragging its bar follows the finger (sheetDrag.ts). */
+  html[data-mode='immersive'] .card-panel {
+    max-height: 30svh;
+    padding: 0.5rem 0.75rem;
+    transition:
+      opacity 120ms linear,
+      max-height var(--dur-chrome) var(--ease-out-cubic);
+  }
+
+  html[data-mode='immersive'] .card-panel:has(.chart-sheet[data-expanded]) {
+    max-height: 85svh;
+  }
+
+  html[data-mode='immersive'] .card-panel[data-dragging]:has(.chart-sheet) {
+    max-height: var(--sheet-drag);
+    transition: opacity 120ms linear;
+  }
+
+  html[data-mode='immersive'] .card-panel .sheet-bar {
+    touch-action: none;
+    cursor: grab;
+  }
+
+  html[data-mode='immersive'] .card-credits {
+    transform: none;
+    max-height: 45svh;
+    overflow-y: auto;
+  }
+
+  html[data-mode='immersive'] .finale::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: var(--mount-border-portrait) solid var(--paper-mount);
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+
+  html[data-mode='immersive'] .finale[data-open]::before {
+    opacity: 1;
+  }
+
+  html[data-mode='immersive'] .mount {
+    display: none;
+  }
+
+  /*
+   * The stele card in zone B (E1, E2): the four link rows as a 2 × 2 grid of 56 px tiles, icon beside
+   * label and "shown as", so the card stays under 45% of the height.
+   */
+  html[data-mode='immersive'] .card-contact .socials-rows {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  html[data-mode='immersive'] .card-contact .socials-rows li + li {
+    border-top: 0;
+  }
+
+  html[data-mode='immersive'] .card-contact .socials-rows li:nth-child(n + 3) {
+    border-top: 1px solid var(--ink-qing);
+  }
+
+  html[data-mode='immersive'] .card-contact .socials-rows a {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-content: center;
+    column-gap: 0.5rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  html[data-mode='immersive'] .card-contact .socials-rows .social-icon {
+    align-self: center;
+  }
+
+  html[data-mode='immersive'] .card-contact .socials-rows .social-display {
+    grid-column: 2;
+    padding: 0;
+    text-align: left;
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+  }
+
+  /*
+   * Portrait finale (§6.4, §8.7 E3, wave-2 H2). Portrait is already a hanging scroll: the painting
+   * fills the frame inside a 12 px border and the scene leaves paper at the top, its sky. So:
+   * - the colophon writes itself on that paper, vertical WenKai with the English beside it and
+   *   "Walk again" and "Still version" under the English, with no panel of its own;
+   * - the link rows fold into four icons in the top-left corner (where the section chip was), each
+   *   a 44 px target whose label and "shown as" text stay as its accessible name;
+   * - the seal stamps bottom-right and the footer sits bottom-left, above the bar;
+   * so the painting in between (map pins, the cabin's cyan speck, the grove, the lantern) is clear.
+   * As the mounts open (E2, 968 on) the stele card fades out and lets the finished picture show
+   * before it is signed.
+   */
+  html[data-mode='immersive'] .card-frame.zone-mount {
+    justify-content: flex-start;
+    padding: calc(env(safe-area-inset-top) + 64px) 4vw 0;
+  }
+
+  html[data-mode='immersive'] .card.card-finale {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 1rem;
+    align-items: start;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    text-shadow:
+      0 0 10px var(--paper),
+      0 0 3px var(--paper);
+    pointer-events: none;
+  }
+
+  html[data-mode='immersive'] .card-finale .colophon {
+    display: contents;
+  }
+
+  /* The Chinese columns stop growing at 24 px, so a large text size leaves the English a readable
+     column beside them instead of a word or two per line (§15, A11Y-5). */
+  html[data-mode='immersive'] .colophon-zh {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    max-height: 28svh;
+    margin: 0;
+    font-size: min(1.25rem, 24px);
+  }
+
+  html[data-mode='immersive'] .colophon-en {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0.15rem 0 0.25rem;
+    color: var(--ink-nong);
+  }
+
+  html[data-mode='immersive'][data-beat='E3'] .finale-links-card {
+    display: none;
+  }
+
+  html[data-mode='immersive'][data-beat='E3'] .finale-links-colophon {
+    display: flex;
+    grid-column: 2;
+    grid-row: 2;
+    gap: 0 1.25rem;
+    margin: 0;
+    pointer-events: auto;
+  }
+
+  /* Short phones: smaller characters, so the date and the signature still take two columns and
+     leave the English, Walk again and the footer room above the ridges and the pins. */
+  @media (max-height: 760px) {
+    html[data-mode='immersive'] .colophon-zh {
+      font-size: min(1.125rem, 22px);
+    }
+  }
+
+  /*
+   * Narrow in text terms (the query is in em, which follows the reader's font size: a phone at 125%
+   * text and up, or a 320 px one): the signed card can outgrow the screen, and at E3 the page can't
+   * scroll any further, so the card scrolls inside itself instead of running off the bottom.
+   */
+  @media (max-width: 21em) {
+    html[data-mode='immersive'] .card.card-finale {
+      max-height: calc(100svh - env(safe-area-inset-top) - 64px - var(--bar-h) - env(safe-area-inset-bottom));
+      overflow-y: auto;
+      pointer-events: auto;
+    }
+  }
+
+  /* The seal stamps into the window's lower-right corner here too, just above the bar (§8.7 E3). */
+  html[data-mode='immersive'] .finale-seal {
+    right: calc(var(--mount-border-portrait) + 0.75rem);
+    bottom: calc(var(--bar-h) + env(safe-area-inset-bottom) + 0.75rem);
+  }
+
+  /* The picture completes itself without the stele card, then gets signed (E2m → E3). */
+  html[data-mode='immersive'][data-mounts]:not([data-beat='E3']) .card-contact:not(:focus-within) {
+    opacity: 0 !important;
+    pointer-events: none;
+    transition: opacity 400ms ease;
+  }
+
+  html[data-mode='immersive'][data-beat='E3'] .card.card-contact {
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  /*
+   * At E3 the stele card keeps only what §8.7 lists (the links; Walk again and Still version are
+   * under the colophon): its label, heading and line step out of sight. They stay for screen readers.
+   */
+  html[data-mode='immersive'][data-beat='E3'] .card-contact > :is(.label, h2, .stele-line),
+  html[data-mode='immersive'][data-beat='E3'] .card-contact .socials :is(.social-label, .social-display) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  html[data-mode='immersive'][data-beat='E3'] .card-contact .socials {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 6px);
+    left: 4vw;
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+  }
+
+  html[data-mode='immersive'][data-beat='E3'] .card-contact .socials li {
+    border: 0;
+  }
+
+  html[data-mode='immersive'][data-beat='E3'] .card-contact .socials a {
+    display: grid;
+    place-items: center;
+    width: var(--min-target);
+    height: var(--min-target);
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--paper-light) 80%, transparent);
+    color: var(--ink-nong);
+  }
+
+  html[data-mode='immersive'][data-beat='E3'] .card-contact .socials .social-icon {
+    grid-row: auto;
+  }
+
+  html[data-mode='immersive'][data-beat='E3'] .card-contact .socials a:is(:hover, :focus-visible, [data-lit]) {
+    background: var(--paper-shade);
+  }
+
+  /* The footer: bottom-left, clear of the lantern, where anchor positioning is missing... */
+  html[data-mode='immersive'] .site-footer {
+    bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+    left: 0;
+    right: auto;
+    width: 50vw;
+    padding: 0 0 0.25rem 4vw;
+    text-align: left;
+    text-shadow:
+      0 0 8px var(--paper),
+      0 0 3px var(--paper);
+    opacity: 0;
+    transition: opacity var(--dur-chrome) ease;
+  }
+
+  html[data-mode='immersive'][data-beat='E3'] .site-footer {
+    opacity: 1;
+  }
+
+  /* ...and on the paper under Walk again where it isn't, so the painting's foot stays clear. */
+  @supports (anchor-name: --a) {
+    html[data-mode='immersive'][data-beat='E3'] .finale-links-colophon {
+      anchor-name: --finale-links;
+    }
+
+    html[data-mode='immersive'][data-beat='E3'] .site-footer {
+      position-anchor: --finale-links;
+      top: anchor(bottom);
+      bottom: auto;
+      left: anchor(left);
+      width: auto;
+      right: 4vw;
+      padding: 0;
+    }
+
+    html[data-mode='immersive'][data-beat='E3'] .site-footer a {
+      padding: 0.35rem 0;
+    }
+  }
+
+  /* Text this large (see the 21em query above) can't keep to the sky: the English runs down over the
+     trees. The signed card and the footer get the mist pocket the other cards have, so they read on
+     paper (A11Y-5). The pocket is a background plus a spread shadow, not padding, so nothing moves:
+     the footer keeps its place above the bar. */
+  @media (max-width: 21em) {
+    html[data-mode='immersive'][data-beat='E3'] .card.card-finale,
+    html[data-mode='immersive'][data-beat='E3'] .site-footer {
+      --mist: color-mix(in srgb, var(--paper) calc(var(--alpha-mist-pocket) * 100%), transparent);
+      border-radius: 0.25rem;
+      background: var(--mist);
+      box-shadow: 0 0 0.5rem 0.5rem var(--mist);
+    }
+  }
+}

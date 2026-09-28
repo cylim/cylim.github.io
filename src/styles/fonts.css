@@ -1,0 +1,104 @@
+/*
+ * Self-hosted subsets (design.md §3), written to public/fonts/ by scripts/subset-fonts.mjs.
+ * Paths match tokens.ts `fontFiles`. The two Latin faces the first screen needs are preloaded in
+ * index.html; WenKai swaps in after first paint; Ma Shan Zheng and JetBrains Mono load only when
+ * something uses them. Every face swaps, so text is never invisible.
+ */
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/cormorant-garamond-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-600.woff2') format('woff2');
+}
+
+/*
+ * Metric-matched stand-ins for the two Latin families (design.md §3: the swap moves nothing, CLS ≤
+ * 0.02). While a web font loads, the browser falls to the next family in its stack (tokens.ts
+ * `font`), and that is where these sit: 'Cormorant' after 'Cormorant Garamond', 'Source Serif Pro'
+ * after 'Source Serif 4'. Each draws Times New Roman (or its metric twins Liberation Serif and Tinos,
+ * so Windows, macOS, iOS, Linux and ChromeOS get the same widths) scaled to the web font's average
+ * letter width and given its ascent and descent, fontaine's method:
+ *   size-adjust = (webFont.xWidthAvg / upm) / (fallback.xWidthAvg / upm)
+ *   ascent-override = hhea.ascender / (upm × size-adjust), descent likewise, line gap 0.
+ * xWidthAvg is the English letter-frequency-weighted advance of a–z and space (capsize). Inputs:
+ * public/fonts/*.woff, and Liberation Serif Regular 818.68 / Bold 870.94 per 2048 units. Recompute
+ * whenever scripts/subset-fonts.mjs changes the Latin files. Android has none of these fonts, so it
+ * falls through to Noto Serif unadjusted; see docs/plan/contracts.md.
+ */
+@font-face {
+  font-family: 'Cormorant';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Times New Roman Bold'), local('TimesNewRomanPS-BoldMT'), local('Liberation Serif Bold'), local('LiberationSerif-Bold'),
+    local('Tinos Bold'), local('Tinos-Bold');
+  size-adjust: 92.07%;
+  ascent-override: 100.36%;
+  descent-override: 31.17%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Source Serif Pro';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Times New Roman'), local('TimesNewRomanPSMT'), local('Liberation Serif'), local('LiberationSerif'), local('Tinos'),
+    local('Tinos-Regular');
+  size-adjust: 111.52%;
+  ascent-override: 92.9%;
+  descent-override: 30.04%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Source Serif Pro';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Times New Roman Bold'), local('TimesNewRomanPS-BoldMT'), local('Liberation Serif Bold'), local('LiberationSerif-Bold'),
+    local('Tinos Bold'), local('Tinos-Bold');
+  size-adjust: 106.4%;
+  ascent-override: 97.37%;
+  descent-override: 31.49%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'LXGW WenKai';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/wenkai-subset.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Ma Shan Zheng';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/mashanzheng-subset.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-400.woff2') format('woff2');
+}
