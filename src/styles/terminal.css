@@ -1,0 +1,259 @@
+/*
+ * The cabin terminal (design.md §10.1): night glass at 88%, a 1 px cyan-dim border, 2 px radius,
+ * JetBrains Mono in cyan-line with a faint glow. No brackets, no scanlines, no typed-out output.
+ */
+
+.terminal-section h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--tracking-label);
+  font-variant-caps: all-small-caps;
+  color: var(--cyan-dim);
+}
+
+.term-screen {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--cyan-dim);
+  border-radius: var(--cabin-card-radius);
+  background: color-mix(in srgb, var(--night) calc(var(--alpha-terminal-glass) * 100%), transparent);
+  color: var(--cyan-line);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-mono);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--cyan-line) calc(var(--alpha-terminal-glow) * 100%), transparent);
+  text-align: left;
+}
+
+.term-log {
+  flex: 1 1 auto;
+  min-height: 8rem;
+  max-height: 22rem;
+  overflow-y: auto;
+  overscroll-behavior: auto;
+  padding: 0.85rem 1rem 0.25rem;
+}
+
+.term-log:focus-visible {
+  outline-offset: -2px;
+}
+
+.term-line {
+  max-width: none;
+  margin: 0;
+  white-space: pre-wrap;
+  /* A handle or URL longer than the line breaks rather than pushing the page sideways. */
+  overflow-wrap: anywhere;
+}
+
+.term-hint {
+  color: var(--cyan-dim);
+}
+
+.term-prompt {
+  color: var(--cyan-bright);
+}
+
+.term-line a {
+  color: var(--cyan-bright);
+  text-decoration: underline;
+}
+
+/* New output settles from a 2 px blur to sharp: ink spreading on wet paper, in light. */
+.term-live .term-entry {
+  animation: settle var(--dur-terminal-settle) ease-out;
+}
+
+@keyframes settle {
+  from {
+    filter: blur(2px);
+    opacity: 0.6;
+  }
+}
+
+.term-form {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.35rem 1rem 0.6rem;
+}
+
+.term-form input {
+  /* No intrinsic width (size=20 is 185 px): the input takes what the prompt leaves, down to 320 px. */
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  min-height: var(--min-target);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--cyan-line);
+  font: inherit;
+  caret-color: var(--cyan-bright);
+  caret-shape: block;
+}
+
+/* The caret breathes only while there is a caret: an unfocused input animating caret-color forces a
+   style recalc every frame, even with the stage stopped and the cabin far off-screen (QM-P9). */
+.term-form input:focus {
+  animation: caret var(--dur-caret) ease-in-out infinite alternate;
+}
+
+.term-form input::placeholder {
+  color: var(--cyan-dim);
+  opacity: 1;
+}
+
+.term-form input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.term-form:focus-within {
+  box-shadow: inset 0 -2px 0 var(--cyan-bright);
+}
+
+/* The caret breathes, 1 to 0.35 over 1.2 s, instead of blinking. */
+@keyframes caret {
+  to {
+    caret-color: color-mix(in srgb, var(--cyan-bright) 35%, transparent);
+  }
+}
+
+.term-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.25rem 1rem 0;
+}
+
+.term-chips button {
+  min-height: var(--min-target);
+  padding: 0 0.8rem;
+  border: 1px solid var(--cyan-ghost);
+  border-radius: var(--cabin-card-radius);
+  background: transparent;
+  color: var(--cyan-line);
+  font: inherit;
+}
+
+.term-chips button:hover {
+  background: var(--night-panel);
+}
+
+.term-close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: var(--min-target);
+  height: var(--min-target);
+  border: 0;
+  background: none;
+  color: var(--cyan-line);
+  fill: currentColor;
+}
+
+/* The qimen command's chart: a 3 × 3 grid, south up, never spaced text (§10.3). */
+.qg {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    'p4 p9 p2'
+    'p3 p5 p7'
+    'p8 p1 p6';
+  gap: 1px;
+  max-width: 30rem;
+  margin: 0.4rem 0;
+  border: 1px solid var(--cyan-ghost);
+  background: var(--cyan-ghost);
+}
+
+.qg-cell {
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  padding: 0.35rem 0.2rem;
+  background: var(--night);
+  font-family: var(--font-cjk);
+  line-height: 1.25;
+}
+
+.qg .zh {
+  font-size: 1em;
+  text-decoration-color: var(--cyan-ghost);
+}
+
+.qg-row {
+  display: flex;
+  gap: 0.4em;
+}
+
+.qg-palace {
+  color: var(--cyan-dim);
+}
+
+/* 值符 and 值使 in inverse video: the cabin stays one hue (§10.1). */
+.qg .qg-mark {
+  padding: 0 0.15em;
+  background: var(--cyan-line);
+  color: var(--night);
+  text-shadow: none;
+}
+
+/* ------------------------------------------------------------------ placement in the walk (§10.2) */
+
+html[data-mode='immersive'] .term-live.term-over-pane {
+  position: fixed;
+  z-index: var(--z-terminal-overlay);
+}
+
+/*
+ * Fades in over the pane when the I3 hold begins and out where it stood when it ends (Terminal.tsx).
+ * Hidden but still in the tab order while it waits for the pane, and shown when a keyboard user
+ * reaches it, as every card is.
+ */
+html[data-mode='immersive'] .term-live[data-pane] {
+  transition: opacity var(--dur-chrome) ease;
+}
+
+html[data-mode='immersive'] .term-live:is([data-pane='leaving'], [data-pane='await']):not(:focus-within) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-mode='immersive'] .term-over-pane .term-log {
+  max-height: none;
+}
+
+.term-open {
+  margin-top: 0.25rem;
+}
+
+.term-screen[data-sheet] {
+  display: none;
+}
+
+.term-screen[data-sheet][data-open] {
+  position: fixed;
+  left: 0;
+  right: 0;
+  /* Portalled to the end of main, above the bottom bar (which the keyboard hides anyway). */
+  z-index: var(--z-sheet);
+  display: flex;
+  border-width: 1px 0 0;
+  border-radius: var(--tooltip-radius) var(--tooltip-radius) 0 0;
+  background: var(--night);
+  padding-top: 2.5rem;
+}
+
+.term-screen[data-sheet][data-open] .term-log {
+  max-height: none;
+}
+
+@media (min-width: 768px) {
+  .term-screen {
+    font-size: var(--fs-mono);
+  }
+}

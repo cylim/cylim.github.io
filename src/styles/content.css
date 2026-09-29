@@ -1,0 +1,574 @@
+/*
+ * Copy: type scale (design.md §3.1), the hero, services, project cards, credits, contact rows and the
+ * footer. Shared by the walk and the album; layout lives in walk.css and album.css.
+ */
+
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: 600;
+  color: var(--ink-jiao);
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  font-weight: 600;
+  color: var(--ink-jiao);
+}
+
+h3 {
+  margin: 1.25rem 0 0.25rem;
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  font-weight: 600;
+  color: var(--ink-jiao);
+}
+
+h4 {
+  margin: 0;
+  font-size: var(--fs-body-small);
+  line-height: var(--lh-body-small);
+  font-weight: 600;
+}
+
+p {
+  max-width: var(--measure);
+  margin: 0 0 0.75em;
+}
+
+.label {
+  margin: 0 0 0.25rem;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--tracking-label);
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  color: var(--ink-zhong);
+}
+
+/* ------------------------------------------------------------------ gloss triggers (design.md §4.3) */
+
+.zh {
+  font-size: var(--fs-gloss-cjk);
+  line-height: var(--lh-gloss-cjk);
+  text-decoration: underline dotted var(--ink-dan) 1px;
+  text-underline-offset: 4px;
+  text-decoration-skip-ink: none;
+  cursor: help;
+  border-radius: 2px;
+}
+
+/* No JavaScript, no tooltip: the gloss is still inline for screen readers, but nothing to hover. */
+@media (scripting: none) {
+  .zh {
+    text-decoration: none;
+    cursor: auto;
+  }
+}
+
+.gloss-hint {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-zhong);
+}
+
+/* ------------------------------------------------------------------ hero (design.md §8.1) */
+
+.hero-title {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.hero-seal {
+  flex: none;
+}
+
+.card-hero h1 {
+  margin-top: 0.25rem;
+}
+
+.hero-role {
+  margin: 0.75rem 0 0.5rem;
+  font-weight: 600;
+  color: var(--ink-jiao);
+}
+
+.hero-positioning {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  color: var(--ink-jiao);
+}
+
+.hero-subline {
+  color: var(--ink-zhong);
+}
+
+.scroll-cue {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--tracking-label);
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  color: var(--ink-zhong);
+}
+
+/* A 1 px line that grows 24 px downward over 3 s and loops; no bouncing arrow. */
+.scroll-cue::after {
+  content: '';
+  width: 1px;
+  height: 24px;
+  background: var(--ink-zhong);
+  transform-origin: top;
+  animation: cue var(--dur-scroll-cue) var(--ease-in-out-cubic) infinite;
+}
+
+@keyframes cue {
+  0% {
+    transform: scaleY(0);
+    opacity: 1;
+  }
+  70% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ social links */
+
+.socials {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.socials a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  min-height: var(--min-target);
+  /* "X" alone is narrower than a thumb (§15: 44 px targets). */
+  min-width: var(--min-target);
+  color: var(--ink-nong);
+  text-decoration: none;
+}
+
+.socials a:hover .social-handle,
+.socials a:focus-visible .social-handle {
+  text-decoration: underline;
+}
+
+.social-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.social-handle {
+  font-weight: 600;
+}
+
+.socials-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+}
+
+.socials-rows li + li {
+  border-top: 1px solid var(--ink-qing);
+}
+
+.socials-rows a {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  column-gap: 0.55em;
+  min-height: var(--contact-row-min);
+  padding: 0.25rem 0.5rem;
+  margin: 0 -0.5rem;
+  border-radius: 2px;
+  transition: background-color var(--dur-chrome) ease;
+}
+
+.socials-rows a:hover,
+.socials-rows a:focus-visible,
+.socials-rows a[data-lit] {
+  background: color-mix(in srgb, var(--paper-shade) 70%, transparent);
+}
+
+.contact-line {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  color: var(--ink-jiao);
+}
+
+.contact-resume {
+  margin: 0.75rem 0 0;
+}
+
+.contact-resume a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-target);
+  font-weight: 600;
+  color: var(--ink-nong);
+}
+
+.finale-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: center;
+  margin-top: 1.25rem;
+}
+
+.finale-links a,
+.finale-links button {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-target);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 600;
+  color: var(--ink-jiao);
+  text-decoration: underline;
+  text-decoration-color: var(--ink-dan);
+}
+
+.walk-again {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+}
+
+/* ------------------------------------------------------------------ services and work */
+
+.service h3:first-child,
+.card > .service:first-child h3 {
+  margin-top: 0;
+}
+
+.services-heading + .service h3 {
+  margin-top: 0.5rem;
+}
+
+.work-card h3 {
+  margin-top: 0.25rem;
+  transition: color var(--dur-chrome) ease;
+}
+
+/* The 3D scroll under the pointer lights its DOM twin (cabinFocus), and the other way round. */
+.work-card[data-focus] h3 {
+  color: var(--cyan-bright);
+}
+
+html[data-mode='immersive'] .card-night:has(> .work-card[data-focus]) {
+  border-color: var(--cyan-dim);
+}
+
+.work-meta {
+  font-size: var(--fs-body-small);
+  line-height: var(--lh-body-small);
+  color: var(--ink-zhong);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  margin: 0.25rem 0 0.75rem;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  color: var(--ink-zhong);
+}
+
+.work-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+}
+
+.work-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-target);
+}
+
+/* A repo path is one long word: at 200% text on a phone it breaks where it must, not off-screen. */
+.work-links a {
+  overflow-wrap: anywhere;
+}
+
+.also ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.also li {
+  margin: 0 0 0.6rem;
+  font-size: var(--fs-body-small);
+  line-height: 1.4;
+}
+
+.also h3 {
+  margin-top: 0.75rem;
+}
+
+.also-title {
+  font-weight: 600;
+}
+
+.work-more summary {
+  min-height: var(--min-target);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ credits (timeline + stack) */
+
+.timeline {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-body-small);
+  line-height: var(--lh-body-small);
+}
+
+.timeline caption {
+  text-align: left;
+  padding-bottom: 0.5rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  font-weight: 600;
+}
+
+.timeline th,
+.timeline td {
+  padding: 0.35rem 0.75rem 0.35rem 0;
+  vertical-align: top;
+  text-align: left;
+}
+
+.timeline th {
+  font-weight: 600;
+}
+
+.timeline-years {
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+}
+
+.timeline-note {
+  display: block;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  opacity: 0.9;
+}
+
+/*
+ * Narrow in text terms (a 320 px screen, or a phone at 200% text: the query is in em, which follows
+ * the reader's font size): each row stacks years, place and role instead of three columns that
+ * can't fit (§15, WCAG 1.4.10). Still a table to assistive tech.
+ */
+@media (max-width: 22em) {
+  .timeline,
+  .timeline caption,
+  .timeline tbody,
+  .timeline tr,
+  .timeline th,
+  .timeline td {
+    display: block;
+  }
+
+  .timeline tr {
+    padding: 0.4rem 0;
+  }
+
+  .timeline tr + tr {
+    border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  }
+
+  .timeline th,
+  .timeline td {
+    padding: 0;
+  }
+}
+
+.stack {
+  margin: 0;
+  font-size: var(--fs-body-small);
+  line-height: var(--lh-body-small);
+}
+
+.stack div {
+  margin-bottom: 0.4rem;
+}
+
+.stack dt {
+  font-weight: 600;
+}
+
+.stack dd {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ grove copy */
+
+.board-note,
+.qm-honesty,
+.qm-method,
+.qm-disclaimer {
+  font-size: var(--fs-body-small);
+  line-height: var(--lh-body-small);
+  color: var(--ink-zhong);
+}
+
+.cast-label {
+  min-height: 1.5em;
+  font-weight: 600;
+  color: var(--ink-jiao);
+}
+
+.read-chart,
+.qm-toggle,
+.qm-now,
+.term-open,
+.album-banner button,
+.settings-mode,
+.toast-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--min-target);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--ink-nong);
+  border-radius: 2px;
+  background: transparent;
+  font-weight: 600;
+  color: var(--ink-jiao);
+  transition:
+    background-color var(--dur-chrome) ease,
+    color var(--dur-chrome) ease;
+}
+
+.read-chart:hover,
+.qm-toggle:hover,
+.qm-now:hover,
+.term-open:hover,
+.album-banner button:hover,
+.settings-mode:hover,
+.toast-action:hover {
+  background: var(--paper-shade);
+}
+
+.qm-toggle[aria-pressed='true'] {
+  background: var(--ink-nong);
+  color: var(--paper-light);
+}
+
+.glossary {
+  margin-top: 1.5rem;
+  font-size: var(--fs-body-small);
+  line-height: var(--lh-body-small);
+}
+
+.glossary summary {
+  min-height: var(--min-target);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.glossary-group h4 {
+  margin: 1rem 0 0.25rem;
+}
+
+.glossary dl {
+  margin: 0;
+}
+
+.glossary dt {
+  font-weight: 600;
+}
+
+.glossary dd {
+  margin: 0 0 0.5rem;
+  color: var(--ink-zhong);
+}
+
+/* ------------------------------------------------------------------ finale */
+
+.colophon-zh {
+  margin: 0 0 1rem;
+  writing-mode: vertical-rl;
+  font-size: 1.5rem;
+  line-height: 1.6;
+  letter-spacing: 0.12em;
+  color: var(--ink-nong);
+  max-height: 70svh;
+}
+
+/* A column breaks between phrases, never inside one (Colophon.tsx). */
+.colophon-phrase {
+  white-space: nowrap;
+}
+
+.colophon-en {
+  font-size: var(--fs-body-small);
+  line-height: var(--lh-body-small);
+  color: var(--ink-zhong);
+}
+
+.finale-seal .seal {
+  display: block;
+}
+
+/* ------------------------------------------------------------------ seals */
+
+.seal {
+  display: block;
+  flex: none;
+  user-select: none;
+}
+
+.site-footer {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-zhong);
+}
+
+.site-footer p {
+  max-width: none;
+  margin: 0;
+}
+
+.site-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-target);
+  padding: 0.75rem 0;
+}

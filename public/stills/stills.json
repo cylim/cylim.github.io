@@ -1,0 +1,135 @@
+{
+  "now": "2026-09-23T11:00:00Z",
+  "beats": {
+    "T0": [
+      {
+        "file": "T0-1600.avif",
+        "bytes": 70321
+      },
+      {
+        "file": "T0-1600.webp",
+        "bytes": 89050
+      },
+      {
+        "file": "T0-800.avif",
+        "bytes": 19586
+      },
+      {
+        "file": "T0-800.webp",
+        "bytes": 25344
+      },
+      {
+        "file": "T0-portrait-800.avif",
+        "bytes": 29312
+      },
+      {
+        "file": "T0-portrait-800.webp",
+        "bytes": 36668
+      }
+    ],
+    "C3": [
+      {
+        "file": "C3-1600.avif",
+        "bytes": 93427
+      },
+      {
+        "file": "C3-1600.webp",
+        "bytes": 121910
+      },
+      {
+        "file": "C3-800.avif",
+        "bytes": 25226
+      },
+      {
+        "file": "C3-800.webp",
+        "bytes": 35198
+      },
+      {
+        "file": "C3-portrait-800.avif",
+        "bytes": 34418
+      },
+      {
+        "file": "C3-portrait-800.webp",
+        "bytes": 44824
+      }
+    ],
+    "I1": [
+      {
+        "file": "I1-1600.avif",
+        "bytes": 94889
+      },
+      {
+        "file": "I1-1600.webp",
+        "bytes": 117934
+      },
+      {
+        "file": "I1-800.avif",
+        "bytes": 30676
+      },
+      {
+        "file": "I1-800.webp",
+        "bytes": 45710
+      },
+      {
+        "file": "I1-portrait-800.avif",
+        "bytes": 59836
+      },
+      {
+        "file": "I1-portrait-800.webp",
+        "bytes": 90214
+      }
+    ],
+    "E1": [
+      {
+        "file": "E1-1600.avif",
+        "bytes": 54661
+      },
+      {
+        "file": "E1-1600.webp",
+        "bytes": 68416
+      },
+      {
+        "file": "E1-800.avif",
+        "bytes": 15878
+      },
+      {
+        "file": "E1-800.webp",
+        "bytes": 20614
+      },
+      {
+        "file": "E1-portrait-800.avif",
+        "bytes": 13324
+      },
+      {
+        "file": "E1-portrait-800.webp",
+        "bytes": 15478
+      }
+    ],
+    "E3": [
+      {
+        "file": "E3-1600.avif",
+        "bytes": 67677
+      },
+      {
+        "file": "E3-1600.webp",
+        "bytes": 91506
+      },
+      {
+        "file": "E3-800.avif",
+        "bytes": 18615
+      },
+      {
+        "file": "E3-800.webp",
+        "bytes": 26310
+      },
+      {
+        "file": "E3-portrait-800.avif",
+        "bytes": 51893
+      },
+      {
+        "file": "E3-portrait-800.webp",
+        "bytes": 69940
+      }
+    ]
+  }
+}

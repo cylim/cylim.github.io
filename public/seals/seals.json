@@ -1,0 +1,16 @@
+{
+  "note": "Resting angles in degrees, clockwise positive. Files named -nav, -hero, -finale have theirs baked in; rotate the base files yourself for other placements (the cabin-desk decal uses desk).",
+  "angles": {
+    "nav": -1.2,
+    "hero": 1.4,
+    "desk": -0.8,
+    "finale": 1.7
+  },
+  "files": [
+    "lin-zhuwen.svg",
+    "lin-baiwen.svg",
+    "lin-zhuwen-nav.svg",
+    "lin-baiwen-hero.svg",
+    "lin-zhuwen-finale.svg"
+  ]
+}

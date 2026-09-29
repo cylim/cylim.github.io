@@ -1,0 +1,974 @@
+/*
+ * UI chrome (design.md §4): skip link, header and jump nav (bottom bar under 768 px), progress,
+ * inscriptions, the sound and settings cluster, the fog-dive title card, toasts and the gloss tooltip.
+ * Ink on the ink world; cyan on night inside the cabin (html[data-palette='night']), crossfading 300 ms.
+ */
+
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: var(--z-skip-link);
+  padding: 0.75rem 1rem;
+  background: var(--paper-light);
+  color: var(--ink-jiao);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* ------------------------------------------------------------------ header (§4.1) */
+
+/*
+ * The header's height: the 56 px token, or taller when the reader's text size is (§15: 200% text
+ * reflows; the nav's two lines are rem, so a fixed 56 px clipped them). Everything that clears the
+ * header (card frames, inscriptions, the album's top and anchors) uses this, not the raw token.
+ */
+:root {
+  --header-block: max(var(--header-h), 3.5rem);
+}
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: var(--z-header);
+  min-height: var(--header-block);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(1.25rem, env(safe-area-inset-right)) 0 max(1.25rem, env(safe-area-inset-left));
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--dur-chrome) ease,
+    border-color var(--dur-chrome) ease;
+}
+
+.site-header[data-scrolled],
+html[data-mode='static'] .site-header {
+  background: color-mix(in srgb, var(--paper-light) calc(var(--alpha-header-scrim) * 100%), transparent);
+  border-bottom-color: var(--ink-qing);
+}
+
+html[data-mode='immersive']:not([data-tier='low']) .site-header[data-scrolled] {
+  backdrop-filter: blur(6px);
+}
+
+html[data-palette='night'] .site-header[data-scrolled] {
+  background: color-mix(in srgb, var(--night) calc(var(--alpha-header-scrim) * 100%), transparent);
+  border-bottom-color: var(--cyan-ghost);
+}
+
+.home-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: var(--min-target);
+  color: var(--ink-jiao);
+  text-decoration: none;
+  transition: color var(--dur-chrome) ease;
+}
+
+.home-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-home-mark);
+  line-height: var(--lh-home-mark);
+  font-weight: 600;
+}
+
+.jump-nav ul {
+  display: flex;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * Before the scrim appears the nav floats on the painting: a soft mist pocket behind it and a paper
+ * halo round each word keep it legible where a branch crosses the top of the frame.
+ */
+.site-header:not([data-scrolled]) .home-mark,
+.site-header:not([data-scrolled]) .jump-nav a {
+  text-shadow:
+    0 0 2px var(--paper),
+    0 0 6px var(--paper),
+    0 0 12px var(--paper);
+}
+
+@media (min-width: 768px) {
+  html[data-mode='immersive'] .site-header:not([data-scrolled]) .jump-nav::before {
+    content: '';
+    position: absolute;
+    inset: -0.5rem -2rem -1rem -2.5rem;
+    z-index: -1;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--paper) 70%, transparent) 55%, transparent);
+    pointer-events: none;
+  }
+
+  html[data-palette='night'] .site-header:not([data-scrolled]) .jump-nav::before {
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--night) 70%, transparent) 55%, transparent);
+  }
+}
+
+.jump-nav {
+  position: relative;
+}
+
+html[data-palette='night'] .site-header:not([data-scrolled]) .home-mark,
+html[data-palette='night'] .site-header:not([data-scrolled]) .jump-nav a {
+  text-shadow:
+    0 0 8px var(--night),
+    0 0 2px var(--night);
+}
+
+.jump-nav a {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--min-target);
+  min-height: var(--min-target);
+  padding: 0 0.25rem;
+  color: var(--ink-nong);
+  text-decoration: none;
+  transition: color var(--dur-chrome) ease;
+}
+
+.nav-zh {
+  font-family: var(--font-cjk);
+  font-size: var(--fs-nav-cjk);
+  line-height: var(--lh-nav-cjk);
+  color: var(--ink-zhong);
+  letter-spacing: 0.1em;
+  transition: color var(--dur-chrome) ease;
+}
+
+.nav-label {
+  position: relative;
+  font-size: var(--fs-nav-label);
+  line-height: var(--lh-nav-label);
+  font-weight: 600;
+}
+
+/* The active place: a 6 px cinnabar square, a tiny seal, left of the label. */
+.nav-marker {
+  position: absolute;
+  top: 50%;
+  left: -12px;
+  width: var(--progress-mark);
+  height: var(--progress-mark);
+  margin-top: calc(var(--progress-mark) / -2);
+  background: var(--cinnabar);
+  opacity: 0;
+  transition: opacity var(--dur-nav-underline) ease;
+}
+
+.nav-underline {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 2px;
+  width: 80%;
+  height: 6px;
+  fill: none;
+  stroke: var(--ink-nong);
+  stroke-linecap: round;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--dur-nav-underline) var(--ease-out-cubic);
+}
+
+.jump-nav a[aria-current] .nav-marker {
+  opacity: 1;
+}
+
+.jump-nav a[aria-current] .nav-underline {
+  clip-path: inset(0 0 0 0);
+}
+
+.jump-nav a:hover .nav-label {
+  color: var(--ink-jiao);
+}
+
+.nav-threshold {
+  display: none;
+}
+
+html[data-palette='night'] .home-mark,
+html[data-palette='night'] .jump-nav a {
+  color: var(--cyan-line);
+}
+
+html[data-palette='night'] .nav-zh {
+  color: var(--cyan-soft);
+}
+
+html[data-palette='night'] .nav-underline {
+  stroke: var(--cyan-line);
+}
+
+/* ------------------------------------------------------------------ bottom bar (§4.2) */
+
+@media (max-width: 767.98px) {
+  .site-header {
+    min-height: 0;
+    padding: 0;
+    background: none !important;
+    border: 0 !important;
+    backdrop-filter: none !important;
+    pointer-events: none;
+  }
+
+  .home-mark {
+    display: none;
+  }
+
+  .jump-nav {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: var(--z-bottom-bar);
+    height: calc(var(--bar-h) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    background: color-mix(in srgb, var(--paper-light) calc(var(--alpha-bottom-bar) * 100%), transparent);
+    border-top: 1px solid var(--ink-qing);
+    pointer-events: auto;
+    transition:
+      background-color var(--dur-chrome) ease,
+      border-color var(--dur-chrome) ease;
+  }
+
+  html[data-palette='night'] .jump-nav {
+    background: color-mix(in srgb, var(--night) calc(var(--alpha-bottom-bar) * 100%), transparent);
+    border-top-color: var(--cyan-ghost);
+  }
+
+  .jump-nav ul {
+    height: 100%;
+    gap: 0;
+  }
+
+  .nav-item,
+  .nav-threshold {
+    display: block;
+    flex: 1 1 25%;
+  }
+
+  .jump-nav a {
+    height: 100%;
+    min-height: var(--nav-slot-min);
+    gap: 2px;
+  }
+
+  .nav-zh {
+    font-size: var(--fs-bar-label);
+    line-height: 1.1;
+  }
+
+  .nav-seal {
+    display: grid;
+    place-items: center;
+    height: calc(var(--fs-bar-label) * 1.1);
+  }
+
+  .nav-label {
+    font-size: var(--fs-bar-label);
+    line-height: var(--lh-bar-label);
+  }
+
+  .nav-underline {
+    display: none;
+  }
+
+  .nav-marker {
+    left: -10px;
+  }
+}
+
+/* ------------------------------------------------------------------ progress (§4.1, §4.2) */
+
+.progress-rail,
+.progress-bar {
+  display: none;
+}
+
+html[data-mode='immersive'] .progress-rail {
+  position: fixed;
+  top: var(--progress-top);
+  bottom: calc(100vh - var(--progress-bottom));
+  right: var(--progress-inset);
+  z-index: var(--z-chrome);
+  display: block;
+  width: 1px;
+  background: var(--ink-dan);
+  pointer-events: none;
+  transition: background-color var(--dur-chrome) ease;
+}
+
+.progress-rail .progress-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--ink-nong);
+  transform-origin: top;
+  transform: scaleY(var(--u, 0));
+}
+
+.progress-tick {
+  position: absolute;
+  left: -2px;
+  top: calc(var(--at) * 100%);
+  width: 5px;
+  height: 1px;
+  background: var(--ink-nong);
+}
+
+.progress-rail .progress-mark {
+  position: absolute;
+  top: 0;
+  left: calc(var(--progress-mark) / -2 + 0.5px);
+  width: var(--progress-mark);
+  height: var(--progress-mark);
+  margin-top: calc(var(--progress-mark) / -2);
+  background: var(--cinnabar);
+  transform: translateY(calc(var(--u, 0) * (var(--progress-bottom) - var(--progress-top))));
+}
+
+html[data-palette='night'] .progress-rail {
+  background: var(--cyan-ghost);
+}
+
+html[data-palette='night'] .progress-rail .progress-fill,
+html[data-palette='night'] .progress-tick {
+  background: var(--cyan-dim);
+}
+
+@media (max-width: 767.98px) {
+  html[data-mode='immersive'] .progress-rail {
+    display: none;
+  }
+
+  html[data-mode='immersive'] .progress-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+    z-index: calc(var(--z-bottom-bar) + 1);
+    display: block;
+    height: 2px;
+    pointer-events: none;
+  }
+
+  .progress-bar .progress-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--ink-nong);
+    transform-origin: left;
+    transform: scaleX(var(--u, 0));
+  }
+
+  .progress-bar .progress-mark {
+    position: absolute;
+    top: -1px;
+    left: -2px;
+    width: 4px;
+    height: 4px;
+    background: var(--cinnabar);
+    transform: translateX(calc(var(--u, 0) * 100vw));
+  }
+
+  html[data-palette='night'] .progress-bar .progress-fill {
+    background: var(--cyan-line);
+  }
+}
+
+/* ------------------------------------------------------------------ inscriptions (§4.1) and chips (§4.2) */
+
+.inscriptions {
+  display: none;
+}
+
+html[data-mode='immersive'] .inscriptions {
+  display: block;
+}
+
+/* In vertical-rl the block axis runs right to left; column-reverse puts the name to the right of the glyphs. */
+.inscription,
+.leaf-inscription {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 0.5rem;
+  writing-mode: vertical-rl;
+  color: var(--ink-nong);
+}
+
+.inscription {
+  text-shadow: 0 0 12px var(--paper);
+  position: fixed;
+  top: calc(var(--header-block) + 1.25rem);
+  left: var(--zone-inset);
+  /* Room for its mist pocket (below) without moving the glyphs: the padding and margin cancel out.
+     More on the right, where the vertical name sits, so the name is inside the pocket's core too
+     (the pocket can't overhang the box: the ink-in mask clips at the border box). */
+  margin: -1.5rem -2.75rem -1.5rem -1.5rem;
+  padding: 1.5rem 2.75rem 1.5rem 1.5rem;
+  z-index: var(--z-chrome);
+  pointer-events: none;
+  opacity: 0;
+  filter: blur(4px);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 55%);
+  mask-size: 100% 220%;
+  mask-position: 0 100%;
+  mask-repeat: no-repeat;
+  transition:
+    opacity var(--dur-inscription) ease,
+    filter var(--dur-inscription) ease,
+    mask-position var(--dur-inscription) var(--ease-out-cubic),
+    color var(--dur-chrome) ease;
+}
+
+/*
+ * The inscription's mist pocket, like every exterior card's (§4.3): paper gathered behind the column,
+ * feathered to nothing at its edge, so 九宫 and THE GROVE stay legible over pine pads and bamboo at
+ * P1, P3–G0 and E1 (CD-4). It inks in with the glyphs (the mask covers it too).
+ */
+.inscription::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--paper) calc(var(--alpha-mist-pocket) * 100%), transparent) 72%,
+    transparent
+  );
+}
+
+html[data-palette='night'] .inscription::before {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--night) calc(var(--alpha-mist-pocket) * 100%), transparent) 72%,
+    transparent
+  );
+}
+
+/* Ink appears top to bottom through a feathered mask while it settles from blur to sharp. */
+.inscription[data-shown] {
+  opacity: var(--alpha-inscription);
+  filter: blur(0);
+  mask-position: 0 0;
+}
+
+.inscription-zh {
+  font-family: var(--font-cjk-display);
+  font-size: var(--insc, var(--fs-section-cjk));
+  line-height: var(--lh-section-cjk);
+}
+
+.inscription-name {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--tracking-label);
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  padding-top: 0.5rem;
+}
+
+html[data-palette='night'] .inscription {
+  color: var(--cyan-line);
+  text-shadow: 0 0 12px var(--night);
+}
+
+.section-chip {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .inscription {
+    display: none;
+  }
+
+  html[data-mode='immersive'] .section-chip {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 12px);
+    left: 4vw;
+    z-index: var(--z-chrome);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 32px;
+    padding: 0.25rem 0.75rem;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--paper-light) calc(var(--alpha-header-scrim) * 100%), transparent);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    font-weight: 600;
+    color: var(--ink-nong);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur-inscription) ease;
+  }
+
+  html[data-mode='immersive'] .section-chip[data-shown] {
+    opacity: 1;
+  }
+
+  html[data-palette='night'] .section-chip {
+    background: color-mix(in srgb, var(--night) calc(var(--alpha-header-scrim) * 100%), transparent);
+    color: var(--cyan-line);
+  }
+}
+
+@media (min-width: 768px) {
+  html[data-mode='immersive'] .section-chip-wait {
+    position: fixed;
+    top: calc(var(--header-block) + 1.25rem);
+    left: var(--zone-inset);
+    z-index: var(--z-chrome);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink-nong);
+    opacity: 0;
+    transition: opacity var(--dur-inscription) ease;
+  }
+
+  html[data-mode='immersive'] .section-chip-wait[data-shown] {
+    opacity: 1;
+  }
+}
+
+.seal-breathe {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ------------------------------------------------------------------ cluster and settings (§4.1, §4.2) */
+
+.cluster {
+  position: fixed;
+  right: calc(var(--progress-inset) + 12px);
+  bottom: 20px;
+  z-index: var(--z-header);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sound-toggle,
+.settings-toggle,
+.settings-close {
+  display: grid;
+  place-items: center;
+  width: var(--min-target);
+  height: var(--min-target);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--paper-light) 70%, transparent);
+  color: var(--ink-nong);
+  fill: currentColor;
+  transition:
+    background-color var(--dur-chrome) ease,
+    color var(--dur-chrome) ease;
+}
+
+.sound-toggle:hover,
+.settings-toggle:hover {
+  background: var(--paper-shade);
+}
+
+html[data-palette='night'] .cluster .sound-toggle,
+html[data-palette='night'] .settings-toggle {
+  background: color-mix(in srgb, var(--night-panel) 70%, transparent);
+  color: var(--cyan-line);
+}
+
+html[data-mode='static'] .cluster-sound {
+  display: none;
+}
+
+/* Settings is all script (quality, sound, the still version switch): no JavaScript, no button. */
+@media (scripting: none) {
+  .settings-toggle {
+    display: none;
+  }
+}
+
+.sound-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.sound-wave {
+  display: none;
+}
+
+.sound-toggle[aria-pressed='true'] .sound-flat {
+  display: none;
+}
+
+/* A guqin string: a slow sine, 2 Hz, 1.5 px amplitude, flipping through its mirror image. */
+.sound-toggle[aria-pressed='true'] .sound-wave {
+  display: inline;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: string calc(var(--dur-sound-wave) / 2) ease-in-out infinite alternate;
+}
+
+@keyframes string {
+  to {
+    transform: scaleY(-1);
+  }
+}
+
+.settings {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.75rem);
+  z-index: var(--z-popover);
+  display: grid;
+  gap: 0.75rem;
+  width: 16rem;
+  padding: 1rem 1rem 1.25rem;
+  border: 1px solid var(--ink-dan);
+  border-radius: var(--tooltip-radius);
+  background: color-mix(in srgb, var(--paper-light) calc(var(--alpha-tooltip) * 100%), transparent);
+  color: var(--ink-nong);
+  font-size: var(--fs-body-small);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink-jiao) 12%, transparent);
+}
+
+.settings-close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  background: none;
+}
+
+.settings-label {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--tracking-label);
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  color: var(--ink-zhong);
+}
+
+.settings-row {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-quality {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.settings-quality legend {
+  padding: 0;
+  margin-bottom: 0.25rem;
+}
+
+.settings-quality label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: var(--min-target);
+  cursor: pointer;
+}
+
+.settings-quality input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  accent-color: var(--cinnabar);
+}
+
+@media (max-width: 767.98px) {
+  .cluster {
+    top: calc(env(safe-area-inset-top) + 8px);
+    right: max(4vw, env(safe-area-inset-right));
+    bottom: auto;
+  }
+
+  .cluster-sound {
+    display: none;
+  }
+
+  .settings-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .settings {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+    width: auto;
+    z-index: var(--z-sheet);
+    border-width: 1px 0 0;
+    border-radius: var(--tooltip-radius) var(--tooltip-radius) 0 0;
+    padding: 1rem 5vw 1.5rem;
+    /* A sheet over the hero copy: at the tooltip's 96% the text under it still reads through
+       (Chrome composites the card text in its own layer), so the sheet is solid. */
+    background: var(--paper-light);
+  }
+
+  .settings-row {
+    display: flex;
+  }
+
+  /* The sound row is the first row, level with the close button in the corner: keep them apart. */
+  .settings-row.settings-sound {
+    padding-right: 3.5rem;
+  }
+}
+
+/* ------------------------------------------------------------------ fog-dive title card (§4.3, §11.1) */
+
+.title-card {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-title-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.title-card[data-state='in'] {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 200ms ease 250ms;
+}
+
+.title-card[data-state='out'] {
+  visibility: visible;
+  opacity: 0;
+  filter: blur(8px);
+  transform: scale(1.04);
+  transition:
+    opacity var(--dur-title-card-out) ease,
+    filter var(--dur-title-card-out) ease,
+    transform var(--dur-title-card-out) ease,
+    visibility 0s linear var(--dur-title-card-out);
+}
+
+.title-card-zh {
+  font-family: var(--font-cjk-display);
+  font-size: var(--fs-title-card-cjk);
+  line-height: var(--lh-title-card-cjk);
+  color: var(--ink-nong);
+}
+
+.title-card-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  font-weight: 600;
+  color: var(--ink-jiao);
+}
+
+.title-card-hint {
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  color: var(--ink-zhong);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.title-card-hint[data-shown] {
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------ toasts (§4.3) */
+
+.toast-host {
+  position: fixed;
+  left: 50%;
+  bottom: calc(20px + var(--min-target) + 1rem);
+  z-index: var(--z-toast);
+  width: min(28rem, 92vw);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  position: relative;
+  border: 1px solid var(--ink-dan);
+  border-radius: var(--tooltip-radius);
+  background: color-mix(in srgb, var(--paper-light) calc(var(--alpha-tooltip) * 100%), transparent);
+  color: var(--ink-nong);
+  font-size: var(--fs-body-small);
+  pointer-events: auto;
+  animation: rise 240ms var(--ease-out-cubic);
+}
+
+.toast p {
+  margin: 0;
+}
+
+/* A toast whose whole message is the action ("3D paused. Tap to restart."). */
+.toast-tap {
+  min-height: var(--min-target);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.toast-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--min-target);
+  height: var(--min-target);
+  border: 0;
+  background: none;
+  font-size: 1.25rem;
+}
+
+html[data-palette='night'] .toast {
+  border-color: var(--cyan-dim);
+  background: color-mix(in srgb, var(--night-panel) calc(var(--alpha-tooltip) * 100%), transparent);
+  color: var(--cyan-soft);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .toast-host {
+    bottom: calc(var(--bar-h) + env(safe-area-inset-bottom) + 1rem);
+  }
+}
+
+/* ------------------------------------------------------------------ gloss tooltip (§4.3) */
+
+.gloss-tip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-tooltip);
+  max-width: var(--tooltip-max-w);
+  padding: 0.6rem 0.85rem 0.7rem;
+  border: 1px solid var(--ink-dan);
+  border-radius: var(--tooltip-radius);
+  background: color-mix(in srgb, var(--paper-light) calc(var(--alpha-tooltip) * 100%), transparent);
+  color: var(--ink-nong);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--ink-jiao) 10%, transparent);
+  opacity: 0;
+  transition: opacity var(--dur-tooltip-delay) ease;
+}
+
+.gloss-tip[data-open] {
+  opacity: 1;
+}
+
+.gloss-tip p {
+  margin: 0;
+}
+
+.gloss-tip-head {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+}
+
+.gloss-tip-zh {
+  font-size: calc(var(--fs-label) * 1.3);
+  margin-right: 0.15em;
+}
+
+.gloss-tip-meaning {
+  margin-top: 0.3rem !important;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+html[data-palette='night'] .gloss-tip {
+  border-color: var(--cyan-dim);
+  background: color-mix(in srgb, var(--night-panel) calc(var(--alpha-tooltip) * 100%), transparent);
+  color: var(--cyan-soft);
+}
+
+/* ------------------------------------------------------------------ album banner (§14.1) */
+
+/*
+ * Prerendered with a line per reason; the head script's <html data-static-reason> picks one before
+ * first paint, so nothing moves at hydration. No reason (no JS, or the walk): no banner.
+ */
+.album-banner,
+.album-banner [data-reason] {
+  display: none;
+}
+
+html[data-mode='static'][data-static-reason] .album-banner {
+  display: flex;
+}
+
+html[data-static-reason='nowebgl'] .album-banner [data-reason='nowebgl'],
+html[data-static-reason='reduced'] .album-banner [data-reason='reduced'],
+html[data-static-reason='saveData'] .album-banner [data-reason='saveData'],
+html[data-static-reason='memory'] .album-banner [data-reason='memory'],
+html[data-static-reason='pref'] .album-banner [data-reason='pref'],
+html[data-static-reason='param'] .album-banner [data-reason='param'],
+html[data-static-reason='slow'] .album-banner [data-reason='slow'],
+html[data-static-reason='error'] .album-banner [data-reason='error'] {
+  display: block;
+}
+
+/* Nothing to walk with: no "Walk the forest". */
+html:is([data-static-reason='nowebgl'], [data-static-reason='error']) .album-walk {
+  display: none;
+}
+
+.album-banner {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin: calc(var(--header-block) + 1rem) auto 0;
+  padding: 0.75rem 1.25rem;
+  width: min(72rem, 92vw);
+  border: 1px solid var(--ink-dan);
+  background: var(--paper-light);
+  font-size: var(--fs-body-small);
+}
+
+.album-banner p {
+  margin: 0;
+}

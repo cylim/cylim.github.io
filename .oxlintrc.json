@@ -1,0 +1,344 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "react",
+    "import"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "env": {
+    "browser": true,
+    "es2024": true
+  },
+  "ignorePatterns": [
+    "dist/**",
+    "dist-ssr/**",
+    "node_modules/**",
+    "public/**",
+    "docs/**"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
+    "no-underscore-dangle": [
+      "warn",
+      {
+        "allow": [
+          "__cy"
+        ]
+      }
+    ],
+    "import/no-unassigned-import": [
+      "warn",
+      {
+        "allow": [
+          "**/*.css"
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/sections/threshold/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "../cabin",
+                  "../cabin/**",
+                  "**/sections/cabin",
+                  "**/sections/cabin/**",
+                  "../grove",
+                  "../grove/**",
+                  "**/sections/grove",
+                  "**/sections/grove/**",
+                  "../contact",
+                  "../contact/**",
+                  "**/sections/contact",
+                  "**/sections/contact/**",
+                  "**/dom",
+                  "**/dom/**",
+                  "**/audio",
+                  "**/audio/**"
+                ],
+                "message": "A section imports only core/, env/, lib/, content/ and theme/. Never another section, the DOM layer or audio."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/sections/cabin/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "../threshold",
+                  "../threshold/**",
+                  "**/sections/threshold",
+                  "**/sections/threshold/**",
+                  "../grove",
+                  "../grove/**",
+                  "**/sections/grove",
+                  "**/sections/grove/**",
+                  "../contact",
+                  "../contact/**",
+                  "**/sections/contact",
+                  "**/sections/contact/**",
+                  "**/dom",
+                  "**/dom/**",
+                  "**/audio",
+                  "**/audio/**"
+                ],
+                "message": "A section imports only core/, env/, lib/, content/ and theme/. Never another section, the DOM layer or audio."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/sections/grove/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "../threshold",
+                  "../threshold/**",
+                  "**/sections/threshold",
+                  "**/sections/threshold/**",
+                  "../cabin",
+                  "../cabin/**",
+                  "**/sections/cabin",
+                  "**/sections/cabin/**",
+                  "../contact",
+                  "../contact/**",
+                  "**/sections/contact",
+                  "**/sections/contact/**",
+                  "**/dom",
+                  "**/dom/**",
+                  "**/audio",
+                  "**/audio/**"
+                ],
+                "message": "A section imports only core/, env/, lib/, content/ and theme/. Never another section, the DOM layer or audio."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/sections/contact/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "../threshold",
+                  "../threshold/**",
+                  "**/sections/threshold",
+                  "**/sections/threshold/**",
+                  "../cabin",
+                  "../cabin/**",
+                  "**/sections/cabin",
+                  "**/sections/cabin/**",
+                  "../grove",
+                  "../grove/**",
+                  "**/sections/grove",
+                  "**/sections/grove/**",
+                  "**/dom",
+                  "**/dom/**",
+                  "**/audio",
+                  "**/audio/**"
+                ],
+                "message": "A section imports only core/, env/, lib/, content/ and theme/. Never another section, the DOM layer or audio."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/dom/**",
+        "src/content/**",
+        "src/theme/**",
+        "src/entry-server.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "three",
+                "message": "The DOM layer ships in the boot chunk and must never pull in 3D code."
+              },
+              {
+                "name": "@react-three/fiber",
+                "message": "The DOM layer ships in the boot chunk and must never pull in 3D code."
+              },
+              {
+                "name": "@react-three/drei",
+                "message": "The DOM layer ships in the boot chunk and must never pull in 3D code."
+              },
+              {
+                "name": "@react-three/postprocessing",
+                "message": "The DOM layer ships in the boot chunk and must never pull in 3D code."
+              },
+              {
+                "name": "postprocessing",
+                "message": "The DOM layer ships in the boot chunk and must never pull in 3D code."
+              },
+              {
+                "name": "troika-three-text",
+                "message": "The DOM layer ships in the boot chunk and must never pull in 3D code."
+              },
+              {
+                "name": "maath",
+                "message": "The DOM layer ships in the boot chunk and must never pull in 3D code."
+              }
+            ],
+            "patterns": [
+              {
+                "group": [
+                  "**/sections/threshold",
+                  "**/sections/threshold/**",
+                  "**/sections/cabin",
+                  "**/sections/cabin/**",
+                  "**/sections/grove",
+                  "**/sections/grove/**",
+                  "**/sections/contact",
+                  "**/sections/contact/**",
+                  "**/env",
+                  "**/env/**",
+                  "**/core/render/**",
+                  "**/core/camera/**",
+                  "**/audio/**",
+                  "three/**",
+                  "@react-three/**"
+                ],
+                "message": "DOM, content and theme stay free of 3D code. Talk to the stage through core/store."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/lib/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react",
+                "message": "lib/ is pure TypeScript: no React."
+              },
+              {
+                "name": "three",
+                "message": "lib/ is pure TypeScript: no three."
+              },
+              {
+                "name": "tyme4ts",
+                "message": "tyme4ts is build-time only (scripts/build-terms). Runtime reads the generated table."
+              }
+            ],
+            "patterns": [
+              {
+                "group": [
+                  "**/core/**",
+                  "**/sections/**",
+                  "**/dom/**",
+                  "**/env/**",
+                  "**/content/**",
+                  "@react-three/**",
+                  "three/**"
+                ],
+                "message": "lib/ is a leaf: pure TypeScript with no app imports."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/env/**",
+        "src/core/**"
+      ],
+      "excludeFiles": [
+        "src/core/sections/registry.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "**/sections/threshold",
+                  "**/sections/threshold/**",
+                  "**/sections/cabin",
+                  "**/sections/cabin/**",
+                  "**/sections/grove",
+                  "**/sections/grove/**",
+                  "**/sections/contact",
+                  "**/sections/contact/**",
+                  "**/dom",
+                  "**/dom/**"
+                ],
+                "message": "core/ and env/ reach sections only through core/sections/registry.ts, and never import the DOM layer."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "scripts/**",
+        "tests/**"
+      ],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}

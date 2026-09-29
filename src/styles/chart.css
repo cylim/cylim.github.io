@@ -1,0 +1,608 @@
+/*
+ * The DOM chart and its controls (design.md §9.6–9.9), and the album's SVG chart (§14.1).
+ * South is at the top everywhere. The only red is the 值符 plate, the 值使 ring and the 值符 arc.
+ */
+
+.panel-heading {
+  margin-top: 0;
+}
+
+.chart-panel {
+  display: grid;
+  /* minmax(0, …): the chart never sizes the column from its content, so 200% text reflows (A11Y-4). */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  font-size: var(--fs-body-small);
+  line-height: var(--lh-body-small);
+}
+
+#qimen {
+  min-width: 0;
+  margin: 0;
+}
+
+#qimen figcaption {
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  color: var(--ink-jiao);
+}
+
+.qm-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.4rem;
+  max-width: none;
+  margin: 0 0 0.35rem;
+  font-size: var(--fs-label);
+  line-height: 1.5;
+  color: var(--ink-zhong);
+}
+
+.qm-header > span:not(:last-child)::after {
+  content: ' ·';
+}
+
+.qm-header .zh,
+.qm-palaces .zh,
+.qm-meaning .zh {
+  font-size: 1.1em;
+}
+
+.qm-band {
+  margin: 0 0 0.6rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-nong);
+}
+
+.qm-south {
+  margin: 0.25rem 0 0.2rem;
+  max-width: none;
+  text-align: center;
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  color: var(--ink-zhong);
+}
+
+.qm-south::before {
+  content: '▲ ';
+  font-size: 0.7em;
+  color: var(--cinnabar);
+}
+
+.qm-glyph,
+.qm-header .zh {
+  white-space: nowrap;
+}
+
+.qm-palaces {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    'p4 p9 p2'
+    'p3 p5 p7'
+    'p8 p1 p6';
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--ink-qing);
+  background: var(--ink-qing);
+}
+
+.qm-palaces li {
+  min-width: 0;
+  /* At 200% text a palace column is narrower than "Instrument": break the word rather than the page. */
+  overflow-wrap: anywhere;
+  padding: 0.3rem 0.45rem 0.45rem;
+  background: var(--paper-light);
+  transition: background-color var(--dur-chrome) ease;
+}
+
+.qm-palaces li[data-selected] {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 2px var(--ink-dan);
+}
+
+.qm-palaces h4 button {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3em;
+  width: 100%;
+  min-height: var(--min-target);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--fs-label);
+  line-height: 1.2;
+  font-weight: 600;
+  text-align: left;
+  color: var(--ink-jiao);
+}
+
+.qm-palaces dl {
+  margin: 0;
+}
+
+.qm-palaces dl > div {
+  display: block;
+}
+
+/* The field names stay for screen readers; sighted readers see the glyph and its English. */
+.qm-palaces dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.qm-palaces dd {
+  margin: 0;
+  font-size: var(--fs-label);
+  line-height: 1.35;
+}
+
+.qm-glyph {
+  color: var(--ink-jiao);
+}
+
+.qm-en {
+  color: var(--ink-zhong);
+}
+
+/* "天禽 Bird" stays one unit and moves to the next line whole; only a column narrower than the unit
+   itself (large text on a phone) wraps inside it (A11Y-4). */
+.qm-multi {
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* 值符: the glyph on a cinnabar plate, like a 白文 seal stamped on the chart (§9.4). */
+.qm-glyph.qm-plate {
+  padding: 0 0.15em;
+  border-radius: 1px;
+  background: var(--cinnabar);
+  color: var(--paper-light);
+  text-decoration: none;
+}
+
+/* 值使: a cinnabar brush ring (圈点) round the door. */
+.qm-glyph.qm-ring {
+  padding: 0 0.25em;
+  border: 1.5px solid var(--cinnabar);
+  border-radius: 50%;
+  text-decoration: none;
+}
+
+.qm-marks,
+.qm-note {
+  max-width: none;
+  margin: 0.2rem 0 0;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-zhong);
+}
+
+.qm-meanings {
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--ink-qing);
+}
+
+.qm-meaning {
+  margin: 0 0 0.35rem;
+  font-size: var(--fs-label);
+  line-height: 1.4;
+}
+
+#qimen .qm-controls {
+  margin: 0.25rem 0 0.75rem;
+}
+
+.qm-controls,
+.qm-compass {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+}
+
+.qm-live {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  width: 100%;
+}
+
+.qm-turn {
+  margin: 0;
+  font-size: var(--fs-label);
+  color: var(--ink-zhong);
+}
+
+.qm-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.qm-step-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--ink-nong);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink-jiao);
+  /* ◀ ▶ exist only in the JetBrains Mono subset (scripts/check-glyphs.mjs). */
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.qm-step-btn:hover {
+  background: var(--paper-shade);
+}
+
+.qm-hour,
+.qm-rotate {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: var(--min-target);
+}
+
+/*
+ * The hour slider and the luopan rotation are the touch time and turn controls: the whole 44 px row
+ * takes the pointer (a tap on the wrapping label only focuses), with a 26 px ink thumb (design.md §15).
+ */
+.qm-hour input,
+.qm-rotate input {
+  flex: 1 1 auto;
+  min-width: 6rem;
+  height: var(--min-target);
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.qm-hour input:disabled,
+.qm-rotate input:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.qm-hour input::-webkit-slider-runnable-track,
+.qm-rotate input::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ink-dan);
+}
+
+.qm-hour input::-moz-range-track,
+.qm-rotate input::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ink-dan);
+}
+
+.qm-hour input::-webkit-slider-thumb,
+.qm-rotate input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  /* Centred on the 4 px track. */
+  margin-top: -11px;
+  border: 2px solid var(--paper-light);
+  border-radius: 50%;
+  background: var(--ink-nong);
+  box-shadow: 0 0 0 1px var(--ink-nong);
+}
+
+.qm-hour input::-moz-range-thumb,
+.qm-rotate input::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--paper-light);
+  border-radius: 50%;
+  background: var(--ink-nong);
+  box-shadow: 0 0 0 1px var(--ink-nong);
+}
+
+.qm-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+  max-width: 100%;
+}
+
+.qm-pick-label {
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  color: var(--ink-zhong);
+}
+
+.qm-pick input {
+  /* A datetime field's intrinsic width at 200% text is wider than a phone column (A11Y-4). */
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--min-target);
+  padding: 0 0.5rem;
+  border: 1px solid var(--ink-dan);
+  border-radius: 2px;
+  background: var(--paper-light);
+  color: var(--ink-jiao);
+}
+
+.qm-readout {
+  margin: 0;
+  font-weight: 600;
+}
+
+.qm-rotate {
+  width: 100%;
+}
+
+/*
+ * 天心十道: two cinnabar hairlines through the chart centre and a pointer at the top (§9.9).
+ * CompassControls sets the centre (--cx, --cy) and the plan area (--plan-w, --plan-h) as fractions
+ * of the viewport, from the rig's framing. They live in #root like the finale layer: above the
+ * painting, under the card frames (z-index 2), so the chart panel and the phone sheet lie on top.
+ */
+.compass-threads {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.thread {
+  position: absolute;
+  background: var(--cinnabar);
+}
+
+.thread-v {
+  top: 0;
+  height: calc(var(--plan-h) * 100%);
+  left: calc(var(--cx) * 100%);
+  width: 1px;
+}
+
+.thread-h {
+  left: 0;
+  width: calc(var(--plan-w) * 100%);
+  top: calc(var(--cy) * 100%);
+  height: 1px;
+}
+
+.thread-pointer {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 4px);
+  left: calc(var(--cx) * 100% - 6px);
+  border: 6px solid transparent;
+  border-top: 10px solid var(--cinnabar);
+}
+
+@media (min-width: 768px) {
+  .thread-v {
+    top: var(--header-block);
+    height: calc(var(--plan-h) * 100% - var(--header-block));
+  }
+
+  .thread-pointer {
+    top: calc(var(--header-block) + 4px);
+  }
+}
+
+/* The palace under the top thread (§9.9). */
+.qm-palaces li[data-facing] {
+  box-shadow: inset 0 2px 0 var(--cinnabar);
+}
+
+.qm-palaces li[data-facing][data-selected] {
+  box-shadow:
+    inset 0 2px 0 var(--cinnabar),
+    inset 0 0 0 2px var(--ink-dan);
+}
+
+/* ------------------------------------------------------------------ phones: the chart sheet (§8.6) */
+
+.sheet-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.sheet-bar [role='tablist'] {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.sheet-bar [role='tab'] {
+  min-height: var(--min-target);
+  padding: 0 0.8rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-weight: 600;
+  color: var(--ink-zhong);
+}
+
+.sheet-bar [role='tab'][aria-selected='true'] {
+  border-bottom-color: var(--cinnabar);
+  color: var(--ink-jiao);
+}
+
+.sheet-toggle {
+  width: var(--min-target);
+  height: var(--min-target);
+  border: 0;
+  background: none;
+}
+
+.sheet-toggle span {
+  display: block;
+  width: 28px;
+  height: 4px;
+  margin: auto;
+  border-radius: 2px;
+  background: var(--ink-dan);
+}
+
+.sheet-panel {
+  overflow-y: auto;
+  overscroll-behavior: auto;
+}
+
+.chart-sheet .qm-palaces li {
+  padding: 0.2rem 0.3rem 0.35rem;
+}
+
+/* ------------------------------------------------------------------ the album SVG chart (§14.1) */
+
+.album-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--font-cjk);
+}
+
+.ac-stone {
+  fill: var(--stone);
+}
+
+.ac-divider {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink-jiao) 35%, transparent);
+  stroke-width: 0.25;
+}
+
+.ac-hour {
+  fill: var(--ink-jiao);
+}
+
+.ac-tick {
+  stroke: var(--ink-jiao);
+  stroke-width: 0.2;
+}
+
+.ac-mountain {
+  fill: var(--ink-jiao);
+}
+
+.ac-mountain .ac-big {
+  font-size: 1.2em;
+}
+
+.ac-mountain .ac-inverse {
+  fill: var(--paper-light);
+}
+
+.ac-bluestone,
+.ac-slab {
+  fill: var(--bluestone);
+}
+
+.ac-platform {
+  fill: var(--bluestone-deep);
+}
+
+.ac-divider-line {
+  stroke: var(--bluestone-deep);
+  stroke-width: 0.8;
+}
+
+/* Ring carvings stay behind once the light has moved into the palaces (§9.5). */
+.ac-carving {
+  fill: var(--paper);
+  fill-opacity: 0.4;
+}
+
+.ac-lit {
+  fill: var(--paper);
+}
+
+.ac-carved {
+  fill: var(--paper-light);
+  fill-opacity: 0.82;
+}
+
+.ac-name,
+.ac-trigram {
+  fill: var(--paper);
+  fill-opacity: 0.72;
+}
+
+.ac-faint {
+  fill: var(--paper);
+  fill-opacity: 0.55;
+}
+
+.ac-void {
+  fill: none;
+  stroke: var(--paper);
+  stroke-opacity: 0.6;
+  stroke-width: 0.4;
+}
+
+.ac-plate {
+  fill: var(--cinnabar);
+}
+
+.ac-ring {
+  fill: none;
+  stroke: var(--cinnabar);
+  stroke-width: 0.9;
+}
+
+.ac-arc {
+  fill: none;
+  stroke: var(--cinnabar);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-opacity: 0.4;
+}
+
+.ac-needle line {
+  stroke: var(--paper-light);
+  stroke-width: 0.5;
+}
+
+.ac-needle .ac-needle-south {
+  stroke: var(--cinnabar);
+  stroke-width: 0.8;
+}
+
+.ac-band {
+  fill: var(--ink-nong);
+}
+
+.album-chart[data-selecting] [data-palace]:not([data-selected]) {
+  opacity: 0.7;
+}
+
+.album-chart [data-selected] .ac-slab {
+  stroke: var(--paper-light);
+  stroke-width: 0.4;
+}

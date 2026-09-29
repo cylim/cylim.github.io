@@ -1,0 +1,61 @@
+cy.my: third-party assets and their licences
+=============================================
+
+Fonts (all SIL Open Font License 1.1; the full licence sits next to each file in /fonts/)
+-----------------------------------------------------------------------------------------
+Subset, and converted to WOFF2 and WOFF, for web delivery on this site only.
+
+Cormorant Garamond SemiBold 600, v4.002
+  Christian Thalmann, Catharsis Fonts. https://github.com/CatharsisFonts/Cormorant
+  /fonts/cormorant-garamond-600.woff2 .woff       licence: /fonts/OFL-Cormorant.txt
+
+Source Serif 4 Regular 400 and Semibold 600 (text optical size), 4.005
+  Adobe, with Reserved Font Name "Source". https://github.com/adobe-fonts/source-serif
+  /fonts/source-serif-4-400.* /fonts/source-serif-4-600.*   licence: /fonts/OFL-SourceSerif4.txt
+
+LXGW WenKai (霞鹜文楷) Regular, v1.522
+  LXGW. https://github.com/lxgw/LxgwWenKai
+  Subset under the licence's additional permission for subsets and WOFF/WOFF2 conversions
+  "solely for web font delivery".
+  /fonts/wenkai-subset.woff2 .woff               licence: /fonts/OFL-LXGWWenKai.txt
+
+Ma Shan Zheng (马善政) Regular
+  The Ma Shan Zheng Project Authors. https://github.com/google/fonts/tree/main/ofl/mashanzheng
+  /fonts/mashanzheng-subset.woff2 .woff, and the outlined /glyphs/hero-rulin.svg and
+  /glyphs/mashanzheng.json                        licence: /fonts/OFL-MaShanZheng.txt
+
+JetBrains Mono Regular 400, v2.304
+  The JetBrains Mono Project Authors. https://github.com/JetBrains/JetBrainsMono
+  /fonts/jetbrains-mono-400.woff2 .woff          licence: /fonts/OFL-JetBrainsMono.txt
+
+
+Seals (/seals/, /favicon.svg, /favicon.ico, /apple-touch-icon.png)
+-------------------------------------------------------------------
+Drawn for this site. The small-seal (小篆) letterforms follow public-domain reference
+drawings on Wikimedia Commons, "Shuowen seal script characters (SVG)":
+
+  林  https://commons.wikimedia.org/wiki/File:%E6%9E%97-seal.svg  Alexbdf, public domain
+  木  https://commons.wikimedia.org/wiki/File:%E6%9C%A8-seal.svg  Wargaz, public domain
+
+The 林 seal is traced by hand after the 林 and 木 drawings.
+
+
+Icons
+-----
+GitHub, X and LinkedIn brand marks (contact and hero social links), flat and unmodified
+  Simple Icons. https://simpleicons.org  https://github.com/simple-icons/simple-icons
+  Licence: CC0 1.0. The brands themselves remain trademarks of their owners.
+  Inlined as SVG paths in src/dom/icons.tsx.
+
+
+Adding an asset
+---------------
+Every third-party model, texture, sound or icon gets an entry here: what, where it is
+used, author, source URL and licence (stack.md §4). Prefer CC0.
+
+
+Sound
+-----
+None to credit. Every sound on the site (wind, pines, stream, cabin hum, door creak, guqin,
+chime, seal) is synthesised in the browser at run time by src/audio; no recordings or
+third-party samples ship.

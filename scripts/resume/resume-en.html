@@ -1,0 +1,341 @@
+<!doctype html>
+<!--
+  English résumé, printed to public/resources/resume-en.pdf by scripts/make-resume.mjs.
+  Keep it in step with the site copy in src/content (hero, services, work, timeline). Facts come from
+  the LinkedIn export, public sources and what the owner approved for publication; nothing else.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>CY Lim, full stack software engineer</title>
+    <style>
+      @font-face {
+        font-family: 'Cormorant Garamond';
+        font-weight: 600;
+        src: url('../../public/fonts/cormorant-garamond-600.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Source Serif 4';
+        font-weight: 400;
+        src: url('../../public/fonts/source-serif-4-400.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Source Serif 4';
+        font-weight: 600;
+        src: url('../../public/fonts/source-serif-4-600.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-weight: 400;
+        src: url('../../public/fonts/jetbrains-mono-400.woff2') format('woff2');
+      }
+
+      @page {
+        size: A4;
+        margin: 10mm 13mm 9mm;
+      }
+
+      :root {
+        --paper: #eee8db;
+        --ink: #141517;
+        --ink-body: #2a2c2e;
+        --ink-soft: #4b4d4e;
+        --rule: #b9b6ab;
+        --cinnabar: #a8322a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font: 400 9pt/1.4 'Source Serif 4', Georgia, serif;
+        color: var(--ink-body);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      header {
+        padding-bottom: 6pt;
+        border-bottom: 1.2pt solid var(--ink);
+      }
+
+      .name {
+        display: flex;
+        align-items: center;
+        gap: 10pt;
+      }
+
+      h1 {
+        margin: 0;
+        font: 600 26pt/1 'Cormorant Garamond', Georgia, serif;
+        color: var(--ink);
+      }
+
+      .seal {
+        width: 22pt;
+        height: 22pt;
+      }
+
+      .role {
+        margin: 3pt 0 0;
+        font-weight: 600;
+        color: var(--ink);
+      }
+
+      .contact {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 12pt;
+        margin: 3pt 0 0;
+        padding: 0;
+        list-style: none;
+        font-size: 8.6pt;
+        color: var(--ink-soft);
+      }
+
+      .summary {
+        margin: 7pt 0 0;
+        font-size: 9.6pt;
+        color: var(--ink);
+      }
+
+      h2 {
+        margin: 8pt 0 4pt;
+        padding-bottom: 1.5pt;
+        font: 600 8.4pt/1.2 'Source Serif 4', Georgia, serif;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--cinnabar);
+        border-bottom: 0.6pt solid var(--rule);
+      }
+
+      .job {
+        margin: 0 0 4.5pt;
+        break-inside: avoid;
+      }
+
+      .job-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 10pt;
+      }
+
+      .job-title {
+        font-weight: 600;
+        color: var(--ink);
+      }
+
+      .job-title span {
+        font-weight: 400;
+        color: var(--ink-soft);
+      }
+
+      .dates {
+        flex: none;
+        font-size: 8.8pt;
+        color: var(--ink-soft);
+      }
+
+      ul.points {
+        margin: 1pt 0 0;
+        padding-left: 10pt;
+      }
+
+      ul.points li {
+        margin: 0.5pt 0;
+      }
+
+      .tags {
+        margin: 1pt 0 0;
+        font: 400 7.2pt/1.35 'JetBrains Mono', monospace;
+        color: var(--ink-soft);
+      }
+
+      .skills {
+        display: grid;
+        grid-template-columns: 6.6em 1fr;
+        gap: 1pt 8pt;
+        margin: 0;
+      }
+
+      .skills dt {
+        font-weight: 600;
+        color: var(--ink);
+      }
+
+      .skills dd {
+        margin: 0;
+      }
+
+      .three-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.3fr;
+        gap: 0 14pt;
+      }
+
+      .plain {
+        margin: 0;
+        padding-left: 10pt;
+      }
+
+      .plain li {
+        margin: 0.5pt 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="name">
+        <h1>CY Lim</h1>
+        <img class="seal" src="../../public/seals/lin-zhuwen.svg" alt="" />
+      </div>
+      <p class="role">Full stack software engineer · Penang, Malaysia</p>
+      <ul class="contact">
+        <li><a href="mailto:jobs@cy.my">jobs@cy.my</a></li>
+        <li><a href="https://cy.my">cy.my</a></li>
+        <li><a href="https://github.com/cylim">github.com/cylim</a></li>
+        <li><a href="https://www.linkedin.com/in/cylim226">linkedin.com/in/cylim226</a></li>
+      </ul>
+    </header>
+
+    <p class="summary">
+      Full stack engineer with nine years of production experience across web, mobile, backend services and DevOps,
+      mostly in TypeScript. Nearly seven of those years were spent building blockchain products at Kysen, and since 2018 I
+      have run my own studio, Cyants, delivering client apps and products of our own.
+    </p>
+
+    <h2>Experience</h2>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-title">Miroma Project Factory <span>· Software Engineer</span></div>
+        <div class="dates">Jun 2026 – present · Sep 2020 – Apr 2022</div>
+      </div>
+      <ul class="points">
+        <li>Building Stage 3 of Pave, Cancer Institute NSW's quit-vaping app for young people, across the Expo mobile app and a NestJS backend on Azure Functions.</li>
+        <li>Built most of Liv, a React Native app that supports people living with dementia and their carers, and its Angular admin portal.</li>
+      </ul>
+      <p class="tags">React Native · Expo · NestJS · Azure · Firebase · Angular</p>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-title">Tokenyze <span>· Frontend Engineer</span></div>
+        <div class="dates">Jun 2024 – Jun 2026</div>
+      </div>
+      <ul class="points">
+        <li>Built the agent dashboard for Tokenyze's tokenised gold platform, which agents use to handle compliance on gold trades.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-title">Kysen Technologies <span>· Software Engineer · PoS validators and products for blockchain teams</span></div>
+        <div class="dates">Oct 2019 – May 2026</div>
+      </div>
+      <ul class="points">
+        <li>Built the React frontend for Cosmos Outpost, an analytics site for the Cosmos ecosystem.</li>
+        <li>Built Harvest, a Flutter mobile wallet on Terra for earning yield on stablecoin deposits and swapping between stablecoins.</li>
+        <li>Worked on Mirror Wallet, a mobile wallet for trading tokenised US stocks on Mirror Protocol.</li>
+      </ul>
+      <p class="tags">React · Flutter · Dart · Cosmos · Terra</p>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-title">Cyants <span>· Founder · Software studio for client builds and our own products</span></div>
+        <div class="dates">Jun 2018 – present</div>
+      </div>
+      <ul class="points">
+        <li>NextRare, 2025–2026. Built features across its iOS and Android app for collectible card packs, including pack reveals, missions, a loyalty points system, and crypto deposits and withdrawals on Base and Solana, plus the backend APIs for rewards and pack odds.</li>
+        <li>Asterix and Amaterasu, 2024–2025. Sole developer of seven web apps for Asterix, a DN404 hybrid token and NFT project on Ethereum, covering staking, vesting, a quest platform and NFT rerolls. Then launched Amaterasu, a hybrid NFT collection on Aptos, including its Move smart contracts.</li>
+        <li>Our own JRNY apps for travellers and group scheduling, and client builds through agencies and Upwork since 2018.</li>
+      </ul>
+      <p class="tags">Expo · React Native · Next.js · Drizzle · Postgres · Privy · wagmi · viem · Move · TanStack Start · Convex</p>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-title">Mercury Labs <span>· Software Engineer, remote · Real-world asset tokenisation</span></div>
+        <div class="dates">Jul 2022 – Sep 2023</div>
+      </div>
+      <ul class="points">
+        <li>Built a Hedera dashboard that lets suppliers issue their own asset tokens, with multisig treasury accounts and token metadata on IPFS. The firm's first product tokenised wine.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-title">atticc <span>· Software Engineer, remote</span></div>
+        <div class="dates">Jul 2022 – Sep 2023</div>
+      </div>
+      <ul class="points">
+        <li>Built most of the web app for a web3 social network, including profiles and follows on CyberConnect, wallet-to-wallet chat over XMTP, token-gated communities, peer-to-peer NFT trading and an NFT membership pass.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-title">TBSx3 <span>· Senior Software Engineer, Penang</span></div>
+        <div class="dates">Jul 2017 – Apr 2018</div>
+      </div>
+      <ul class="points">
+        <li>Led the Penang engineering team, including hiring and project management, for a blockchain-based anti-counterfeiting product. Built its API services for the web dashboard and mobile app, and set up GitLab CI/CD deploying to AWS, Rancher and Firebase.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-title">Earlier</div>
+        <div class="dates">2015 – 2017</div>
+      </div>
+      <ul class="points">
+        <li>Lava X Technologies, Full Stack Developer, 2017. Led a team that built client MVPs in six weeks. Tableapp, iOS Developer intern, 2015.</li>
+      </ul>
+    </div>
+
+    <h2>Skills</h2>
+    <dl class="skills">
+      <dt>Languages</dt>
+      <dd>TypeScript, JavaScript, Dart, Swift, Solidity, Move</dd>
+      <dt>Web, mobile</dt>
+      <dd>React, Next.js, TanStack, Tailwind CSS, three.js · React Native, Expo, Flutter, iOS</dd>
+      <dt>Backend</dt>
+      <dd>Node.js, NestJS, PostgreSQL, Drizzle ORM, Convex, Cloudflare Workers and D1</dd>
+      <dt>Web3</dt>
+      <dd>Cosmos, Terra, Ethereum, Base, Aptos, Solana, Hedera, wagmi and viem</dd>
+      <dt>DevOps</dt>
+      <dd>GitHub Actions, GitLab CI, Docker, AWS, Azure, Firebase, Cloudflare, Playwright</dd>
+    </dl>
+
+    <div class="three-col">
+      <div>
+        <h2>Education</h2>
+        <ul class="plain">
+          <li>Bachelor of Computer Science, Digital System Security. University of Wollongong, 2016</li>
+          <li>CPEH ethical hacking certification</li>
+        </ul>
+      </div>
+      <div>
+        <h2>Languages</h2>
+        <ul class="plain">
+          <li>English, Chinese: native</li>
+          <li>Cantonese, Malay: limited working</li>
+          <li>Japanese: elementary</li>
+        </ul>
+      </div>
+      <div>
+        <h2>Community and open source</h2>
+        <ul class="plain">
+          <li>Organised the JavaScript Malaysia meetup in Penang and gave talks there and at Docker Penang</li>
+          <li>Merged fixes in React, TanStack Query, Aptos Core, Ghost and Harmony's 1wallet</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
