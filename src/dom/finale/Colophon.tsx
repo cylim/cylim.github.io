@@ -18,7 +18,7 @@ const vars = (v: Record<string, number>) => v as CSSProperties
 
 /**
  * The colophon's columns break only between phrases (丙午年 · 秋分后五日 · 戌时 · the signature), never
- * inside one, the separator stays with the date, and the signature 林 写于槟城 is one unit: on a
+ * inside one, the separator stays with the date, and the signature 林 is one unit: on a
  * narrow screen the column breaks before it, as a painter starts the name on a fresh column. `at` is
  * each phrase's first index in `chars`, which times the writing.
  */

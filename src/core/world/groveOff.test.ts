@@ -15,7 +15,9 @@ import {
   STILLS,
   channelKeys,
   sampleScalar,
+  scrollSvh,
   sectionAtJvh,
+  sectionHeightSvh,
   type Channel,
 } from './journey'
 import { grove } from './layout'
@@ -59,7 +61,7 @@ describe('the walk with the grove paused (content/features.ts)', () => {
       at = s.jvh[1]
     }
     expect(at).toBe(J)
-    expect(WALK_SECTION_IDS.reduce((n, id) => n + SECTION_SPANS[id].heightSvh, 0)).toBe(J + 100)
+    expect(WALK_SECTION_IDS.reduce((n, id) => n + sectionHeightSvh(id), 0)).toBeCloseTo(scrollSvh(J) + 100, 9)
     expect(SECTION_SPANS.contact.arrivalJvh).toBe(669)
     for (const jvh of [572, 600, 640, 700, 782]) expect(sectionAtJvh(jvh)).toBe('contact')
     for (const b of BEATS.filter((x) => x.id.startsWith('P'))) expect(b.section, b.id).toBe('contact')

@@ -58,6 +58,7 @@ const PLACES: Record<SocialId, BoardPlace> = {
   github: { y: 2.1, side: -1, away: 22, length: 0.9, droop: 1.6 },
   x: { y: 1.77, side: 1, away: 30, length: 0.95, droop: 1.0 },
   linkedin: { y: 1.44, side: -1, away: 26, length: 1.0, droop: 2.4 },
+  telegram: { y: 1.11, side: 1, away: 24, length: 0.95, droop: 1.9 },
 }
 
 export interface Board extends BoardPlace {
@@ -72,7 +73,7 @@ export const FACE_LIFT = 0.003
 
 // ---------------------------------------------------------------------------- the face atlas
 
-/** One canvas holds the three board faces as rows, each as seen from the front (tip left or right). */
+/** One canvas holds the board faces as rows, each as seen from the front (tip left or right). */
 export const ATLAS = { pxPerMetre: 720, gap: 0.04 } as const
 const M = ATLAS.pxPerMetre
 const maxLength = Math.max(...BOARDS.map((b) => b.length))

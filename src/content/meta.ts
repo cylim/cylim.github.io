@@ -37,7 +37,7 @@ export const meta = {
     creator: '@seewhy' as string | null,
   },
   /** <link rel="me"> targets. */
-  relMe: ['https://github.com/cylim', 'https://x.com/seewhy', 'https://www.linkedin.com/in/cylim226'],
+  relMe: ['https://github.com/cylim', 'https://x.com/seewhy', 'https://www.linkedin.com/in/cylim226', 'https://t.me/cyants'],
   jsonLd: {
     '@context': 'https://schema.org',
     '@type': 'Person',
@@ -48,7 +48,7 @@ export const meta = {
     address: { '@type': 'PostalAddress', addressLocality: 'Penang', addressCountry: 'MY' },
     alumniOf: { '@type': 'CollegeOrUniversity', name: 'University of Wollongong' },
     knowsLanguage: ['English', 'Chinese', 'Cantonese', 'Malay', 'Japanese'],
-    sameAs: ['https://github.com/cylim', 'https://x.com/seewhy', 'https://www.linkedin.com/in/cylim226'],
+    sameAs: ['https://github.com/cylim', 'https://x.com/seewhy', 'https://www.linkedin.com/in/cylim226', 'https://t.me/cyants'],
   },
 } as const
 

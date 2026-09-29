@@ -42,7 +42,7 @@ The 林 seal is traced by hand after the 林 and 木 drawings.
 
 Icons
 -----
-GitHub, X and LinkedIn brand marks (contact and hero social links), flat and unmodified
+GitHub, X, LinkedIn and Telegram brand marks (contact and hero social links), flat and unmodified
   Simple Icons. https://simpleicons.org  https://github.com/simple-icons/simple-icons
   Licence: CC0 1.0. The brands themselves remain trademarks of their owners.
   Inlined as SVG paths in src/dom/icons.tsx.

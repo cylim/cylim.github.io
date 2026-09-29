@@ -6,10 +6,10 @@ import { colophonDate, formatColophon, termPhraseEn, type ColophonCopy } from '.
 
 // lib/ may not import src/content; this mirrors content/site.ts `colophon` and a slice of the glossary.
 const COPY: ColophonCopy = {
-  zh: '{yearGz}年 {termDay} {hourBranch}时 · 林 写于槟城',
+  zh: '{yearGz}年 {termDay} {hourBranch}时 · 林',
   termDayZero: '{term}日',
   termDayAfter: '{term}后{n}日',
-  en: 'Inscribed in Penang for your visit, {termDayEn}, in the {yearPinyin} year, at the hour of the {hourAnimal}. 林 is Lim. Two trees make a forest.',
+  en: 'Inscribed in Penang for your visit, {termDayEn}, in the {yearPinyin} year, at the hour of the {hourAnimal}.',
   termDayZeroEn: 'on the day of {termEn}',
   termDayAfterEn: '{nEn} days after {termEn}',
   termDayOneEn: 'one day after {termEn}',
@@ -36,30 +36,30 @@ const at = (iso: string, opts: Parameters<typeof colophonDate>[1] = PENANG) => f
 describe('colophon (design.md §8.7 E3)', () => {
   it('writes the design example five days after 秋分', () => {
     expect(at('2026-09-28T19:30:00+08:00')).toEqual({
-      zh: '丙午年 秋分后五日 戌时 · 林 写于槟城',
-      en: 'Inscribed in Penang for your visit, five days after the autumn equinox, in the Bing-Wu year, at the hour of the Dog. 林 is Lim. Two trees make a forest.',
+      zh: '丙午年 秋分后五日 戌时 · 林',
+      en: 'Inscribed in Penang for your visit, five days after the autumn equinox, in the Bing-Wu year, at the hour of the Dog.',
     })
   })
 
   it('reads {term}日 on the date of the term, before and after its instant (秋分 08:05)', () => {
-    expect(at('2026-09-23T07:00:00+08:00').zh).toBe('丙午年 秋分日 辰时 · 林 写于槟城')
-    expect(at('2026-09-23T10:00:00+08:00').zh).toBe('丙午年 秋分日 巳时 · 林 写于槟城')
+    expect(at('2026-09-23T07:00:00+08:00').zh).toBe('丙午年 秋分日 辰时 · 林')
+    expect(at('2026-09-23T10:00:00+08:00').zh).toBe('丙午年 秋分日 巳时 · 林')
     expect(at('2026-09-23T10:00:00+08:00').en).toContain('on the day of the autumn equinox')
   })
 
   it('says one day after, then counts to 十四', () => {
     const one = at('2026-09-24T12:00:00+08:00')
-    expect(one.zh).toBe('丙午年 秋分后一日 午时 · 林 写于槟城')
+    expect(one.zh).toBe('丙午年 秋分后一日 午时 · 林')
     expect(one.en).toContain('one day after the autumn equinox')
-    expect(at('2026-10-07T12:00:00+08:00').zh).toBe('丙午年 秋分后十四日 午时 · 林 写于槟城')
-    expect(at('2026-10-08T01:00:00+08:00').zh).toBe('丙午年 寒露日 丑时 · 林 写于槟城')
+    expect(at('2026-10-07T12:00:00+08:00').zh).toBe('丙午年 秋分后十四日 午时 · 林')
+    expect(at('2026-10-08T01:00:00+08:00').zh).toBe('丙午年 寒露日 丑时 · 林')
   })
 
   it('writes the eve of the next term past fourteen days (小暑 07-07 → 大暑 07-23)', () => {
     const d = colophonDate(Date.parse('2026-07-22T12:00:00+08:00'), PENANG)
     expect(d.termDay).toEqual({ kind: 'before', term: '大暑', days: 1 })
     const c = at('2026-07-22T12:00:00+08:00')
-    expect(c.zh).toBe('丙午年 大暑前一日 午时 · 林 写于槟城')
+    expect(c.zh).toBe('丙午年 大暑前一日 午时 · 林')
     expect(c.en).toContain('the day before Major Heat')
   })
 
@@ -75,33 +75,33 @@ describe('colophon (design.md §8.7 E3)', () => {
   it('turns the year at the 立春 instant (04:02:08 +08:00), not 1 January', () => {
     expect(at('2026-01-10T12:00:00+08:00').zh.slice(0, 3)).toBe('乙巳年')
     const before = at('2026-02-04T03:00:00+08:00')
-    expect(before.zh).toBe('乙巳年 立春日 寅时 · 林 写于槟城')
+    expect(before.zh).toBe('乙巳年 立春日 寅时 · 林')
     expect(before.en).toContain('on the day of the Start of Spring, in the Yi-Si year')
-    expect(at('2026-02-04T05:00:00+08:00').zh).toBe('丙午年 立春日 卯时 · 林 写于槟城')
+    expect(at('2026-02-04T05:00:00+08:00').zh).toBe('丙午年 立春日 卯时 · 林')
   })
 
   it("counts days on the visitor's clock: 秋分 is 09-22 in New York", () => {
-    expect(at('2026-09-22T22:00:00-04:00', { timeZone: 'America/New_York' }).zh).toBe('丙午年 秋分日 亥时 · 林 写于槟城')
-    expect(at('2026-09-22T22:00:00-04:00').zh).toBe('丙午年 秋分日 巳时 · 林 写于槟城')
+    expect(at('2026-09-22T22:00:00-04:00', { timeZone: 'America/New_York' }).zh).toBe('丙午年 秋分日 亥时 · 林')
+    expect(at('2026-09-22T22:00:00-04:00').zh).toBe('丙午年 秋分日 巳时 · 林')
   })
 
   it('uses the 子 hour from 23:00, and under zi23 that hour already counts as the next date', () => {
-    expect(at('2026-09-28T23:30:00+08:00').zh).toBe('丙午年 秋分后六日 子时 · 林 写于槟城')
-    expect(at('2026-09-29T00:30:00+08:00').zh).toBe('丙午年 秋分后六日 子时 · 林 写于槟城')
+    expect(at('2026-09-28T23:30:00+08:00').zh).toBe('丙午年 秋分后六日 子时 · 林')
+    expect(at('2026-09-29T00:30:00+08:00').zh).toBe('丙午年 秋分后六日 子时 · 林')
     // The 子时 before the equinox date is the equinox date's 子时, not the eve's.
-    expect(at('2026-09-22T22:30:00+08:00').zh).toBe('丙午年 秋分前一日 亥时 · 林 写于槟城')
-    expect(at('2026-09-22T23:30:00+08:00').zh).toBe('丙午年 秋分日 子时 · 林 写于槟城')
+    expect(at('2026-09-22T22:30:00+08:00').zh).toBe('丙午年 秋分前一日 亥时 · 林')
+    expect(at('2026-09-22T23:30:00+08:00').zh).toBe('丙午年 秋分日 子时 · 林')
   })
 
   it('dates a term that falls at 23:xx on the zi23 date (雨水 2026-02-18 23:51 +08:00)', () => {
-    expect(at('2026-02-18T22:30:00+08:00').zh).toBe('丙午年 立春后十四日 亥时 · 林 写于槟城')
-    expect(at('2026-02-18T23:20:00+08:00').zh).toBe('丙午年 雨水日 子时 · 林 写于槟城')
-    expect(at('2026-02-19T12:00:00+08:00').zh).toBe('丙午年 雨水日 午时 · 林 写于槟城')
+    expect(at('2026-02-18T22:30:00+08:00').zh).toBe('丙午年 立春后十四日 亥时 · 林')
+    expect(at('2026-02-18T23:20:00+08:00').zh).toBe('丙午年 雨水日 子时 · 林')
+    expect(at('2026-02-19T12:00:00+08:00').zh).toBe('丙午年 雨水日 午时 · 林')
     // With a midnight day boundary the civil date is used throughout.
     const civil = { ...PENANG, ziHour: 'midnight' } as const
-    expect(at('2026-02-18T23:20:00+08:00', civil).zh).toBe('丙午年 雨水日 子时 · 林 写于槟城')
-    expect(at('2026-02-19T12:00:00+08:00', civil).zh).toBe('丙午年 雨水后一日 午时 · 林 写于槟城')
-    expect(at('2026-09-22T23:30:00+08:00', { ...PENANG, ziHour: 'split' }).zh).toBe('丙午年 秋分前一日 子时 · 林 写于槟城')
+    expect(at('2026-02-18T23:20:00+08:00', civil).zh).toBe('丙午年 雨水日 子时 · 林')
+    expect(at('2026-02-19T12:00:00+08:00', civil).zh).toBe('丙午年 雨水后一日 午时 · 林')
+    expect(at('2026-09-22T23:30:00+08:00', { ...PENANG, ziHour: 'split' }).zh).toBe('丙午年 秋分前一日 子时 · 林')
   })
 
   // 8760 hours × 3 zi-hour rules: well under a second alone, but give it room on a loaded CI runner.

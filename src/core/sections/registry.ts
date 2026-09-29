@@ -11,7 +11,7 @@
 import { defineSection } from './defineSection'
 import { SECTION_HASH, SECTION_IDS, type SectionId } from './ids'
 import type { SectionDefinition } from './types'
-import { SCENE_SPANS, SECTION_SPANS } from '../world/beats'
+import { SCENE_SPANS, SECTION_SPANS, sectionHeightSvh } from '../world/beats'
 import { nav, inscriptions } from '../../content/site'
 
 const labelOf = (id: SectionId) => nav.find((n) => n.id === id)?.label ?? id
@@ -23,7 +23,7 @@ const common = (id: SectionId) => ({
   zh: inscriptions[id].accent.zh,
   spanJvh: SCENE_SPANS[id],
   arrivalJvh: SECTION_SPANS[id].arrivalJvh,
-  heightSvh: SECTION_SPANS[id].heightSvh,
+  heightSvh: sectionHeightSvh(id),
 })
 
 export const registry = {

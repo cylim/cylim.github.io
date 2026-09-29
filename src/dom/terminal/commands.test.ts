@@ -77,6 +77,7 @@ describe('runCommand', () => {
       'https://github.com/cylim',
       'https://x.com/seewhy',
       'https://www.linkedin.com/in/cylim226',
+      'https://t.me/cyants',
       'https://cy.my/resources/resume-en.pdf',
     ])
   })

@@ -7,7 +7,9 @@ import {
   channelKeys,
   jvhToU,
   sampleScalar,
+  scrollSvh,
   sectionAtJvh,
+  sectionHeightSvh,
   uToJvh,
   type Channel,
 } from './journey'
@@ -42,9 +44,9 @@ describe('sections', () => {
     expect(at).toBe(J)
   })
 
-  it('DOM heights total J + 100 svh (design.md §0)', () => {
-    const total = SECTION_IDS.reduce((n, id) => n + SECTION_SPANS[id].heightSvh, 0)
-    expect(total).toBe(J + 100)
+  it('DOM heights total the scroll length of J plus 100 svh (design.md §0)', () => {
+    const total = SECTION_IDS.reduce((n, id) => n + sectionHeightSvh(id), 0)
+    expect(total).toBeCloseTo(scrollSvh(J) + 100, 9)
   })
 })
 

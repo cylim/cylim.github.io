@@ -167,9 +167,10 @@ export const motion = {
   scrollCue: 3000,
   /**
    * First-load loading screen (intro.ts): 林 brushes in over `brush`, one 木 at a time. It
-   * holds at least `min` (first load per tab), lifts when the stage is live, and never past `max`.
+   * holds at least `min` (first load per tab) and lifts when the forest and the scenes in view are
+   * ready. `max` only guards against a load that hangs.
    */
-  intro: { brush: 1100, min: 1400, max: 7000, out: 600 },
+  intro: { brush: 1100, min: 1400, max: 30000, out: 600 },
   /** Earlier/Later long-press: repeat after `delay`, then every `interval` (4 per second). */
   longPress: { delay: 400, interval: 250 },
   /** Terminal output lines settle from a 2 px blur; the caret breathes instead of blinking. */

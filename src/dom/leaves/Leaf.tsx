@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { BEAT_SPANS, SECTION_SPANS, type BeatId, type BeatSpan } from '../../core/world/beats'
+import { BEAT_SPANS, scrollSvhBetween, sectionHeightSvh, type BeatId, type BeatSpan } from '../../core/world/beats'
 import type { SectionId } from '../../core/sections/ids'
 import { inscriptions } from '../../content/site'
-import { cardByBeat, trackJvh } from '../cards'
+import { cardByBeat, trackSvh } from '../cards'
 
 export interface CardContent {
   body: ReactNode
@@ -18,16 +18,16 @@ export type Cards = Partial<Record<BeatId, CardContent>>
 const vars = (v: Record<string, number>) => v as CSSProperties
 
 /**
- * One beat of the scroll track (design.md §6.2): a div of the beat's jvh length. In the walk its card
- * sits in a sticky one-viewport frame inside a track `trackJvh + 100` svh long (see cards.ts); in the
+ * One beat of the scroll track (design.md §6.2): a div of the beat's scroll length. In the walk its card
+ * sits in a sticky one-viewport frame inside a track `trackSvh + 100` svh long (see cards.ts); in the
  * album the track and frame collapse and the card is ordinary flow.
  */
 function BeatBlock({ beat, content }: { beat: BeatSpan; content: CardContent | undefined }) {
   const spec = cardByBeat(beat.id)
   return (
-    <div className="beat" data-beat={beat.id} style={vars({ '--span': beat.jvh[1] - beat.jvh[0] })}>
+    <div className="beat" data-beat={beat.id} style={vars({ '--span': scrollSvhBetween(beat.jvh[0], beat.jvh[1]) })}>
       {spec && content && (
-        <div className="card-track" style={vars({ '--track': trackJvh(spec) })}>
+        <div className="card-track" style={vars({ '--track': trackSvh(spec) })}>
           <div className={`card-frame zone-${spec.zone}`} data-under={spec.underInscription ? '' : undefined}>
             <div
               className={content.className ? `card ${content.className}` : 'card'}
@@ -62,7 +62,7 @@ export function LeafInscription({ id }: { id: SectionId }) {
 }
 
 /**
- * A section: in the walk, a scroll track of its SECTION_SPANS height in svh; in the album, a leaf
+ * A section: in the walk, a scroll track of its scroll length in svh (sectionHeightSvh); in the album, a leaf
  * with its painting (`art`) beside the text (design.md §14.1).
  */
 export function Leaf({ id, art, cards }: { id: SectionId; art?: ReactNode; cards: Cards }) {
@@ -71,7 +71,7 @@ export function Leaf({ id, art, cards }: { id: SectionId; art?: ReactNode; cards
       id={id}
       className={`leaf leaf-${id}`}
       aria-labelledby={`${id}-heading`}
-      style={vars({ '--h': SECTION_SPANS[id].heightSvh })}
+      style={vars({ '--h': sectionHeightSvh(id) })}
     >
       {art && <div className="leaf-art">{art}</div>}
       <div className="leaf-text">

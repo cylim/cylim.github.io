@@ -189,16 +189,16 @@ export const seals = {
  * The colophon (题跋) writes itself in E3, dated for this visit in the traditional calendar.
  * Rules: the sexagenary year turns at 立春; the term day reads {term}日 on day 0 and
  * {term}后{N}日 (Chinese numerals) on days 1 to 14; values come from the same calendar as the chart.
- * Example: 丙午年 秋分后五日 戌时 · 林 写于槟城
+ * Example: 丙午年 秋分后五日 戌时 · 林
  */
 export const colophon = {
   enabled: true,
   /** {yearGz} e.g. 丙午; {termDay} e.g. 秋分后五日; {hourBranch} e.g. 戌. */
-  zh: '{yearGz}年 {termDay} {hourBranch}时 · 林 写于槟城',
+  zh: '{yearGz}年 {termDay} {hourBranch}时 · 林',
   termDayZero: '{term}日',
   termDayAfter: '{term}后{n}日',
   /** {termDayEn} e.g. "five days after the autumn equinox"; {yearPinyin} e.g. "Bing-Wu"; {hourAnimal} e.g. "Dog". */
-  en: 'Inscribed in Penang for your visit, {termDayEn}, in the {yearPinyin} year, at the hour of the {hourAnimal}. 林 is Lim. Two trees make a forest.',
+  en: 'Inscribed in Penang for your visit, {termDayEn}, in the {yearPinyin} year, at the hour of the {hourAnimal}.',
   termDayZeroEn: 'on the day of {termEn}',
   termDayAfterEn: '{nEn} days after {termEn}',
   termDayOneEn: 'one day after {termEn}',
