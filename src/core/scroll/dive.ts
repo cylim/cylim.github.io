@@ -215,8 +215,12 @@ export async function diveTo(target: SectionId, opts: DiveOptions = {}): Promise
     cancelAnimationFrame(raf)
     if (s.dive.phase !== 'idle') setDive({ phase: 'idle', amount: 0, to: null, waiting: false })
     if (joining) {
+      // Not settled while the grove's leaf renders (isSettled, e2e): the album has no paper to show,
+      // so the hold is state only.
+      setDive({ phase: 'hold', amount: 0, to: id, waiting: true })
       await joinWalk()
       if (my !== token) return
+      setDive({ phase: 'idle', amount: 0, to: null, waiting: false })
     }
     const section = document.getElementById(id)
     if (section) {
