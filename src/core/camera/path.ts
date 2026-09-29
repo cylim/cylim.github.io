@@ -21,13 +21,13 @@ export interface PathVariant {
   readonly hFit: number
 }
 
-const overrides: Partial<Record<BeatId, PortraitOverride>> = PORTRAIT.overrides
-const lookLift: ReadonlySet<BeatId> = new Set(PORTRAIT.lookLiftBeats)
-
 const withY = (v: Vec3, y: number): Vec3 => [v[0], y, v[2]]
 
 /** Every key of a Vec3 channel across the walk, with the variant applied. */
 export function vecKeys(channel: 'pos' | 'look', variant: PathVariant): Key<Vec3>[] {
+  // PORTRAIT and BEATS are live bindings (a detour can join the grove walk): read them per call.
+  const overrides: Partial<Record<BeatId, PortraitOverride>> = PORTRAIT.overrides
+  const lookLift: ReadonlySet<BeatId> = new Set(PORTRAIT.lookLiftBeats)
   const out: Key<Vec3>[] = []
   for (const b of BEATS) {
     let keys: readonly Key<Vec3>[] = b[channel]

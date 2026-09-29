@@ -31,11 +31,12 @@ import { BED_SPANS } from '../../audio/cues'
 import { groveOnScreen } from '../../audio/triggers'
 import { hero, meta, nav, terminal, terminalCommands } from '../../content'
 
-// The walk with the grove paused, whatever content/features.ts says today: the grove-on walk is
-// pinned by journey.test.ts, path.test.ts and the rest.
-vi.mock('../../content/features', () => ({ features: { grove: false } }))
+// The walk without the grove, as a detour starts it, whatever content/features.ts says today: the
+// grove-on walk is pinned by journey.test.ts, path.test.ts and the rest, the switch between them by
+// walkSwitch.test.ts, and an off grove's links by groveOffMode.test.ts.
+vi.mock('../../content/features', () => ({ features: { grove: 'detour' } }))
 
-describe('the walk with the grove paused (content/features.ts)', () => {
+describe('the walk without the grove (a detour, content/features.ts)', () => {
   it('cuts the grove beats and moves the exit up by their 217 jvh', () => {
     expect(GROVE_GAP).toBe(217)
     expect(J).toBe(783)
@@ -68,10 +69,11 @@ describe('the walk with the grove paused (content/features.ts)', () => {
     expect(BEATS.find((b) => b.id === 'P1')?.zone).toBeNull()
   })
 
-  it('sends #grove, and anything asking for the grove, to the lantern', () => {
-    expect(sectionFromHash('#grove')).toBe('contact')
-    expect(walkSection('grove')).toBe('contact')
-    expect(SECTION_SPANS.grove.arrivalJvh).toBe(SECTION_SPANS.contact.arrivalJvh)
+  it('keeps #grove the grove, though it has no span on this walk until a dive joins it', () => {
+    expect(sectionFromHash('#grove')).toBe('grove')
+    expect(walkSection('grove')).toBe('grove')
+    expect(WALK_SECTION_IDS).toEqual(['threshold', 'cabin', 'contact'])
+    expect(SECTION_SPANS.grove.jvh).toEqual([572, 572])
     expect(registry.grove.arrivalJvh).toBe(669)
   })
 
@@ -158,13 +160,13 @@ describe('the walk with the grove paused (content/features.ts)', () => {
     expect(BED_SPANS.hum).toEqual([[245, 572]])
   })
 
-  it('leaves the grove out of the nav, the first-screen copy, the meta tags and the terminal help', () => {
-    expect(nav.map((n) => n.id)).toEqual(['threshold', 'cabin', 'contact'])
-    for (const s of [hero.subline, meta.description, meta.og.description]) expect(s).not.toMatch(/Qimen|grove/i)
+  it('keeps the grove on the map: the nav, the first-screen copy, the meta tags and the terminal', () => {
+    expect(nav.map((n) => n.id)).toEqual(['threshold', 'cabin', 'grove', 'contact'])
+    for (const s of [hero.subline, meta.description, meta.og.description]) expect(s).toMatch(/Qimen/)
     const help = terminalCommands.find((c) => c.name === 'help')?.output ?? []
-    expect(help.join('\n')).not.toMatch(/qimen|grove/i)
-    expect(terminalCommands.filter((c) => c.name === 'qimen' || c.name === 'grove').every((c) => c.hidden)).toBe(true)
-    expect(terminalCommands.find((c) => c.name === 'grove')?.action).toEqual({ type: 'navigate', hash: '#contact' })
-    expect(terminal.chips).not.toContain('qimen')
+    expect(help.join('\n')).toMatch(/qimen/)
+    expect(terminalCommands.filter((c) => c.name === 'qimen' || c.name === 'grove').some((c) => c.hidden)).toBe(false)
+    expect(terminalCommands.find((c) => c.name === 'grove')?.action).toEqual({ type: 'navigate', hash: '#grove' })
+    expect(terminal.chips).toContain('qimen')
   })
 })

@@ -107,7 +107,7 @@ export function createDetents(maxPerSecond = DETENT_MAX_PER_SECOND): Detents {
 
 /**
  * The hour chime plays only when the grove is on screen: from the reveal to the end of the grove, not
- * mid-dive. Never while the grove is paused (content/features.ts): there is no chart to chime for.
+ * mid-dive. Never while the grove is off the walk (core/world/walk.ts): there is no chart to chime for.
  */
 export const groveOnScreen = (s: Pick<JourneyState, 'jvh' | 'dive'>): boolean =>
   GROVE_ON && s.dive.phase === 'idle' && s.jvh >= MARKS.reveal[0] && s.jvh < SCENE_SPANS.grove[1]

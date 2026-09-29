@@ -18,6 +18,7 @@ import { createStore } from 'zustand/vanilla'
 import { useStore } from 'zustand'
 import { SECTION_IDS, type SectionId } from '../sections/ids'
 import { FOG_COVER, PRELOAD_U, SCENE_SPANS, jvhToU } from '../world/beats'
+import { groveOnWalk } from '../world/walk'
 import type { PalaceNo } from '../../lib/qimen/types'
 import type { SocialId } from '../../content/socials'
 import type { AlbumReason } from '../../content/ui'
@@ -88,10 +89,16 @@ export interface TerminalLine {
 
 export interface JourneyState {
   // ---------------------------------------------------------------- scroll and camera
-  /** Camera path parameter 0..1 (u = jvh / 1000). Writer: ScrollDriver (frozen while a dive runs). */
+  /** Camera path parameter 0..1 (u = jvh / J). Writer: ScrollDriver (frozen while a dive runs). */
   u: number
-  /** Same position in journey vh, 0..1000. Writer: ScrollDriver, alongside u. */
+  /** Same position in journey vh, 0..J. Writer: ScrollDriver, alongside u. */
   jvh: number
+  /**
+   * The grove is on this walk (core/world/walk.ts). Starts as content/features.ts says; a detour
+   * visit flips it to true once, when a dive joins the grove walk under paper, and React re-renders
+   * the scroll track, the progress ticks, the rig and the grove scene from it. Writer: dive.ts.
+   */
+  groveWalk: boolean
   /** Section under the scroll position; drives nav aria-current and chrome. Writer: ScrollDriver / diveTo. */
   active: SectionId
   /** Next frame: place the camera without damping, then the rig clears it. Writer: diveTo; reader-and-clearer: CameraRig. */
@@ -190,6 +197,7 @@ export function initialJourneyState(): JourneyState {
   return {
     u: 0,
     jvh: 0,
+    groveWalk: groveOnWalk(),
     active: 'threshold',
     snap: true,
     dive: { phase: 'idle', amount: 0, to: null, waiting: false },

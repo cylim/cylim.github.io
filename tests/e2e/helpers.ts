@@ -1,22 +1,30 @@
 import type { Page, TestInfo } from '@playwright/test'
 import { features } from '../../src/content/features'
 
-/** The grove is on the walk (src/content/features.ts); the specs follow the site. */
-export const GROVE = features.grove
+/**
+ * The grove's mode (src/content/features.ts); the specs follow the site. Reachable: a nav item and a
+ * working #grove link (on the walk, or a detour the dive joins). On the walk: a fresh load has it.
+ */
+export const GROVE_MODE = features.grove
+export const GROVE_REACHABLE = GROVE_MODE !== 'off'
+export const GROVE_ON_WALK = GROVE_MODE === 'walk'
 
 /** Fixed chart time, so the grove and colophon render the same on every run. */
 export const NOW = '2026-01-01T04:00:00Z'
 
-/** Section ids in walk order with their deep-link hashes (design.md §6.2). No grove while it is paused. */
+/** Section ids in walk order with their deep-link hashes (design.md §6.2). The grove while it is reachable. */
 export const ARRIVALS = [
   { id: 'threshold', hash: '' },
   { id: 'cabin', hash: '#cabin' },
-  ...(GROVE ? [{ id: 'grove', hash: '#grove' } as const] : []),
+  ...(GROVE_REACHABLE ? [{ id: 'grove', hash: '#grove' } as const] : []),
   { id: 'contact', hash: '#contact' },
 ] as const
 
-/** Journey length in jvh: 1000, or 783 with the grove's 217 jvh cut (src/core/world/beats.ts). */
-export const JOURNEY_END = GROVE ? 1000 : 783
+/** The sections a fresh load has, in walk order: the grove only while it is on the walk. */
+export const WALK_ARRIVALS = ARRIVALS.filter((a) => a.id !== 'grove' || GROVE_ON_WALK)
+
+/** Journey length in jvh on a fresh load: 1000, or 783 with the grove's 217 jvh cut (src/core/world/beats.ts). */
+export const JOURNEY_END = GROVE_ON_WALK ? 1000 : 783
 
 /**
  * The mode a project should boot in (design.md §13.2, src/core/boot/mode.ts). No WebGL2 and

@@ -9,39 +9,44 @@
  */
 
 import type { SectionId } from '../sections/ids'
-import { features } from '../../content/features'
+import { groveOnWalk, onWalkChange } from './walk'
 
 // ---------------------------------------------------------------------------- the grove switch
 
 /**
- * The grove is on the walk (content/features.ts). Every table below is written for the full walk
- * (design.md §6 numbers) and, with the grove paused, rebuilt from it: G0–G4 are cut, the path from
- * the moon gate cuts through the mist wall to the southern trees and belongs to contact, and
- * everything from the exit on moves up by the grove's length (`afterGrove`).
+ * The grove is on this walk (core/world/walk.ts). Every table below is written for the full walk
+ * (design.md §6 numbers) and, without the grove, rebuilt from it: G0–G4 are cut, the path from the
+ * moon gate cuts through the mist wall to the southern trees and belongs to contact, and everything
+ * from the exit on moves up by the grove's length (`afterGrove`).
+ *
+ * The walk-dependent tables are `let` bindings: a detour visit joins the grove walk at runtime and
+ * `rebuildWalk` (bottom of the file) reassigns them. Importers see the new values through the live
+ * binding, so read them when you need them; don't copy them into module-level constants elsewhere
+ * without registering a rebuild (walk.ts `onWalkChange`).
  */
-export const GROVE_ON = features.grove
+export let GROVE_ON = groveOnWalk()
 
 /** The grove's own beats (G0–G4) on the full walk, 645–862 jvh. */
 export const GROVE_CUT = [645, 862] as const
 
-/** How far everything after the grove moves up while it is paused: 0, or 217 jvh. */
-export const GROVE_GAP = GROVE_ON ? 0 : GROVE_CUT[1] - GROVE_CUT[0]
+/** How far everything after the grove moves up while it is off the walk: 0, or 217 jvh. */
+export let GROVE_GAP = GROVE_ON ? 0 : GROVE_CUT[1] - GROVE_CUT[0]
 
 /**
  * A full-walk jvh (design.md §6, the tables here and in journey.ts) → the same place on this walk.
- * The identity with the grove on; with it paused, positions from the exit (862) on move up by 217.
+ * The identity with the grove on; without it, positions from the exit (862) on move up by 217.
  * Positions inside the grove have no place on a groveless walk and are returned unchanged.
  */
 export const afterGrove = (jvh: number) => (jvh >= GROVE_CUT[1] ? jvh - GROVE_GAP : jvh)
 
 /**
- * Grove paused only: where the camera cuts from the mist wall to the southern trees, under a flash of
+ * Grove off the walk only: where the camera cuts from the mist wall to the southern trees, under a flash of
  * paper at the fog's peak (journey.ts P2 and P3). The grove chunk draws the path up to here and the
  * contact scene takes over.
  */
 export const MIST_CUT = 628
 
-export const J = afterGrove(1000)
+export let J = afterGrove(1000)
 
 export const jvhToU = (jvh: number) => jvh / J
 export const uToJvh = (u: number) => u * J
@@ -64,40 +69,46 @@ const FULL_SECTION_SPANS = {
 } as const satisfies Record<SectionId, SectionSpan>
 
 /**
- * The DOM sections: scroll track, nav, hash and `active`. With the grove paused there is no grove
+ * The DOM sections: scroll track, nav, hash and `active`. With the grove off the walk there is no grove
  * section: contact runs from the moon gate (the path is the way to the lantern), and grove keeps an
  * empty span there whose arrival is contact's, so a #grove link lands on the lantern.
  */
-export const SECTION_SPANS: Readonly<Record<SectionId, SectionSpan>> = GROVE_ON
-  ? FULL_SECTION_SPANS
-  : {
-      threshold: FULL_SECTION_SPANS.threshold,
-      cabin: FULL_SECTION_SPANS.cabin,
-      grove: { id: 'grove', jvh: [572, 572], arrivalJvh: afterGrove(886) },
-      contact: { id: 'contact', jvh: [572, J], arrivalJvh: afterGrove(886) },
-    }
+const buildSectionSpans = (): Readonly<Record<SectionId, SectionSpan>> =>
+  GROVE_ON
+    ? FULL_SECTION_SPANS
+    : {
+        threshold: FULL_SECTION_SPANS.threshold,
+        cabin: FULL_SECTION_SPANS.cabin,
+        grove: { id: 'grove', jvh: [572, 572], arrivalJvh: afterGrove(886) },
+        contact: { id: 'contact', jvh: [572, J], arrivalJvh: afterGrove(886) },
+      }
+
+export let SECTION_SPANS = buildSectionSpans()
 
 /**
  * The stretch of the walk each section's scene draws: SectionHost mounts it within RIG.preloadU of
  * this span, and the store's `visibleSections`, the finale stand-ins and the sound beds follow it.
- * The DOM spans with the grove on. With it paused the grove chunk still draws the path, from the
+ * The DOM spans with the grove on. Without it the grove chunk still draws the path, from the
  * moon gate to the cut in the mist wall, and the contact scene takes over there.
  */
-export const SCENE_SPANS: Readonly<Record<SectionId, readonly [number, number]>> = GROVE_ON
-  ? {
-      threshold: FULL_SECTION_SPANS.threshold.jvh,
-      cabin: FULL_SECTION_SPANS.cabin.jvh,
-      grove: FULL_SECTION_SPANS.grove.jvh,
-      contact: FULL_SECTION_SPANS.contact.jvh,
-    }
-  : {
-      threshold: FULL_SECTION_SPANS.threshold.jvh,
-      cabin: FULL_SECTION_SPANS.cabin.jvh,
-      grove: [572, MIST_CUT],
-      contact: [MIST_CUT, J],
-    }
+const buildSceneSpans = (): Readonly<Record<SectionId, readonly [number, number]>> =>
+  GROVE_ON
+    ? {
+        threshold: FULL_SECTION_SPANS.threshold.jvh,
+        cabin: FULL_SECTION_SPANS.cabin.jvh,
+        grove: FULL_SECTION_SPANS.grove.jvh,
+        contact: FULL_SECTION_SPANS.contact.jvh,
+      }
+    : {
+        threshold: FULL_SECTION_SPANS.threshold.jvh,
+        cabin: FULL_SECTION_SPANS.cabin.jvh,
+        grove: [572, MIST_CUT],
+        contact: [MIST_CUT, J],
+      }
 
-/** The DOM section at a journey position. Never 'grove' while the grove is paused. */
+export let SCENE_SPANS = buildSceneSpans()
+
+/** The DOM section at a journey position. Never 'grove' while the grove is off the walk. */
 export function sectionAtJvh(jvh: number): SectionId {
   if (jvh < SECTION_SPANS.cabin.jvh[0]) return 'threshold'
   if (jvh < SECTION_SPANS.grove.jvh[0]) return 'cabin'
@@ -176,7 +187,7 @@ const FULL_BEAT_SPANS: readonly BeatSpan[] = [
   span('E3', 'contact', [985, 1000], [985, 1000], 'mount'),
 ]
 
-/** The grove's own beats, cut from the walk while it is paused. */
+/** The grove's own beats, cut from the walk while it is off the walk. */
 export const isGroveBeat = (id: BeatId) => id[0] === 'G'
 
 const shiftRange = (r: readonly [number, number]): readonly [number, number] => [afterGrove(r[0]), afterGrove(r[1])]
@@ -190,25 +201,26 @@ export function withoutGrove<B extends BeatSpan>(b: B): B {
   return { ...b, jvh: shiftRange(b.jvh), hold: b.hold && shiftRange(b.hold) }
 }
 
-export const BEAT_SPANS: readonly BeatSpan[] = GROVE_ON
-  ? FULL_BEAT_SPANS
-  : FULL_BEAT_SPANS.filter((b) => !isGroveBeat(b.id)).map(withoutGrove)
+const buildBeatSpans = (): readonly BeatSpan[] =>
+  GROVE_ON ? FULL_BEAT_SPANS : FULL_BEAT_SPANS.filter((b) => !isGroveBeat(b.id)).map(withoutGrove)
 
-export const BEAT_IDS: readonly BeatId[] = BEAT_SPANS.map((b) => b.id)
+export let BEAT_SPANS = buildBeatSpans()
+
+export let BEAT_IDS: readonly BeatId[] = BEAT_SPANS.map((b) => b.id)
 
 export function beatSpanAt(jvh: number): BeatSpan {
   const clamped = Math.min(Math.max(jvh, 0), J - 1e-9)
   return BEAT_SPANS.find((b) => clamped >= b.jvh[0] && clamped < b.jvh[1]) ?? (BEAT_SPANS[BEAT_SPANS.length - 1] as BeatSpan)
 }
 
-/** A beat's span. A paused grove beat answers with its full-walk span, so the grove's modules still load. */
+/** A beat's span. A grove beat off the walk answers with its full-walk span, so the grove's modules still load. */
 export function beatSpanById(id: BeatId): BeatSpan {
   const b = BEAT_SPANS.find((x) => x.id === id) ?? FULL_BEAT_SPANS.find((x) => x.id === id)
   if (!b) throw new Error(`unknown beat ${id}`)
   return b
 }
 
-/** The beat is on this walk (false for G0–G4 while the grove is paused). */
+/** The beat is on this walk (false for G0–G4 while the grove is off the walk). */
 export const onWalk = (id: BeatId) => BEAT_SPANS.some((b) => b.id === id)
 
 /** The beat's hold, or the whole beat when it has none. */
@@ -230,7 +242,7 @@ export const inHold = (jvh: number) => BEAT_SPANS.some((b) => b.hold !== null &&
 export const HOLD_STRETCH = 1.5
 
 /** The jvh where a hold starts or ends: where the scroll map changes pace. */
-export const HOLD_EDGES: readonly number[] = BEAT_SPANS.flatMap((b) => b.hold ?? [])
+export let HOLD_EDGES: readonly number[] = BEAT_SPANS.flatMap((b) => b.hold ?? [])
 
 /** Scroll length in svh from the top of the walk to `jvh`: hold jvh count HOLD_STRETCH times. */
 export function scrollSvh(jvh: number): number {
@@ -251,7 +263,7 @@ export function sectionHeightSvh(id: SectionId): number {
 // ---------------------------------------------------------------------------- marks and seams (§8, §11.2)
 
 /** Scroll positions that trigger or scrub something. Values in jvh. */
-export const MARKS = {
+const buildMarks = () => ({
   heroFadeOut: [40, 65],
   /** Prefetch the cabin chunk at u ≥ 0.12 (§11.3). */
   prefetchCabin: 120,
@@ -275,15 +287,20 @@ export const MARKS = {
   readChart: 742,
   finaleStart: afterGrove(935),
   sealStamp: afterGrove(985),
-} as const
+} as const)
+
+export let MARKS = buildMarks()
 
 /**
  * The mist wall waits (design.md §8.5 P2): past the reveal, the fog holds at its peak until the scene
- * the mist opens on is ready. The grove with it on; with it paused, the lantern's scene, through P3.
+ * the mist opens on is ready. The grove with it on; without it, the lantern's scene, through P3.
  */
-export const MIST_WAIT: { readonly section: SectionId; readonly jvh: readonly [number, number] } = GROVE_ON
-  ? { section: 'grove', jvh: [MARKS.reveal[0], FULL_SECTION_SPANS.grove.jvh[1]] }
-  : { section: 'contact', jvh: MARKS.reveal }
+const buildMistWait = (): { readonly section: SectionId; readonly jvh: readonly [number, number] } =>
+  GROVE_ON
+    ? { section: 'grove', jvh: [MARKS.reveal[0], FULL_SECTION_SPANS.grove.jvh[1]] }
+    : { section: 'contact', jvh: MARKS.reveal }
+
+export let MIST_WAIT = buildMistWait()
 
 /** Fog above this density counts as cover for quality changes and mount/unmount (§11.1, §11.3). */
 export const FOG_COVER = 0.12
@@ -312,13 +329,15 @@ export const FRAMING = {
 // ---------------------------------------------------------------------------- stills (§14.1)
 
 /** `?still=<beat>` renders the beat at this jvh for the album stills and og.png (scripts/shots.mjs). */
-export const STILLS: Partial<Record<BeatId, number>> = {
+const buildStills = (): Partial<Record<BeatId, number>> => ({
   T0: 0,
   C3: 301,
   I1: 360,
   E1: afterGrove(909),
   E3: J,
-}
+})
+
+export let STILLS = buildStills()
 
 /** Journey position for a still: the table above, else the middle of the beat's hold (or of the beat). */
 export function stillJvh(id: BeatId): number {
@@ -327,3 +346,22 @@ export function stillJvh(id: BeatId): number {
   const [a, z] = holdOf(id)
   return (a + z) / 2
 }
+
+// ---------------------------------------------------------------------------- joining the grove walk
+
+/** Reassign every walk table above for the walk as it is now (walk.ts `joinGroveWalk`). */
+function rebuildWalk(): void {
+  GROVE_ON = groveOnWalk()
+  GROVE_GAP = GROVE_ON ? 0 : GROVE_CUT[1] - GROVE_CUT[0]
+  J = afterGrove(1000)
+  SECTION_SPANS = buildSectionSpans()
+  SCENE_SPANS = buildSceneSpans()
+  BEAT_SPANS = buildBeatSpans()
+  BEAT_IDS = BEAT_SPANS.map((b) => b.id)
+  HOLD_EDGES = BEAT_SPANS.flatMap((b) => b.hold ?? [])
+  MARKS = buildMarks()
+  MIST_WAIT = buildMistWait()
+  STILLS = buildStills()
+}
+
+onWalkChange(rebuildWalk)

@@ -1,6 +1,7 @@
 import { lazy, useEffect, useSyncExternalStore } from 'react'
 import { journey, useJourney } from '../../core/store/journey'
 import { MARKS } from '../../core/world/beats'
+import { features } from '../../content/features'
 import { grove } from '../../content/grove'
 import { groveHeading } from '../../content/site'
 import { GlossText } from '../gloss/GlossText'
@@ -45,10 +46,12 @@ function GlossHint() {
 /**
  * The glossary ships as prerendered HTML only: the server renders it, and the production client keeps
  * that markup as-is instead of carrying the whole glossary in the boot bundle. The dev server has no
- * prerender, so it renders the list on the client.
+ * prerender, so it renders the list on the client. Neither is a grove that isn't on the walk at load
+ * (a detour): the client mounts it when a dive joins the grove walk, and the list comes with this
+ * leaf's own chunk (dom/ContentLayer.tsx loads it lazily).
  */
 function GlossaryIsland() {
-  if (import.meta.env.SSR || import.meta.env.DEV) {
+  if (import.meta.env.SSR || import.meta.env.DEV || features.grove !== 'walk') {
     return (
       <div className="glossary-island">
         <GlossaryList />

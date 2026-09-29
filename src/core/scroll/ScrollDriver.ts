@@ -13,6 +13,8 @@
  *   stage then costs no main-thread time at all (QM-P9).
  * - While a fog-dive is going in or holding, the driver leaves u alone: the dive owns the position.
  * - The hash follows the active section with replaceState, debounced; it never pushes.
+ * - The walk tables are read per measure: a detour joining the grove walk re-renders the track and
+ *   calls `remeasureScroll` (dive.ts), and the map is rebuilt from the new sections.
  */
 
 import type Lenis from 'lenis'
@@ -22,12 +24,13 @@ import { SECTION_HASH, WALK_SECTION_IDS } from '../sections/ids'
 import { easing, motion } from '../../theme/tokens'
 import { buildScrollMap, jvhAtScroll, linearScrollMap, reanchorScrollY, scrollAtJvh, type ScrollAnchor, type ScrollMap } from './progress'
 
-const ARRIVALS = WALK_SECTION_IDS.map((id) => SECTION_SPANS[id].arrivalJvh)
+/** This walk's arrivals, the scroll map's magnets. Per call: the walk can change (walk.ts). */
+const arrivals = () => WALK_SECTION_IDS.map((id) => SECTION_SPANS[id].arrivalJvh)
 
 /** Scrollable height in CSS px (design.md §0: documentHeight − innerHeight). */
 export const scrollRange = () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
 
-let map: ScrollMap = linearScrollMap(1, J, ARRIVALS)
+let map: ScrollMap = linearScrollMap(1, J, arrivals())
 let lenis: Lenis | null = null
 /** rAF id of the Lenis pump; 0 while Lenis rests. */
 let lenisFrame = 0
@@ -52,6 +55,16 @@ function wakeLenis(): void {
 }
 /** The running driver's store update, so a programmatic jump can publish its position at once. */
 let syncStore: (() => void) | null = null
+/** The running driver's re-measure. */
+let remeasureNow: (() => void) | null = null
+
+/**
+ * Measure the track again now, without waiting for the ResizeObserver: the dive calls it under paper
+ * once the grove walk's sections have rendered (dive.ts), before it jumps to the arrival.
+ */
+export function remeasureScroll(): void {
+  remeasureNow?.()
+}
 /**
  * Album only: the section under this line (px below the viewport top) is the active one. A leaf
  * lands with its top just under the fixed header (scroll-margin-top), so probing at the viewport top
@@ -95,7 +108,7 @@ function measure(): ScrollMap {
     }
   }
   albumProbe = Math.max(margin + 8, window.innerHeight / 4)
-  return buildScrollMap(anchors, scrollRange(), J, ARRIVALS)
+  return buildScrollMap(anchors, scrollRange(), J, arrivals())
 }
 
 /** Journey position of a document scroll offset, from the measured DOM. */
@@ -261,6 +274,7 @@ export function startScrollDriver(opts: ScrollDriverOptions = { smoothWheel: fal
   }
   remeasure()
   syncStore = update
+  remeasureNow = remeasure
 
   const ro = new ResizeObserver(remeasure)
   const content = document.getElementById('content')
@@ -288,6 +302,7 @@ export function startScrollDriver(opts: ScrollDriverOptions = { smoothWheel: fal
   return () => {
     stopped = true
     if (syncStore === update) syncStore = null
+    if (remeasureNow === remeasure) remeasureNow = null
     ro.disconnect()
     removeEventListener('scroll', update)
     removeEventListener('resize', remeasure)

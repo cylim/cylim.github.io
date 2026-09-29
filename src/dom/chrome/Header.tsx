@@ -24,6 +24,10 @@ function Underline() {
  */
 function useAlbumActive(enabled: boolean): SectionId | null {
   const [id, setId] = useState<SectionId | null>(null)
+  // A live binding: a detour joining the grove walk replaces it (with the grove's leaf) and flips the
+  // store, which hands this hook the new array. The grove's leaf is a lazy chunk, so it may appear a
+  // little later: the effect watches #content for sections it has not observed yet.
+  const sectionIds = useJourney(() => WALK_SECTION_IDS)
   useEffect(() => {
     if (!enabled) return
     const ratios = new Map<SectionId, number>()
@@ -37,12 +41,25 @@ function useAlbumActive(enabled: boolean): SectionId | null {
       },
       { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] },
     )
-    for (const sid of WALK_SECTION_IDS) {
-      const el = document.getElementById(sid)
-      if (el) io.observe(el)
+    const observed = new Set<Element>()
+    const observe = () => {
+      for (const sid of sectionIds) {
+        const el = document.getElementById(sid)
+        if (el && !observed.has(el)) {
+          observed.add(el)
+          io.observe(el)
+        }
+      }
     }
-    return () => io.disconnect()
-  }, [enabled])
+    observe()
+    const content = document.getElementById('content')
+    const mo = new MutationObserver(observe)
+    if (content && observed.size < sectionIds.length) mo.observe(content, { childList: true })
+    return () => {
+      io.disconnect()
+      mo.disconnect()
+    }
+  }, [enabled, sectionIds])
   return enabled ? id : null
 }
 

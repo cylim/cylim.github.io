@@ -3,7 +3,7 @@
  * §6.4 portrait overrides, §11.2 seams. The single tuning file for the camera.
  *
  * Scroll is measured in journey vh (jvh). The journey is J = 1000 jvh and u = jvh / J. With the grove
- * paused (content/features.ts) the tables are the same full walk, rebuilt by `groveless` at the end
+ * off the walk (content/features.ts) the tables are the same full walk, rebuilt by `groveless` at the end
  * of the beat table: J is 783 and everything from the exit on sits 217 jvh earlier (beats.ts).
  * Pure data plus tiny pure helpers; no three.js. Owner: core-journey.
  *
@@ -18,7 +18,7 @@
  * - fov, fog, roll, paper: piecewise-linear between keys, constant before the first and after the last.
  * - `cut: true` on a key means "do not interpolate into this key": the channel jumps at `at`.
  *   Used at 572, where the camera teleports under full paper from the hall to the path, and with the
- *   grove paused at 628, from the mist wall to the southern trees.
+ *   grove off the walk at 628, from the mist wall to the southern trees.
  * - `fit: 'plan'` on a pos key means the rig replaces y with h_fit (R4 circle plus 1 m margin
  *   fits the chart viewport; about 34 m at 16:9) and recomputes it on resize.
  *
@@ -36,6 +36,7 @@
 import type { SectionId } from '../sections/ids'
 import type { Vec3 } from './layout'
 import { GROVE_ON, J, MIST_CUT, PRELOAD_U, afterGrove, isGroveBeat, withoutGrove, type BeatId, type TextZone } from './beats'
+import { onWalkChange } from './walk'
 
 // Spans, beat ranges, marks, framing and stills live in beats.ts (the boot chunk's share of the walk).
 export * from './beats'
@@ -53,12 +54,15 @@ export interface EmergePose {
   readonly note: string
 }
 
-export const EMERGE: Record<SectionId, EmergePose> = {
+const buildEmerge = (): Record<SectionId, EmergePose> => ({
   threshold: { atJvh: 0, back: 3, note: 'T0 pose pulled 3 m back' },
   cabin: { atJvh: 312, note: 'C4 pose just outside the open door; every jump into the cabin still passes the door' },
   grove: { pos: [0, 40, -140], look: [0, 0.45, -150.5], note: 'Descends through cloud onto the G1 seat' },
   contact: { atJvh: afterGrove(872), note: 'E0 pose among the southern trees' },
-}
+})
+
+/** Walk-dependent (the contact pose moves with the exit): a live binding, see the bottom of the file. */
+export let EMERGE = buildEmerge()
 
 // ---------------------------------------------------------------------------- beats (§6.1)
 
@@ -371,10 +375,10 @@ const FULL_BEATS: readonly Beat[] = [
   }),
 ]
 
-// ------------------------------------------------------------ the walk with the grove paused
+// ------------------------------------------------------------ the walk with the grove off the walk
 
 /**
- * P2 and P3 with the grove paused. The mist wall is the cut: the fog is at its 0.14 peak, a flash of
+ * P2 and P3 with the grove off the walk. The mist wall is the cut: the fog is at its 0.14 peak, a flash of
  * paper covers the last few jvh of P2, and under it the camera jumps from the crest (z −112) to the
  * south of the empty clearing, so the grove is never seen. The mist then parts on the southern trees
  * with the lantern glowing through them, and the walk carries on into E0.
@@ -413,7 +417,10 @@ function beatWithoutGrove(b: Beat): Beat {
   }
 }
 
-export const BEATS: readonly Beat[] = GROVE_ON ? FULL_BEATS : FULL_BEATS.filter((b) => !isGroveBeat(b.id)).map(beatWithoutGrove)
+const buildBeats = (): readonly Beat[] => (GROVE_ON ? FULL_BEATS : FULL_BEATS.filter((b) => !isGroveBeat(b.id)).map(beatWithoutGrove))
+
+/** The camera table for this walk: a live binding, see the bottom of the file. */
+export let BEATS = buildBeats()
 
 // ---------------------------------------------------------------------------- rig (§6.3)
 
@@ -576,7 +583,7 @@ const FULL_PORTRAIT = {
 } as const
 
 /**
- * With the grove paused, P3 looks level at the southern trees instead of tilting down onto the rings,
+ * With the grove off the walk, P3 looks level at the southern trees instead of tilting down onto the rings,
  * so it takes the look lift and the default subject height, and the exit overrides move up.
  */
 function portraitWithoutGrove() {
@@ -594,7 +601,17 @@ function portraitWithoutGrove() {
   }
 }
 
-export const PORTRAIT: typeof FULL_PORTRAIT = GROVE_ON ? FULL_PORTRAIT : portraitWithoutGrove()
+const buildPortrait = (): typeof FULL_PORTRAIT => (GROVE_ON ? FULL_PORTRAIT : portraitWithoutGrove())
+
+/** Portrait framing for this walk: a live binding, see the bottom of the file. */
+export let PORTRAIT = buildPortrait()
+
+// A detour visit joining the grove walk (walk.ts): beats.ts has rebuilt its tables first (it registered first).
+onWalkChange(() => {
+  EMERGE = buildEmerge()
+  BEATS = buildBeats()
+  PORTRAIT = buildPortrait()
+})
 
 // ---------------------------------------------------------------------------- helpers
 
@@ -603,7 +620,7 @@ export function beatAt(jvh: number): Beat {
   return BEATS.find((b) => clamped >= b.jvh[0] && clamped < b.jvh[1]) ?? (BEATS[BEATS.length - 1] as Beat)
 }
 
-/** A beat's row. A paused grove beat answers with its full-walk row, so the grove's modules still load. */
+/** A beat's row. A grove beat off the walk answers with its full-walk row, so the grove's modules still load. */
 export function beatById(id: BeatId): Beat {
   const b = BEATS.find((x) => x.id === id) ?? FULL_BEATS.find((x) => x.id === id)
   if (!b) throw new Error(`unknown beat ${id}`)

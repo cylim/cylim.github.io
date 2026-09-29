@@ -56,8 +56,9 @@ describe('prerendered content layer (design.md §14.2: everything is in the HTML
     }
   })
 
-  // The live page follows content/features.ts: the grove's copy is there exactly when the grove is on.
-  it.runIf(features.grove)('carries the grove explanation, the noscript line and the whole glossary', () => {
+  // The live page follows content/features.ts: the grove's copy is prerendered exactly when the grove
+  // is on the walk. A detour grove is rendered by the client when a dive joins it.
+  it.runIf(features.grove === 'walk')('carries the grove explanation, the noscript line and the whole glossary', () => {
     has(groveHeading.heading)
     for (const s of [grove.disclaimer, grove.honesty, grove.noscript, grove.boardNote, grove.luopan]) has(s)
     // Glossary meanings wrap their Chinese runs in <span lang="zh-Hans"> (A11Y-8),
@@ -69,14 +70,18 @@ describe('prerendered content layer (design.md §14.2: everything is in the HTML
     expect(html).toContain('<noscript>')
   })
 
-  it.runIf(!features.grove)('leaves the paused grove out: no section, chart, glossary or Qimen copy', () => {
+  it.runIf(features.grove !== 'walk')('leaves a grove off the walk out: no section, chart copy or glossary', () => {
     expect(html).not.toContain('id="grove"')
-    expect(html).not.toContain('href="#grove"')
     expect(html).not.toContain(esc(groveHeading.heading))
     for (const s of [grove.disclaimer, grove.honesty, grove.noscript, grove.boardNote, grove.luopan, grove.readChart]) {
       expect(html, s).not.toContain(esc(s))
     }
     expect(html).not.toContain('glossary-island')
+    // A detour grove is still on the map: the nav links to it.
+    expect(html.includes('href="#grove"')).toBe(features.grove === 'detour')
+  })
+
+  it.runIf(features.grove === 'off')('names Qimen nowhere but the terminal while the grove is off', () => {
     // The terminal's whoami keeps its fengshui and Qimen line; nothing else names it.
     expect(whoamiOutput.reduce((h, line) => h.replace(esc(line), ''), html)).not.toMatch(/Qimen/)
   })

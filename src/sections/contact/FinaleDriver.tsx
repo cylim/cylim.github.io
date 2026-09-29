@@ -9,8 +9,8 @@ import { FINALE, albumWindow, finaleShowing, insideRect, pinMoved, type Pin } fr
 import { FinaleFlags } from './finaleFlags'
 
 type PinId = keyof JourneyState['pins']
-/** No grove pin while the grove is paused (content/features.ts). */
-const PIN_IDS: readonly PinId[] = features.grove ? ['threshold', 'cabin', 'grove'] : ['threshold', 'cabin']
+/** A grove pin while the grove is on the map, on the walk or a detour; none while it is off (content/features.ts). */
+const PIN_IDS: readonly PinId[] = features.grove !== 'off' ? ['threshold', 'cabin', 'grove'] : ['threshold', 'cabin']
 /** The pins keep their place for this long after the scroll moves, while the camera damps in. */
 const PRECISE_MS = 2000
 /** A pin this close to the window's edge hides rather than hang half over the mount. */
@@ -19,7 +19,7 @@ const PIN_MARGIN = 8
 const GLINT_NEAR = 30
 
 /**
- * Projects the E3 map pins (three; two with the grove paused) into `journey.pins` (CSS px) while the
+ * Projects the E3 map pins (three; two with the grove off) into `journey.pins` (CSS px) while the
  * finale shows. While the scroll moves and the camera damps in, pins follow to half a pixel; once it
  * only breathes they move in steps of FINALE.pinSlop, so the store goes quiet and the frame governor
  * can idle.

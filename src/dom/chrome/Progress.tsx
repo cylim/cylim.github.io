@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
-import { journey } from '../../core/store/journey'
+import { journey, useJourney } from '../../core/store/journey'
 import { SECTION_SPANS, jvhToU } from '../../core/world/beats'
 import { WALK_SECTION_IDS } from '../../core/sections/ids'
 
-const ARRIVALS = WALK_SECTION_IDS.map((id) => jvhToU(SECTION_SPANS[id].arrivalJvh))
+/** Ticks at this walk's arrivals. Per render: a detour joining the grove walk adds one and moves the rest. */
+const arrivals = () => WALK_SECTION_IDS.map((id) => jvhToU(SECTION_SPANS[id].arrivalJvh))
 
 /**
  * Progress (design.md §4.1, §4.2): a hairline on the right edge that fills with ink as u grows, ticks
@@ -14,6 +15,8 @@ const ARRIVALS = WALK_SECTION_IDS.map((id) => jvhToU(SECTION_SPANS[id].arrivalJv
 export function Progress() {
   const rail = useRef<HTMLDivElement>(null)
   const bar = useRef<HTMLDivElement>(null)
+  // Re-render the ticks when a detour joins the grove walk; the fill is written straight from the store.
+  useJourney((s) => s.groveWalk)
 
   useEffect(() => {
     const set = (u: number) => {
@@ -31,7 +34,7 @@ export function Progress() {
     <>
       <div ref={rail} className="progress-rail" aria-hidden="true">
         <span className="progress-fill" />
-        {ARRIVALS.map((u) => (
+        {arrivals().map((u) => (
           <span key={u} className="progress-tick" style={{ ['--at' as string]: u }} />
         ))}
         <span className="progress-mark" />

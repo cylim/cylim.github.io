@@ -13,6 +13,7 @@
  */
 
 import { J, MARKS, SCENE_SPANS } from '../core/world/beats'
+import { onWalkChange } from '../core/world/walk'
 import { motion } from '../theme/tokens'
 
 export const dbToGain = (db: number): number => (db === -Infinity ? 0 : 10 ** (db / 20))
@@ -54,9 +55,10 @@ export type Span = readonly [number, number]
 /**
  * Where each bed plays, in jvh (§12 table), by where the scenes draw (SCENE_SPANS: with the grove
  * paused, the path's pines run to the cut in the mist wall and the lantern's crackle starts there).
- * Inner edges crossfade over ±BED_EDGE.
+ * Inner edges crossfade over ±BED_EDGE. Walk-dependent, like CRACKLE_RISE and SILENCE_AFTER_SEAL:
+ * live bindings, rebuilt when a detour joins the grove walk (core/world/walk.ts).
  */
-export const BED_SPANS: Record<BedId, readonly Span[]> = {
+const buildBedSpans = (): Record<BedId, readonly Span[]> => ({
   wind: [
     [0, 322],
     [SCENE_SPANS.grove[0], J],
@@ -68,10 +70,12 @@ export const BED_SPANS: Record<BedId, readonly Span[]> = {
   stream: [[580, 612]],
   hum: [SCENE_SPANS.cabin],
   crackle: [SCENE_SPANS.contact],
-}
+})
+
+export let BED_SPANS = buildBedSpans()
 
 /** The crackle rises from LEVEL.crackle[0] to [1] across this span. */
-export const CRACKLE_RISE: Span = SCENE_SPANS.contact
+export let CRACKLE_RISE: Span = SCENE_SPANS.contact
 
 export const BED_EDGE = 8
 
@@ -112,4 +116,12 @@ export const FADE_IN_S = motion.soundFadeIn / 1000
 export const FADE_OUT_S = motion.soundFadeIn / 1000
 
 /** After the seal: let the thud ring this long, then fade the beds to silence. */
-export const SILENCE_AFTER_SEAL = { delay: 0.5, tau: 0.5, fromJvh: MARKS.sealStamp - 10 } as const
+const buildSilence = () => ({ delay: 0.5, tau: 0.5, fromJvh: MARKS.sealStamp - 10 }) as const
+
+export let SILENCE_AFTER_SEAL = buildSilence()
+
+onWalkChange(() => {
+  BED_SPANS = buildBedSpans()
+  CRACKLE_RISE = SCENE_SPANS.contact
+  SILENCE_AFTER_SEAL = buildSilence()
+})

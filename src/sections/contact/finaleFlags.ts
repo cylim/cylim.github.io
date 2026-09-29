@@ -25,8 +25,9 @@ const setFlag = (flag: FinaleFlag, on: boolean) => {
  *   writes itself, then the 林 seal stamps. Leaving E3 early cancels what is still pending; coming
  *   back resumes it. Reduced motion and e2e sign at once.
  * - From E2 on, the pines in layout `exit.finaleOpening` stand aside so the painting shows the
- *   grove's rings; they go and come back while the camera faces away from them. Not while the grove
- *   is paused (content/features.ts): the trees stay and keep the empty clearing out of the painting.
+ *   grove's rings; they go and come back while the camera faces away from them. Also as a detour: the
+ *   grove is on the map. Not while it is off (content/features.ts): the trees stay and keep the
+ *   empty clearing out of the painting.
  */
 export class FinaleFlags {
   private scissorTimer: Timer | undefined
@@ -66,7 +67,7 @@ export class FinaleFlags {
   }
 
   private apply(s: JourneyState): void {
-    this.opening(features.grove && finaleShowing(s.jvh))
+    this.opening(features.grove !== 'off' && finaleShowing(s.jvh))
     const open = s.mode === 'immersive' && mountOpenAt(s.jvh)
     if (s.finale.mountOpen !== open) setFlag('mountOpen', open)
     this.scissor(open)

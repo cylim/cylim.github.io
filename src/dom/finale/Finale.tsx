@@ -9,8 +9,8 @@ import { leaderOf, placePins, speckKeepOut, type PinPoint, type PinSize, type Re
 import { finaleWindow, insideWindow } from './window'
 
 type PinId = keyof JourneyState['pins']
-/** A paused section (content/features.ts) has no pin. */
-const onMap = (id: PinId) => id !== 'grove' || features.grove
+/** The grove has a pin while it is on the map, on the walk or a detour; not while it is off (content/features.ts). */
+const onMap = (id: PinId) => id !== 'grove' || features.grove !== 'off'
 /** Walk order, which is also the tab order. */
 const PINS: readonly { id: PinId; href: string }[] = [
   { id: 'threshold', href: '/' },
@@ -43,7 +43,7 @@ const setFlag = (name: string, on: boolean) => {
  *   the latest at E3, never before E2.
  * - The seal and the colophon live in the E3 card; this marks `html[data-seal]` and
  *   `html[data-colophon]` once per visit, and walk.css stamps and writes them.
- * - Map pins (three; two with the grove paused) float over their projected world points
+ * - Map pins (three; two with the grove off) float over their projected world points
  *   (`journey.pins`, written by the scene every frame): real links that fog-dive, shown at E3 while the point is inside the window. Each
  *   is a dot on the point and a label beside it, tied by a hairline leader; pins.ts keeps the labels
  *   off each other, off the other dots and off the cabin's cyan speck, lifting one when it has to,

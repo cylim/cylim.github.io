@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { GROVE, NOW, expectedMode, settled } from './helpers'
+import { GROVE_REACHABLE, NOW, expectedMode, settled } from './helpers'
 
 // An <Activity> hide keeps a section's GPU resources warm (stack.md §4); only a real unmount frees
 // them (sections/shared/lifetime.ts). wave3c QM-1 / QM-P1: the grove chart lost every glyph after
@@ -7,7 +7,7 @@ import { GROVE, NOW, expectedMode, settled } from './helpers'
 
 test('the grove chart keeps its glyphs and shaders across a hide and show', async ({ page }, info) => {
   test.skip(expectedMode(info) !== 'immersive', 'the walk only')
-  test.skip(!GROVE, 'the grove is paused (src/content/features.ts)')
+  test.skip(!GROVE_REACHABLE, 'the grove is off (src/content/features.ts)')
   test.setTimeout(120_000)
   // Count programs deleted on the page's own canvas (troika's SDF canvas is detached, so it's left out).
   await page.addInitScript(() => {

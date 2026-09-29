@@ -34,7 +34,8 @@ export interface Viewport {
   readonly header: number
 }
 
-const overrides: Partial<Record<BeatId, PortraitOverride>> = PORTRAIT.overrides
+/** Portrait overrides of this walk (PORTRAIT is a live binding: a detour can join the grove walk). */
+const overrides = (): Partial<Record<BeatId, PortraitOverride>> => PORTRAIT.overrides
 
 /** Vertical FOV (degrees) that gives horizontal FOV `hDeg` at `aspect` (width / height). */
 export const vFovFromH = (hDeg: number, aspect: number) => (2 * Math.atan(Math.tan((hDeg * DEG) / 2) / aspect)) / DEG
@@ -56,11 +57,11 @@ export function fovKeys(portrait: boolean, aspect: number): Key<number>[] {
   const base = portraitBaseFov(aspect)
   const valueAt = (at: number) => {
     const b = beatAt(at)
-    return overrides[b.id]?.fov ?? (b.medium === 'night' ? PORTRAIT.interiorVFov : base)
+    return overrides()[b.id]?.fov ?? (b.medium === 'night' ? PORTRAIT.interiorVFov : base)
   }
   const out: Key<number>[] = keys.map((k) => ({ ...k, v: valueAt(k.at) }))
   for (const b of BEATS) {
-    const fov = overrides[b.id]?.fov
+    const fov = overrides()[b.id]?.fov
     if (fov === undefined) continue
     const [a, z] = b.hold ?? b.jvh
     out.push({ at: a, v: fov }, { at: z, v: fov })

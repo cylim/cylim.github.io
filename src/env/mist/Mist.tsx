@@ -28,8 +28,11 @@ interface MistSpec {
 }
 
 const G: Hole = [grove.centre[0], grove.centre[2], 22, 34]
-/** The grove's clearing is open only while the grove is on (content/features.ts); paused, the mist lies over it. */
-const groveHole: readonly Hole[] = features.grove ? [G] : []
+/**
+ * The grove's clearing is open while the grove is on the map, on the walk or a detour (the finale
+ * painting shows its rings); off, the mist lies over it (content/features.ts).
+ */
+const groveHole: readonly Hole[] = features.grove !== 'off' ? [G] : []
 const E: Hole = [exit.orbitCentre[0], exit.orbitCentre[2], 14, 26]
 const C: Hole = [cabin.centre[0], cabin.centre[2], 9, 18]
 const peak = mountains.mainPeak

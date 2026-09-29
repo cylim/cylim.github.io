@@ -28,6 +28,7 @@ const CHUNKS: Record<string, () => Promise<unknown>> = {
   'chart/CastLabel': () => import('./chart/CastLabel'),
   'chart/AlbumChart': () => import('./chart/AlbumChart'),
   'finale/Colophon': () => import('./finale/Colophon'),
+  'leaves/Grove': () => import('./leaves/Grove'),
 }
 
 const roots: Root[] = []
@@ -104,19 +105,22 @@ describe('prerender and hydration', () => {
   it('keeps the section contract other modules rely on', () => {
     const root = document.createElement('div')
     root.innerHTML = renderToString(<ContentLayer />)
-    // The sections follow content/features.ts: four with the grove on, three while it is paused.
-    expect(WALK_SECTION_IDS).toEqual(features.grove ? ['threshold', 'cabin', 'grove', 'contact'] : ['threshold', 'cabin', 'contact'])
+    // The sections follow content/features.ts: four with the grove on the walk, three while it is a
+    // detour (until a dive joins it) or off. The nav links to it unless it is off.
+    const onWalk = features.grove === 'walk'
+    const reachable = features.grove !== 'off'
+    expect(WALK_SECTION_IDS).toEqual(onWalk ? ['threshold', 'cabin', 'grove', 'contact'] : ['threshold', 'cabin', 'contact'])
     for (const id of WALK_SECTION_IDS) {
       const s = root.querySelector(`section#${id}`)
       expect(s?.getAttribute('aria-labelledby')).toBe(`${id}-heading`)
       expect(root.querySelector(`#${id}-heading`)?.getAttribute('tabindex')).toBe('-1')
     }
     expect(root.querySelectorAll('main section.leaf')).toHaveLength(WALK_SECTION_IDS.length)
-    expect(root.querySelectorAll('main#content .beat[data-beat]')).toHaveLength(features.grove ? 31 : 26)
+    expect(root.querySelectorAll('main#content .beat[data-beat]')).toHaveLength(onWalk ? 31 : 26)
     expect(root.querySelectorAll('main#content .beat[data-beat]')).toHaveLength(BEAT_SPANS.length)
-    expect(root.querySelectorAll('a[data-jump]').length).toBeGreaterThanOrEqual(features.grove ? 5 : 4)
-    expect(root.querySelector('[data-scroll-jvh="742"]') !== null).toBe(features.grove)
-    expect(root.querySelector('a[href="#grove"]') !== null).toBe(features.grove)
+    expect(root.querySelectorAll('a[data-jump]').length).toBeGreaterThanOrEqual(reachable ? 5 : 4)
+    expect(root.querySelector('[data-scroll-jvh="742"]') !== null).toBe(onWalk)
+    expect(root.querySelector('a[href="#grove"]') !== null).toBe(reachable)
     expect(root.querySelector('.skip-link')?.getAttribute('href')).toBe('#content')
     expect(root.querySelectorAll('h1')).toHaveLength(1)
     expect(root.querySelector('footer.site-footer')).not.toBeNull()
@@ -126,8 +130,8 @@ describe('prerender and hydration', () => {
     const root = document.createElement('div')
     root.innerHTML = renderToString(<ContentLayer />)
     const triggers = [...root.querySelectorAll('.zh[data-gloss]')]
-    // They are in the grove's copy; while it is paused there may be none, and any left must still hold.
-    expect(triggers.length).toBeGreaterThanOrEqual(features.grove ? 6 : 0)
+    // They are in the grove's copy; while it is off the walk there may be none, and any left must still hold.
+    expect(triggers.length).toBeGreaterThanOrEqual(features.grove === 'walk' ? 6 : 0)
     for (const t of triggers) {
       expect(t.getAttribute('lang')).toBe('zh-Hans')
       const gloss = root.querySelector(`#${CSS.escape(t.getAttribute('aria-describedby') ?? '')}`)

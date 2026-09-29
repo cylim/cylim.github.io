@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { ARRIVALS, GROVE, NOW, THREE_CHUNK, booted, expectedMode, expectedStaticReason, settled } from './helpers'
+import { GROVE_ON_WALK, NOW, WALK_ARRIVALS, THREE_CHUNK, booted, expectedMode, expectedStaticReason, settled } from './helpers'
 
 // The album, no JavaScript, and the static files that replace Jekyll (design.md §14,
 // stack.md §9, §10). Every visitor gets all the content; only the atmosphere is optional.
@@ -45,11 +45,12 @@ test.describe('the album', () => {
     await page.goto(`/?mode=static&e2e=1&now=${NOW}`)
     await settled(page)
     await expect(page.locator('html')).toHaveAttribute('data-mode', 'static')
-    for (const { id } of ARRIVALS) {
+    for (const { id } of WALK_ARRIVALS) {
       await expect(page.locator(`section#${id}`)).toHaveCount(1)
       await expect(page.locator(`#${id}-heading`)).toHaveAttribute('tabindex', '-1')
     }
-    await expect(page.locator('section#grove')).toHaveCount(GROVE ? 1 : 0)
+    // A detour grove joins the page when a jump heads there, not before (src/content/features.ts).
+    await expect(page.locator('section#grove')).toHaveCount(GROVE_ON_WALK ? 1 : 0)
     await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
   })
 
@@ -71,13 +72,13 @@ test.describe('without JavaScript', () => {
     await page.goto('/')
     await expect(page.locator('html')).toHaveAttribute('data-mode', 'static')
     await expect(page.getByRole('heading', { level: 1, name: 'CY Lim' })).toBeVisible()
-    for (const { id } of ARRIVALS) await expect(page.locator(`section#${id} h1, section#${id} h2`).first()).toBeAttached()
+    for (const { id } of WALK_ARRIVALS) await expect(page.locator(`section#${id} h1, section#${id} h2`).first()).toBeAttached()
     for (const href of ['https://github.com/cylim', 'https://x.com/seewhy', 'https://www.linkedin.com/in/cylim226', 'https://t.me/cyants']) {
       await expect(page.locator(`a[rel~="me"][href="${href}"]`).first()).toBeAttached()
     }
     const html = await page.content()
-    // The grove's noscript line, exactly when the grove is on (src/content/features.ts).
-    expect(html.includes('The live chart needs JavaScript.')).toBe(GROVE)
+    // The grove's noscript line, exactly when the grove is on the walk (src/content/features.ts).
+    expect(html.includes('The live chart needs JavaScript.')).toBe(GROVE_ON_WALK)
   })
 })
 

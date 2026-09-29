@@ -40,6 +40,7 @@ import {
   type EmergePose,
 } from '../world/journey'
 import { cabin, hall, pathZone } from '../world/layout'
+import { onWalkChange } from '../world/walk'
 import { motion } from '../../theme/tokens'
 import { buildCameraPath, sampleUnit, type CameraPath } from './path'
 import { buildFraming, planViewport, projection, type Framing, type Viewport } from './framing'
@@ -48,12 +49,18 @@ import { planFocus, zoomLens, zoomToFill, type Lens, type PlanFocus } from './pl
 const DEG = Math.PI / 180
 const TAU = Math.PI * 2
 
-const KEYS = {
+const buildKeys = () => ({
   fog: channelKeys('fog'),
   roll: channelKeys('roll'),
   up: channelKeys('up'),
   paper: channelKeys('paper'),
-}
+})
+
+/** The scalar channels of this walk. Rebuilt when a detour joins the grove walk (walk.ts). */
+let KEYS = buildKeys()
+onWalkChange(() => {
+  KEYS = buildKeys()
+})
 
 const PARALLAX_BEATS: ReadonlySet<BeatId> = new Set(RIG.parallaxBeats)
 
@@ -138,6 +145,8 @@ export class Rig {
 
   private path: CameraPath | null = null
   private framing: Framing | null = null
+  /** The camera table the path and framing were built from: a detour joining the grove walk replaces it. */
+  private beats = BEATS
   private header = 0
   private lastJvh = Number.NaN
   private lagging = false
@@ -151,6 +160,13 @@ export class Rig {
   }
 
   private ensureFraming(width: number, height: number): { path: CameraPath; framing: Framing } {
+    // A new walk (walk.ts): rebuild everything. The dive swaps it under full paper with a snap.
+    if (this.beats !== BEATS) {
+      this.beats = BEATS
+      this.framing = null
+      this.path = null
+      this.lastJvh = Number.NaN
+    }
     const f = this.framing
     const v: Viewport = { width, height, header: this.header }
     if (!f || f.viewport.width !== v.width || f.viewport.height !== v.height || f.viewport.header !== v.header) {

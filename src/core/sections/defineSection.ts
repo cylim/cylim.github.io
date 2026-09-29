@@ -11,6 +11,23 @@ import type { SectionDefinition, SectionDefinitionInput, SectionSceneModule } fr
  * rethrows its first rejection forever. SectionHost's boundary logs the failure and counts the
  * section ready, so dives and the fog never wait on it, and the DOM layer still has the content.
  */
+/** The walk-dependent fields of a definition: where its scene draws, where a jump lands, its height. */
+export type SectionWalkSpans = Pick<SectionDefinition, 'spanJvh' | 'arrivalJvh' | 'heightSvh'>
+
+const derivedSpans = (w: SectionWalkSpans) => ({
+  ...w,
+  span: [jvhToU(w.spanJvh[0]), jvhToU(w.spanJvh[1])] as const,
+  arrivalU: jvhToU(w.arrivalJvh),
+})
+
+/**
+ * Move a definition onto the walk as it is now, in place, when a detour joins the grove walk
+ * (core/world/walk.ts). `load` and the lazy `Scene` stay the same objects, so nothing refetches.
+ */
+export function refreshSpans(def: SectionDefinition, w: SectionWalkSpans): void {
+  Object.assign(def, derivedSpans(w))
+}
+
 export function defineSection(input: SectionDefinitionInput): SectionDefinition {
   let pending: Promise<SectionSceneModule> | null = null
   const load = () => {
@@ -22,8 +39,7 @@ export function defineSection(input: SectionDefinitionInput): SectionDefinition 
   }
   return {
     ...input,
-    span: [jvhToU(input.spanJvh[0]), jvhToU(input.spanJvh[1])],
-    arrivalU: jvhToU(input.arrivalJvh),
+    ...derivedSpans(input),
     load,
     Scene: lazy(load),
   }

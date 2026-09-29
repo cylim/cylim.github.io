@@ -1,5 +1,5 @@
 import { J, MARKS, beatSpanById, holdOf, scrollSvhBetween, type BeatId } from '../core/world/beats'
-import { features } from '../content/features'
+import { groveOnWalk, onWalkChange } from '../core/world/walk'
 
 /**
  * When each copy card shows in the immersive walk (design.md §6.1, §6.4, §8). Pure data plus the
@@ -30,7 +30,7 @@ export interface CardSpec {
 
 const FADE = 6
 
-const ALL_CARDS: readonly CardSpec[] = [
+const buildAllCards = (): readonly CardSpec[] => [
   // Hero holds 0–35 and fades out 40–65 while the camera steps in.
   { beat: 'T0', zone: 'L', show: [0, MARKS.heroFadeOut[0]], fade: [0, MARKS.heroFadeOut[1] - MARKS.heroFadeOut[0]] },
   { beat: 'F1', zone: 'L', show: holdOf('F1'), fade: [FADE, FADE] },
@@ -52,10 +52,20 @@ const ALL_CARDS: readonly CardSpec[] = [
   { beat: 'E3', zone: 'mount', show: holdOf('E3'), fade: [4, 0] },
 ]
 
-/** The grove's cards: its intro by the stream, the seat and the chart panel. Gone while it is paused. */
+/** The grove's cards: its intro by the stream, the seat and the chart panel. Gone while it is off the walk. */
 const GROVE_CARDS: ReadonlySet<BeatId> = new Set(['P1', 'G1', 'G3'])
 
-export const CARDS: readonly CardSpec[] = features.grove ? ALL_CARDS : ALL_CARDS.filter((c) => !GROVE_CARDS.has(c.beat))
+const buildCards = (): readonly CardSpec[] => {
+  const all = buildAllCards()
+  return groveOnWalk() ? all : all.filter((c) => !GROVE_CARDS.has(c.beat))
+}
+
+/** This walk's cards: a live binding, rebuilt when a detour joins the grove walk (core/world/walk.ts). */
+export let CARDS = buildCards()
+
+onWalkChange(() => {
+  CARDS = buildCards()
+})
 
 export const cardByBeat = (id: BeatId): CardSpec | undefined => CARDS.find((c) => c.beat === id)
 
