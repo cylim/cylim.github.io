@@ -91,8 +91,14 @@ test('scrolling through the walk passes every section in order', async ({ page }
     await expect.poll(() => page.evaluate(() => window.__cy?.state().active), { timeout: 20_000 }).toBe(id)
     jvhs.push(await page.evaluate(() => window.__cy?.state().jvh ?? -1))
   }
-  await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }))
-  await expect.poll(() => page.evaluate(() => Math.round(window.__cy?.state().jvh ?? -1)), { timeout: 20_000 }).toBe(JOURNEY_END)
+  // The album's leaves still grow after hydration (the live terminal and the colophon mount client-only),
+  // which can leave a single scroll short of the bottom: scroll again on every read.
+  const toBottom = () =>
+    page.evaluate(() => {
+      scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
+      return Math.round(window.__cy?.state().jvh ?? -1)
+    })
+  await expect.poll(toBottom, { timeout: 20_000 }).toBe(JOURNEY_END)
   expect(jvhs).toEqual(jvhs.toSorted((a, b) => a - b))
 })
 
@@ -107,8 +113,13 @@ test('a detour to the grove puts it on the walk for the rest of the visit', asyn
   await expect(page.locator('#grove')).toBeInViewport()
   await expect(page.locator('#grove-heading')).toBeFocused()
   expect(await page.evaluate(() => window.__cy?.state().active)).toBe('grove')
-  // The walk now runs through the grove to the lantern: the full 1000 jvh.
-  await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }))
-  await expect.poll(() => page.evaluate(() => Math.round(window.__cy?.state().jvh ?? -1)), { timeout: 20_000 }).toBe(1000)
+  // The walk now runs through the grove to the lantern: the full 1000 jvh. Scroll again on every read,
+  // as late client-only content can grow the page under a single scroll.
+  const toBottom = () =>
+    page.evaluate(() => {
+      scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
+      return Math.round(window.__cy?.state().jvh ?? -1)
+    })
+  await expect.poll(toBottom, { timeout: 20_000 }).toBe(1000)
   await expect.poll(() => page.evaluate(() => window.__cy?.state().active), { timeout: 20_000 }).toBe('contact')
 })

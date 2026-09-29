@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect } from 'react'
 import { journey, useJourney } from '../core/store/journey'
+import { MARKS } from '../core/world/beats'
 import { contact } from '../content/site'
 import { ui } from '../content/ui'
 import { bindCards, bindFocusFollow, bindGlideControls, bindPalette, bindVeil } from './bindings'
@@ -21,20 +22,44 @@ const WalkChrome = lazy(() => import('./chrome/WalkChrome'))
 /**
  * The grove's leaf (copy, chart, glossary) is its own chunk: it is off the first screen, and as a
  * detour it only mounts when a dive joins the grove walk. The server renders it in place; hydration
- * keeps that markup until the chunk arrives. A dive heading for the grove starts the fetch while it
- * goes into paper, and the join waits for the section to appear (core/scroll/dive.ts).
+ * keeps that markup until the chunk arrives. As a detour, the fetch starts early: on entering the cabin
+ * (with the grove's scene chunk, MARKS.prefetchGrove), on a press or hover of a #grove link, or when a
+ * dive heads there. The join waits for the section to appear (core/scroll/dive.ts).
  */
 const loadGroveLeaf = () => import('./leaves/Grove')
 const GroveSection = lazy(() => loadGroveLeaf().then((m) => ({ default: m.GroveSection })))
 
 function PrefetchGroveLeaf() {
-  useEffect(
-    () =>
-      journey.subscribe((s, prev) => {
-        if (s.dive.to === 'grove' && prev.dive.to !== 'grove') void loadGroveLeaf()
-      }),
-    [],
-  )
+  useEffect(() => {
+    let done = false
+    let idle = 0
+    const load = () => {
+      if (done) return
+      done = true
+      stop()
+      void loadGroveLeaf()
+    }
+    // Passing the cabin is only a hint: fetch when the page is idle, so it never competes with the
+    // chunks the visitor is looking at (the terminal, the colophon). A dive or an intent is not.
+    const unsubscribe = journey.subscribe((s) => {
+      if (s.dive.to === 'grove') load()
+      else if (s.jvh >= MARKS.prefetchGrove && !idle) {
+        idle = typeof requestIdleCallback === 'function' ? requestIdleCallback(load, { timeout: 4000 }) : window.setTimeout(load, 1000)
+      }
+    })
+    const onIntent = (e: Event) => {
+      if (e.target instanceof Element && e.target.closest('a[href="#grove"]')) load()
+    }
+    const intents = ['pointerdown', 'pointerover', 'touchstart', 'focusin'] as const
+    for (const type of intents) document.addEventListener(type, onIntent, { passive: true })
+    function stop() {
+      if (idle && typeof cancelIdleCallback === 'function') cancelIdleCallback(idle)
+      else window.clearTimeout(idle)
+      unsubscribe()
+      for (const type of intents) document.removeEventListener(type, onIntent)
+    }
+    return stop
+  }, [])
   return null
 }
 

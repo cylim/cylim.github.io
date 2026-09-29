@@ -177,6 +177,11 @@ function onHandScroll(): void {
   else if (phase === 'hold') interruptHold?.()
 }
 
+/** Joining the grove walk gives up on the grove's leaf only after this many frames as well as the dive's give-up time... */
+const JOIN_MIN_FRAMES = 30
+/** ...and waits no longer than this, however slow the frames (a chunk that never arrives). */
+const JOIN_CAP_MS = 20_000
+
 const nextFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
 
 /**
@@ -189,10 +194,20 @@ async function joinWalk(): Promise<void> {
   if (!joinGroveWalk()) return
   journey.setState((s) => ({ groveWalk: true, ready: { ...s.ready, grove: false } }))
   // React commits the new track within a frame; the grove's leaf is a lazy chunk (dom/ContentLayer.tsx),
-  // so wait for its section too, up to the dive's give-up time.
+  // so wait for its section too. The scroll map is measured from the sections, so measuring without
+  // it would land the arrival in the cabin. A main thread busy compiling shaders can starve the frames
+  // for seconds, so giving up takes the dive's give-up time and a run of frames, within a hard cap.
   const t0 = performance.now()
+  let frames = 0
+  const waiting = () => {
+    const ms = performance.now() - t0
+    return ms < JOIN_CAP_MS && (ms < motion.dive.giveUp || frames < JOIN_MIN_FRAMES)
+  }
   await nextFrame()
-  while (!document.getElementById('grove') && performance.now() - t0 < motion.dive.giveUp) await nextFrame()
+  while (!document.getElementById('grove') && waiting()) {
+    await nextFrame()
+    frames++
+  }
   remeasureScroll()
 }
 
