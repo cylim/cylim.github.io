@@ -165,6 +165,11 @@ export const motion = {
   canvas: { reveal: 1800, revealSkip: 300, revealReduced: 800, fadeIn: 800 },
   seal: { total: 220, press: 120, bleed: 400 },
   scrollCue: 3000,
+  /**
+   * First-load loading screen (intro.ts): 林 brushes in over `brush`, one 木 at a time. It
+   * holds at least `min` (first load per tab), lifts when the stage is live, and never past `max`.
+   */
+  intro: { brush: 1100, min: 1400, max: 7000, out: 600 },
   /** Earlier/Later long-press: repeat after `delay`, then every `interval` (4 per second). */
   longPress: { delay: 400, interval: 250 },
   /** Terminal output lines settle from a 2 px blur; the caret breathes instead of blinking. */
@@ -208,6 +213,8 @@ export const z = {
   terminalOverlay: 22,
   veil: 30,
   titleCard: 31,
+  /** First-load loading screen: over #root (header included), passing clicks through to it. */
+  intro: 35,
   header: 40,
   bottomBar: 40,
   sheet: 45,
@@ -301,6 +308,8 @@ export function cssVars(): Record<string, string> {
   out['--dur-seal-press'] = `${motion.seal.press}ms`
   out['--dur-seal-bleed'] = `${motion.seal.bleed}ms`
   out['--dur-scroll-cue'] = `${motion.scrollCue}ms`
+  out['--dur-intro-brush'] = `${motion.intro.brush}ms`
+  out['--dur-intro-out'] = `${motion.intro.out}ms`
   out['--dur-terminal-settle'] = `${motion.terminalSettle}ms`
   out['--dur-caret'] = `${motion.caretBreath}ms`
   out['--dur-sound-wave'] = `${motion.soundWave}ms`

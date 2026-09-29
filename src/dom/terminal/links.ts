@@ -1,3 +1,4 @@
+import { contact } from '../../content/site'
 import { socials } from '../../content/socials'
 import { workItems } from '../../content/work'
 
@@ -7,7 +8,11 @@ const displayOf = (href: string) => href.replace(/^https?:\/\/(www\.)?/, '').rep
 let table: (readonly [display: string, href: string])[] | null = null
 function links() {
   if (!table) {
-    const hrefs = [...socials.map((s) => s.href), ...Object.values(workItems).flatMap((w) => w.links.map((l) => l.href))]
+    const hrefs = [
+      ...socials.map((s) => s.href),
+      `https://cy.my${contact.resume.href}`,
+      ...Object.values(workItems).flatMap((w) => w.links.map((l) => l.href)),
+    ]
     // Longest first, so github.com/cylim/oripax wins over github.com/cylim.
     table = [...new Set(hrefs)].map((h) => [displayOf(h), h] as const).toSorted((a, b) => b[0].length - a[0].length)
   }

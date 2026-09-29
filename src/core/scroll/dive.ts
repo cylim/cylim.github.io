@@ -17,7 +17,7 @@
 import { CY_EVENT, emit } from '../events'
 import { journey, type DiveState, type JourneyState } from '../store/journey'
 import { J, SECTION_SPANS } from '../world/beats'
-import { SECTION_HASH, type SectionId } from '../sections/ids'
+import { SECTION_HASH, walkSection, type SectionId } from '../sections/ids'
 import { registry } from '../sections/registry'
 import { prefetchSection } from '../sections/prefetch'
 import { easing, motion } from '../../theme/tokens'
@@ -171,7 +171,9 @@ export interface DiveOptions {
 }
 
 /** Fog-dive to a section's arrival. Resolves when it has settled or was superseded. History is the caller's job. */
-export async function diveTo(id: SectionId, opts: DiveOptions = {}): Promise<void> {
+export async function diveTo(target: SectionId, opts: DiveOptions = {}): Promise<void> {
+  // A paused section (the grove) lands where its links do.
+  const id = walkSection(target)
   const my = ++token
   interruptHold?.()
   const s = journey.getState()

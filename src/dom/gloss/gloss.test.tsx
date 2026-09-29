@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { grove, hero, nav } from '../../content'
+import { grove, nav } from '../../content'
+import { inscriptions } from '../../content/site'
 import { glossDetail, romanize } from './detail'
 import { placeTooltip } from './GlossLayer'
 import { accentGloss, bootGloss, segmentCopy } from './lookup'
@@ -51,8 +52,8 @@ describe('GlossText', () => {
 
 describe('accent glosses', () => {
   it('site accents carry a meaning for the tooltip', () => {
-    expect(accentGloss(hero.accent)).toMatchObject({ zh: '入林', pinyin: 'rù lín', en: 'into the forest (林 is also Lim)' })
-    expect(accentGloss(hero.accent).meaning).toBeTruthy()
+    expect(accentGloss(inscriptions.threshold.accent)).toMatchObject({ zh: '林', pinyin: 'lín', en: 'forest (also the surname Lim)' })
+    expect(accentGloss(inscriptions.threshold.accent).meaning).toBeTruthy()
     for (const n of nav) expect(bootGloss(n.accent.zh), n.accent.zh).toBeDefined()
   })
 

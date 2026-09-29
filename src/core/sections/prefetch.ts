@@ -8,6 +8,8 @@
  * | contact | with grove                                                                     |
  *
  * Intent (pointerdown, touchstart or hover on a `data-jump` link) is wired in core/scroll/hashNav.
+ * With the grove paused (content/features.ts) the grove chunk still carries the path through the
+ * mist wall, so it keeps its place here; there is just no Grove link to hover.
  */
 
 import { journey } from '../store/journey'

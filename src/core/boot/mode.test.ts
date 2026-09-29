@@ -96,8 +96,9 @@ describe('index.html head script agrees with decideBoot', () => {
     env: BootEnvironment
     prefs: Prefs
     search: string
+    hash?: string
   }
-  const runHead = ({ env, prefs, search }: Case): { mode: string | undefined; reason: string | undefined } => {
+  const runHead = ({ env, prefs, search, hash = '' }: Case): { mode: string | undefined; reason: string | undefined; intro: boolean; veil: boolean } => {
     const attrs: Record<string, string> = {}
     const window: Record<string, unknown> = env.hasWebgl2 ? { WebGL2RenderingContext: Object } : {}
     runInNewContext(headScript ?? '', {
@@ -111,12 +112,21 @@ describe('index.html head script agrees with decideBoot', () => {
       navigator: { deviceMemory: env.deviceMemory, connection: { saveData: env.saveData } },
       localStorage: { getItem: (k: string) => (k === 'cy.prefs' ? JSON.stringify(prefs) : null) },
       matchMedia: (q: string) => ({ matches: q.includes('reduced-motion') && env.reducedMotion }),
-      location: { search, hash: '' },
+      location: { search, hash },
       URLSearchParams,
       setTimeout: () => 0,
     })
-    return { mode: attrs['data-mode'], reason: attrs['data-static-reason'] }
+    return { mode: attrs['data-mode'], reason: attrs['data-static-reason'], intro: 'data-intro' in attrs, veil: 'data-veil' in attrs }
   }
+
+  it('raises the loading screen on a plain walk load only, and the veil on a deep link', () => {
+    const walk = { env: desktop({ hasWebgl2: true, saveData: false, deviceMemory: 8, reducedMotion: false }), prefs: {} }
+    expect(runHead({ ...walk, search: '' })).toMatchObject({ intro: true, veil: false })
+    expect(runHead({ ...walk, search: '?e2e=1' })).toMatchObject({ intro: false })
+    expect(runHead({ ...walk, search: '?still=T0' })).toMatchObject({ intro: false })
+    expect(runHead({ ...walk, search: '', hash: '#grove' })).toMatchObject({ intro: false, veil: true })
+    expect(runHead({ ...walk, prefs: { mode: 'static' }, search: '' })).toMatchObject({ mode: 'static', intro: false })
+  })
 
   it('finds the head script', () => {
     expect(headScript).toContain('data-static-reason')
@@ -134,11 +144,11 @@ describe('index.html head script agrees with decideBoot', () => {
     expect(cases.length).toBe(192)
     for (const c of cases) {
       const d = decideBoot(parseBootParams(c.search), c.prefs, c.env)
-      const head = runHead(c)
+      const { mode, reason } = runHead(c)
       // With ?mode=immersive and no WebGL2 the head script optimistically paints the walk; boot's probe
       // then overturns it. Every other case must match exactly, reason included.
       if (!c.env.hasWebgl2 && c.search) continue
-      expect({ ...head, case: c }).toEqual({ mode: d.mode, reason: d.staticReason ?? undefined, case: c })
+      expect({ mode, reason, case: c }).toEqual({ mode: d.mode, reason: d.staticReason ?? undefined, case: c })
     }
   })
 })

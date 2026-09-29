@@ -2,12 +2,16 @@
  * The four sections. The only place core/ reaches into src/sections/, and only through dynamic
  * imports, so each scene is its own chunk. After day 1 nobody edits this file except to tune
  * spans and arrivals, which live in core/world/journey.ts anyway.
+ *
+ * `spanJvh` is where the scene draws (SCENE_SPANS); arrival and height are the DOM section's. With
+ * the grove paused (content/features.ts) the grove entry stays: its chunk draws the path from the
+ * moon gate to the mist wall, and its arrival is contact's.
  */
 
 import { defineSection } from './defineSection'
 import { SECTION_HASH, SECTION_IDS, type SectionId } from './ids'
 import type { SectionDefinition } from './types'
-import { SECTION_SPANS } from '../world/beats'
+import { SCENE_SPANS, SECTION_SPANS } from '../world/beats'
 import { nav, inscriptions } from '../../content/site'
 
 const labelOf = (id: SectionId) => nav.find((n) => n.id === id)?.label ?? id
@@ -17,7 +21,7 @@ const common = (id: SectionId) => ({
   hash: SECTION_HASH[id],
   label: labelOf(id),
   zh: inscriptions[id].accent.zh,
-  spanJvh: SECTION_SPANS[id].jvh,
+  spanJvh: SCENE_SPANS[id],
   arrivalJvh: SECTION_SPANS[id].arrivalJvh,
   heightSvh: SECTION_SPANS[id].heightSvh,
 })

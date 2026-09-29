@@ -38,14 +38,12 @@ export const methodTerms: readonly GlossaryTerm[] = [
 
 /**
  * Site accents outside the chart.
- * TODO(owner): 文 and 留白 glosses are new (design.md §4.5 and the terminal's `cat .mist`).
+ * TODO(owner): the 留白 gloss is new (the terminal's `cat .mist`).
  */
 export const siteAccents: readonly GlossaryTerm[] = [
   { zh: '林', pinyin: 'lín', en: 'forest', meaning: 'Two trees make a forest. 林 is also the surname Lim.' },
-  { zh: '入林', pinyin: 'rù lín', en: 'into the forest', meaning: 'Stepping into the trees. 林 is also Lim.' },
   { zh: '木屋', pinyin: 'mù wū', en: 'wooden hut', meaning: "The scholar's hut in every landscape painting. This one writes software." },
   { zh: '九宫', pinyin: 'jiǔ gōng', en: 'nine palaces', meaning: 'The Luo Shu grid every Qimen chart is laid on.' },
   { zh: '石灯', pinyin: 'shí dēng', en: 'stone lantern', meaning: 'The one warm light in the forest, at the end of the path.' },
-  { zh: '文', pinyin: 'wén', en: 'writing', meaning: 'Writing, literature. Here, the blog.' },
   { zh: '留白', pinyin: 'liú bái', en: 'leaving white', meaning: 'Ink-wash painters paint mist by not painting it: the paper is left blank.' },
 ]

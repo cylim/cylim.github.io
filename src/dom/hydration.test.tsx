@@ -6,6 +6,9 @@ import { renderToString } from 'react-dom/server'
 import { hydrateRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { journey } from '../core/store/journey'
+import { WALK_SECTION_IDS } from '../core/sections/ids'
+import { BEAT_SPANS } from '../core/world/beats'
+import { features } from '../content/features'
 import { ContentLayer } from './ContentLayer'
 
 /**
@@ -101,14 +104,19 @@ describe('prerender and hydration', () => {
   it('keeps the section contract other modules rely on', () => {
     const root = document.createElement('div')
     root.innerHTML = renderToString(<ContentLayer />)
-    for (const id of ['threshold', 'cabin', 'grove', 'contact']) {
+    // The sections follow content/features.ts: four with the grove on, three while it is paused.
+    expect(WALK_SECTION_IDS).toEqual(features.grove ? ['threshold', 'cabin', 'grove', 'contact'] : ['threshold', 'cabin', 'contact'])
+    for (const id of WALK_SECTION_IDS) {
       const s = root.querySelector(`section#${id}`)
       expect(s?.getAttribute('aria-labelledby')).toBe(`${id}-heading`)
       expect(root.querySelector(`#${id}-heading`)?.getAttribute('tabindex')).toBe('-1')
     }
-    expect(root.querySelectorAll('main#content .beat[data-beat]')).toHaveLength(31)
-    expect(root.querySelectorAll('a[data-jump]').length).toBeGreaterThanOrEqual(5)
-    expect(root.querySelector('[data-scroll-jvh="742"]')).not.toBeNull()
+    expect(root.querySelectorAll('main section.leaf')).toHaveLength(WALK_SECTION_IDS.length)
+    expect(root.querySelectorAll('main#content .beat[data-beat]')).toHaveLength(features.grove ? 31 : 26)
+    expect(root.querySelectorAll('main#content .beat[data-beat]')).toHaveLength(BEAT_SPANS.length)
+    expect(root.querySelectorAll('a[data-jump]').length).toBeGreaterThanOrEqual(features.grove ? 5 : 4)
+    expect(root.querySelector('[data-scroll-jvh="742"]') !== null).toBe(features.grove)
+    expect(root.querySelector('a[href="#grove"]') !== null).toBe(features.grove)
     expect(root.querySelector('.skip-link')?.getAttribute('href')).toBe('#content')
     expect(root.querySelectorAll('h1')).toHaveLength(1)
     expect(root.querySelector('footer.site-footer')).not.toBeNull()
@@ -118,7 +126,8 @@ describe('prerender and hydration', () => {
     const root = document.createElement('div')
     root.innerHTML = renderToString(<ContentLayer />)
     const triggers = [...root.querySelectorAll('.zh[data-gloss]')]
-    expect(triggers.length).toBeGreaterThan(5)
+    // They are in the grove's copy; while it is paused there may be none, and any left must still hold.
+    expect(triggers.length).toBeGreaterThanOrEqual(features.grove ? 6 : 0)
     for (const t of triggers) {
       expect(t.getAttribute('lang')).toBe('zh-Hans')
       const gloss = root.querySelector(`#${CSS.escape(t.getAttribute('aria-describedby') ?? '')}`)

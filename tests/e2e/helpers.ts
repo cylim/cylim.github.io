@@ -1,15 +1,22 @@
 import type { Page, TestInfo } from '@playwright/test'
+import { features } from '../../src/content/features'
+
+/** The grove is on the walk (src/content/features.ts); the specs follow the site. */
+export const GROVE = features.grove
 
 /** Fixed chart time, so the grove and colophon render the same on every run. */
 export const NOW = '2026-01-01T04:00:00Z'
 
-/** Section ids in walk order with their deep-link hashes (design.md §6.2). */
+/** Section ids in walk order with their deep-link hashes (design.md §6.2). No grove while it is paused. */
 export const ARRIVALS = [
   { id: 'threshold', hash: '' },
   { id: 'cabin', hash: '#cabin' },
-  { id: 'grove', hash: '#grove' },
+  ...(GROVE ? [{ id: 'grove', hash: '#grove' } as const] : []),
   { id: 'contact', hash: '#contact' },
 ] as const
+
+/** Journey length in jvh: 1000, or 783 with the grove's 217 jvh cut (src/core/world/beats.ts). */
+export const JOURNEY_END = GROVE ? 1000 : 783
 
 /**
  * The mode a project should boot in (design.md §13.2, src/core/boot/mode.ts). No WebGL2 and

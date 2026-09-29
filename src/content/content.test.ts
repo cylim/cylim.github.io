@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { features } from './features'
 import {
   alsoOrder,
   branches,
@@ -6,7 +7,6 @@ import {
   chartTerms,
   chartOptions,
   featuredOrder,
-  featuredWork,
   fill,
   glossFor,
   glossForMark,
@@ -30,23 +30,32 @@ import { missingGlosses } from '../lib/qimen/labels'
 import { segmentCopy } from '../dom/gloss/lookup'
 
 describe('owner defaults (design.md §18.1)', () => {
-  it('hero accent is 入林 with positioning option 3 and no availability line', () => {
-    expect(hero.accent.zh).toBe('入林')
-    expect(hero.positioning).toBe(hero.positioningOptions[2])
+  it('hero has no accent, the full-stack positioning line and no availability line', () => {
+    expect('accent' in hero).toBe(false)
+    expect(hero.positioning).toBe(hero.positioningOptions[3])
     expect(hero.availability).toBeNull()
     expect(hero.showSocialRow).toBe(true)
   })
 
-  it('nav reads Work / Grove / Contact with 木屋 / 九宫 / 石灯', () => {
+  it.runIf(features.grove)('nav reads Work / Grove / Contact with 木屋 / 九宫 / 石灯', () => {
     const places = nav.filter((n) => n.id !== 'threshold')
     expect(places.map((n) => n.label)).toEqual(['Work', 'Grove', 'Contact'])
     expect(places.map((n) => n.accent.zh)).toEqual(['木屋', '九宫', '石灯'])
     expect(places.map((n) => n.href)).toEqual(['#cabin', '#grove', '#contact'])
   })
 
-  it('four featured scrolls, three "Also" items, JRNY Spark nowhere', () => {
-    expect(featuredOrder).toEqual(['oripax', 'jrny', 'cosmos-insights', 'terra-dapp'])
-    expect(alsoOrder).toEqual(['jrny-plan', 'tbsx3', 'upstream'])
+  it.runIf(!features.grove)('nav reads Work / Contact with 木屋 / 石灯 while the grove is paused', () => {
+    const places = nav.filter((n) => n.id !== 'threshold')
+    expect(places.map((n) => n.label)).toEqual(['Work', 'Contact'])
+    expect(places.map((n) => n.accent.zh)).toEqual(['木屋', '石灯'])
+    expect(places.map((n) => n.href)).toEqual(['#cabin', '#contact'])
+    // No Qimen in the copy a visitor meets first (the terminal's whoami keeps its fengshui line).
+    for (const s of [hero.subline, meta.description, meta.og.description]) expect(s).not.toMatch(/Qimen|grove/i)
+  })
+
+  it('four featured scrolls, four "Also" items, JRNY Spark nowhere', () => {
+    expect(featuredOrder).toEqual(['tokenyze', 'kysen', 'nextrare', 'asterix'])
+    expect(alsoOrder).toEqual(['miroma', 'atticc', 'mercury-labs', 'jrny'])
     const shown = new Set<string>([...featuredOrder, ...alsoOrder])
     expect(shown.has('jrny-spark')).toBe(false)
     expect(Object.keys(workItems)).toContain('jrny-spark')
@@ -57,12 +66,11 @@ describe('owner defaults (design.md §18.1)', () => {
     expect(ids.toSorted()).toEqual(services.map((s) => s.id).toSorted())
   })
 
-  it('socials only: GitHub, X (short link), LinkedIn, Blog with a trailing slash', () => {
+  it('socials only: GitHub, X, LinkedIn (no blog)', () => {
     expect(socials.map((s) => s.href)).toEqual([
       'https://github.com/cylim',
       'https://x.com/seewhy',
       'https://www.linkedin.com/in/cylim226',
-      'https://cy.my/blog/',
     ])
     expect(socials.find((s) => s.id === 'x')?.label).toBe('X')
   })
@@ -87,7 +95,7 @@ describe('helpers', () => {
   it('glossFor finds chart glyphs and site accents', () => {
     expect(glossFor('天英')?.en).toBe('Hero')
     expect(glossFor('秋分')?.en).toBe('Autumn Equinox')
-    expect(glossFor('入林')?.pinyin).toBe('rù lín')
+    expect(glossFor('林')?.pinyin).toBe('lín')
     expect(glossFor('不存在')).toBeUndefined()
   })
 })
@@ -149,20 +157,19 @@ describe('glosses in context (review CD-2, CD-3, CD-5)', () => {
 })
 
 describe('career facts (LinkedIn export, github.com/cylim/talks; review CP-4, CP-5, CP-10)', () => {
-  const siteCopy = JSON.stringify({ timeline, cabin, terminalCommands, services, meta })
-
-  it('Cyants is Software Engineer, as on LinkedIn; no founder or studio claim anywhere', () => {
+  it('Cyants is the owner\'s studio (owner-confirmed), and JRNY is a Cyants product', () => {
     const cyants = timeline.find((e) => e.org === 'Cyants')
-    expect(cyants).toMatchObject({ start: 2018, end: 2024, role: 'Software Engineer' })
-    expect(siteCopy).not.toMatch(/founder|studio/i)
+    expect(cyants).toMatchObject({ start: 2018, end: 'now', role: 'Founder' })
+    for (const id of ['jrny', 'jrny-plan', 'jrny-spark'] as const) expect(workItems[id].context).toBe('Cyants')
   })
 
   it('personal projects are labelled personal, never client work', () => {
     expect(meta.og.description).not.toMatch(/client work/i)
-    expect(serviceById('web-apps').body).toMatch(/JRNY and OripaX below are two recent personal builds/)
-    for (const w of featuredWork.filter((x) => x.id === 'oripax' || x.id === 'jrny')) expect(w.context).toBe('Personal project')
+    expect(serviceById('web-apps').body).toMatch(/my studio Cyants, whose own products include JRNY/)
+    expect(workItems.oripax.context).toBe('Personal project')
     const projects = terminalCommands.find((c) => c.name === 'projects')?.output ?? []
-    for (const name of ['OripaX', 'JRNY Plan', 'JRNY ']) expect(projects.find((l) => l.includes(name)), name).toMatch(/\(personal\)$/)
+    expect(projects.find((l) => l.includes('OripaX'))).toMatch(/\(personal\)$/)
+    for (const name of ['JRNY Plan', 'JRNY ']) expect(projects.find((l) => l.includes(name)), name).toMatch(/\(Cyants\)$/)
   })
 
   it('reads as one chronology under a caption that covers every kind of row', () => {

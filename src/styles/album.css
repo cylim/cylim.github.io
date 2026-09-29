@@ -99,10 +99,6 @@ html[data-mode='static'] .leaf-text > .beat:empty {
   object-fit: cover;
 }
 
-.card-hero .hero-mark {
-  margin-top: 0.25rem;
-}
-
 html[data-mode='static'] .card-hero {
   padding-top: 0.5rem;
 }

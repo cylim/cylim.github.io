@@ -15,9 +15,9 @@ const Colophon = lazy(() => import('../finale/Colophon'))
 /**
  * "Walk again" and "Still version", shown with the link rows once the finale is signed (design.md
  * §8.7). Rendered twice, and CSS shows at most one (the other is display: none, so out of the
- * accessibility tree): under the link rows in the stele card (album, landscape walk), or under the
+ * accessibility tree): under the link rows in the contact card (album, landscape walk), or under the
  * colophon in the E3 card, where a phone's finale keeps them on the paper above the painting. Before
- * E3 the stele card's copy is out of sight but still the next Tab after the rows, and shows while it
+ * E3 the contact card's copy is out of sight but still the next Tab after the rows, and shows while it
  * has focus (walk.css), so the keyboard reaches them from E1 on.
  */
 function FinaleLinks({ where }: { where: 'card' | 'colophon' }) {
@@ -55,8 +55,11 @@ const cards: Cards = {
         <h2 id="contact-heading" tabIndex={-1}>
           {contact.heading}
         </h2>
-        <p className="stele-line">{contact.line}</p>
+        <p className="contact-line">{contact.line}</p>
         <SocialLinks variant="rows" />
+        <p className="contact-resume">
+          <a href={contact.resume.href}>{contact.resume.label}</a>
+        </p>
         <FinaleLinks where="card" />
       </>
     ),

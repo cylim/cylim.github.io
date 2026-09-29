@@ -1,5 +1,6 @@
 import { lazy, useEffect } from 'react'
 import { useJourney } from '../core/store/journey'
+import { features } from '../content/features'
 import { contact } from '../content/site'
 import { ui } from '../content/ui'
 import { bindCards, bindFocusFollow, bindGlideControls, bindPalette, bindVeil } from './bindings'
@@ -62,7 +63,8 @@ export function ContentLayer() {
         <AlbumBanner />
         <ThresholdSection />
         <CabinSection />
-        <GroveSection />
+        {/* Paused with content/features.ts: no #grove section, copy, chart or glossary. */}
+        {features.grove && <GroveSection />}
         <ContactSection />
         {/* The gloss tooltip: fixed, but inside main, so it sits in a landmark like everything else. */}
         <Client>

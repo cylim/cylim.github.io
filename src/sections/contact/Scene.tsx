@@ -2,19 +2,19 @@ import type { SectionSceneProps } from '../../core/sections/types'
 import { FinaleDriver } from './FinaleDriver'
 import { FinaleProxies } from './FinaleProxies'
 import { Lantern } from './Lantern'
-import { Stele } from './Stele'
+import { Signpost } from './Signpost'
 
 /**
  * The exit and the finale (design.md §8.7, signature moment 3 in §16): the stone lantern, the only
- * warm light in the ink world; the Han stele with the four carved rows; and, from E2, the scene
- * side of "the painting signs itself". The Stele suspends until its carved face is drawn, so
- * SectionHost prewarms with the texture in place.
+ * warm light in the ink world; the wooden signpost with a finger board per social link; and, from
+ * E2, the scene side of "the painting signs itself". The Signpost suspends until its board faces
+ * are drawn, so SectionHost prewarms with the texture in place.
  */
 export default function ContactScene(_props: SectionSceneProps) {
   return (
     <group name="contact">
       <Lantern />
-      <Stele />
+      <Signpost />
       <FinaleProxies />
       <FinaleDriver />
     </group>

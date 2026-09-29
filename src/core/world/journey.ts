@@ -2,7 +2,9 @@
  * The walk as data: design.md §6.1 beat table, §6.2 sections and hash targets, §6.3 rig rules,
  * §6.4 portrait overrides, §11.2 seams. The single tuning file for the camera.
  *
- * Scroll is measured in journey vh (jvh). The journey is J = 1000 jvh and u = jvh / J.
+ * Scroll is measured in journey vh (jvh). The journey is J = 1000 jvh and u = jvh / J. With the grove
+ * paused (content/features.ts) the tables are the same full walk, rebuilt by `groveless` at the end
+ * of the beat table: J is 783 and everything from the exit on sits 217 jvh earlier (beats.ts).
  * Pure data plus tiny pure helpers; no three.js. Owner: core-journey.
  *
  * Keyframe model
@@ -15,7 +17,8 @@
  * - up: normalised lerp between keys.
  * - fov, fog, roll, paper: piecewise-linear between keys, constant before the first and after the last.
  * - `cut: true` on a key means "do not interpolate into this key": the channel jumps at `at`.
- *   Used once, at 572, where the camera teleports under full paper from the hall to the path.
+ *   Used at 572, where the camera teleports under full paper from the hall to the path, and with the
+ *   grove paused at 628, from the mist wall to the southern trees.
  * - `fit: 'plan'` on a pos key means the rig replaces y with h_fit (R4 circle plus 1 m margin
  *   fits the chart viewport; about 34 m at 16:9) and recomputes it on resize.
  *
@@ -32,7 +35,7 @@
 
 import type { SectionId } from '../sections/ids'
 import type { Vec3 } from './layout'
-import { J, PRELOAD_U, type BeatId, type TextZone } from './beats'
+import { GROVE_ON, J, MIST_CUT, PRELOAD_U, afterGrove, isGroveBeat, withoutGrove, type BeatId, type TextZone } from './beats'
 
 // Spans, beat ranges, marks, framing and stills live in beats.ts (the boot chunk's share of the walk).
 export * from './beats'
@@ -54,7 +57,7 @@ export const EMERGE: Record<SectionId, EmergePose> = {
   threshold: { atJvh: 0, back: 3, note: 'T0 pose pulled 3 m back' },
   cabin: { atJvh: 312, note: 'C4 pose just outside the open door; every jump into the cabin still passes the door' },
   grove: { pos: [0, 40, -140], look: [0, 0.45, -150.5], note: 'Descends through cloud onto the G1 seat' },
-  contact: { atJvh: 872, note: 'E0 pose among the southern trees' },
+  contact: { atJvh: afterGrove(872), note: 'E0 pose among the southern trees' },
 }
 
 // ---------------------------------------------------------------------------- beats (§6.1)
@@ -116,7 +119,7 @@ const k = <T>(at: number, v: T, extra?: Pick<Key<T>, 'cut' | 'fit'>): Key<T> => 
 /** h_fit placeholder for 16:9 with the chart panel on the right third; the rig recomputes it. */
 export const H_FIT_DEFAULT = 34
 
-export const BEATS: readonly Beat[] = [
+const FULL_BEATS: readonly Beat[] = [
   // ------------------------------------------------------------ threshold, 0–245
   beat({
     id: 'T0', section: 'threshold', jvh: [0, 40], hold: [0, 35], zone: 'L',
@@ -348,7 +351,7 @@ export const BEATS: readonly Beat[] = [
     // design.md §6.1 looks at y 3.6 with 48°, which cuts the lantern at its plinth; a little lower and
     // wider keeps the whole lantern and its light pool while the peak still fills the top 40%.
     look: [k(886, [-0.5, 3.2, -188]), k(932, [-0.5, 3.2, -188])],
-    notes: 'Low angle, 高远: stele, lantern, peak above. #contact arrives at 886.',
+    notes: 'Low angle, 高远: signpost, lantern, peak above. #contact arrives at 886.',
   }),
   beat({
     id: 'E2', section: 'contact', jvh: [935, 985], zone: null,
@@ -367,6 +370,50 @@ export const BEATS: readonly Beat[] = [
     notes: 'Signed: the colophon writes itself, then the 林 seal stamps; map pins, "Walk again".',
   }),
 ]
+
+// ------------------------------------------------------------ the walk with the grove paused
+
+/**
+ * P2 and P3 with the grove paused. The mist wall is the cut: the fog is at its 0.14 peak, a flash of
+ * paper covers the last few jvh of P2, and under it the camera jumps from the crest (z −112) to the
+ * south of the empty clearing, so the grove is never seen. The mist then parts on the southern trees
+ * with the lantern glowing through them, and the walk carries on into E0.
+ */
+const MIST_PAPER = [620, MIST_CUT - 1] as const
+const P2_WITHOUT_GROVE: Partial<Beat> = {
+  paper: [k(MIST_PAPER[0], 0), k(MIST_PAPER[1], 1)],
+  notes: 'The mist wall: near-whiteout, then full paper at 627 for the cut to the southern trees. Guqin harmonic at 622.',
+}
+const P3_WITHOUT_GROVE: Partial<Beat> = {
+  pos: [k(MIST_CUT, [0.7, 1.9, -159], { cut: true }), k(645, [0.55, 1.85, -167.5])],
+  look: [k(MIST_CUT, [0.3, 2.3, -188], { cut: true }), k(645, [0.1, 2.5, -188])],
+  fov: [k(MIST_CUT, 45)],
+  fog: [k(MIST_CUT, 0.14), k(640, 0.018)],
+  paper: [k(MIST_CUT + 1, 1), k(636, 0)],
+  notes: 'The mist parts on the southern trees; the lantern glows through them. Cut from the mist wall under full paper at 628.',
+}
+
+const shiftKeys = <T>(keys: readonly Key<T>[]): Key<T>[] => keys.map((key) => ({ ...key, at: afterGrove(key.at) }))
+
+/** A full-walk beat on the groveless walk: beats.ts `withoutGrove`, plus its keys moved with it. */
+function beatWithoutGrove(b: Beat): Beat {
+  const moved = withoutGrove(b)
+  if (b.id === 'P2') return { ...moved, ...P2_WITHOUT_GROVE }
+  if (b.id === 'P3') return { ...moved, ...P3_WITHOUT_GROVE }
+  if (b.section === 'grove') return moved
+  return {
+    ...moved,
+    pos: shiftKeys(b.pos),
+    look: shiftKeys(b.look),
+    fov: shiftKeys(b.fov),
+    fog: shiftKeys(b.fog),
+    roll: shiftKeys(b.roll),
+    up: shiftKeys(b.up),
+    paper: shiftKeys(b.paper),
+  }
+}
+
+export const BEATS: readonly Beat[] = GROVE_ON ? FULL_BEATS : FULL_BEATS.filter((b) => !isGroveBeat(b.id)).map(beatWithoutGrove)
 
 // ---------------------------------------------------------------------------- rig (§6.3)
 
@@ -423,7 +470,7 @@ export interface PortraitOverride {
   readonly notes: string
 }
 
-export const PORTRAIT = {
+const FULL_PORTRAIT = {
   /** Portrait vFOV derives from this horizontal FOV, clamped to `vFovClamp`. */
   hFovDeg: 46,
   vFovClamp: [55, 68] as const,
@@ -505,17 +552,17 @@ export const PORTRAIT = {
       notes: 'Steeper seat.',
     },
     G3: { notes: 'The R4 circle fits the screen width and centres 30% from the top; the chart sheet sits below.' },
-    // design.md §6.4 says "stele centred", but the portrait frame is only about 29° wide at 58° and
-    // centring the stele would cut the lantern at the right edge. The pair is centred instead: stele
-    // left, lantern right, both whole in the top 55% above the zone-B card. The look target sits at
-    // stele height (y 0 plus the 1.5 m portrait look lift), so only the foot of the peak shows.
-    // A metre further back than landscape: from the landscape seat the stele's plinth and the
-    // lantern's base touch the two edges of a 390 px frame.
+    // The portrait frame is only about 29° wide at 58°: centring the signpost would cut the lantern
+    // at the right edge. The pair is centred instead, from the tips of the east-pointing boards to
+    // the lantern's eave: signpost left, lantern right, both whole in the top 55% above the zone-B
+    // card. The look target sits at board height (y 0 plus the 1.5 m portrait look lift), so only
+    // the foot of the peak shows. A metre further back than landscape: from the landscape seat the
+    // boards' tips and the lantern's base touch the two edges of a 390 px frame.
     E1: {
       fov: 58,
-      pos: [k(886, [0.1, 1.2, -178.8]), k(932, [0.1, 1.25, -179.2])],
-      look: [k(886, [-0.25, 0, -188]), k(932, [-0.25, 0, -188])],
-      notes: 'Stele and lantern centred as a pair, above the card.',
+      pos: [k(886, [-0.1, 1.2, -178.8]), k(932, [-0.1, 1.25, -179.2])],
+      look: [k(886, [-0.5, 0, -188]), k(932, [-0.5, 0, -188])],
+      notes: 'Signpost and lantern centred as a pair, above the card.',
     },
     // The walk laid out from lantern to ridges spans under 30° of view, and a phone's frame is 55° or
     // more tall. Tilt up to put the painting in the lower part of the scroll, the lantern near the foot,
@@ -528,6 +575,27 @@ export const PORTRAIT = {
   } satisfies Partial<Record<BeatId, PortraitOverride>>,
 } as const
 
+/**
+ * With the grove paused, P3 looks level at the southern trees instead of tilting down onto the rings,
+ * so it takes the look lift and the default subject height, and the exit overrides move up.
+ */
+function portraitWithoutGrove() {
+  const { P3: _p3, ...subjectY } = FULL_PORTRAIT.subjectY
+  const overrides: Partial<Record<BeatId, PortraitOverride>> = {}
+  for (const [id, o] of Object.entries(FULL_PORTRAIT.overrides) as [BeatId, PortraitOverride][]) {
+    if (isGroveBeat(id)) continue
+    overrides[id] = { ...o, ...(o.pos && { pos: shiftKeys(o.pos) }), ...(o.look && { look: shiftKeys(o.look) }) }
+  }
+  return {
+    ...FULL_PORTRAIT,
+    subjectY: subjectY as typeof FULL_PORTRAIT.subjectY,
+    lookLiftBeats: [...FULL_PORTRAIT.lookLiftBeats, 'P3'] as readonly BeatId[],
+    overrides: overrides as typeof FULL_PORTRAIT.overrides,
+  }
+}
+
+export const PORTRAIT: typeof FULL_PORTRAIT = GROVE_ON ? FULL_PORTRAIT : portraitWithoutGrove()
+
 // ---------------------------------------------------------------------------- helpers
 
 export function beatAt(jvh: number): Beat {
@@ -535,8 +603,9 @@ export function beatAt(jvh: number): Beat {
   return BEATS.find((b) => clamped >= b.jvh[0] && clamped < b.jvh[1]) ?? (BEATS[BEATS.length - 1] as Beat)
 }
 
+/** A beat's row. A paused grove beat answers with its full-walk row, so the grove's modules still load. */
 export function beatById(id: BeatId): Beat {
-  const b = BEATS.find((x) => x.id === id)
+  const b = BEATS.find((x) => x.id === id) ?? FULL_BEATS.find((x) => x.id === id)
   if (!b) throw new Error(`unknown beat ${id}`)
   return b
 }

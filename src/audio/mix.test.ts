@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { initialJourneyState } from '../core/store/journey'
 import { MARKS } from '../core/world/beats'
 import { CUTOFF, GRIND_FULL_SPEED, LEVEL, gainToDb } from './cues'
 import { mixAt, spanWeight, streamPan, type MixState } from './mix'
+
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../content/features', () => ({ features: { grove: true } }))
 
 const at = (patch: Partial<MixState> = {}): MixState => {
   const s = initialJourneyState()

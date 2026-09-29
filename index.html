@@ -6,7 +6,7 @@
     <title>CY Lim, software engineer in Penang</title>
     <meta
       name="description"
-      content="Software engineer in Penang, Malaysia. I build React and TypeScript web apps and web3 frontends, and practise fengshui and Qimen Dunjia."
+      content="Software engineer in Penang, Malaysia, shipping since 2017. I build React and TypeScript web apps, web3 frontends and mobile apps for clients, and practise fengshui."
     />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://cy.my/" />
@@ -20,12 +20,12 @@
     <meta property="og:title" content="CY Lim · A walk into the mist" />
     <meta
       property="og:description"
-      content="Scroll through an ink-wash forest. Selected work in a cabin, a live Qimen Dunjia chart in a grove, and a lantern at the end of the path."
+      content="Walk through an ink-wash forest. My work hangs in a cabin, and a signpost at the end of the path shows where to find me."
     />
     <meta property="og:image" content="https://cy.my/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="CY Lim, with the line “The parts of software people touch. Web, mobile and web3, since 2017.”, under pine trees in ink-wash mist." />
+    <meta property="og:image:alt" content="CY Lim, with the line “Full stack since 2017. Web and mobile apps, the services behind them, and the pipelines that ship them.”, under pine trees in ink-wash mist." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@seewhy" />
 
@@ -89,6 +89,8 @@
       A deep link into the walk starts in full paper and only emerges (design.md §6.2), so the veil goes
       up here, before the section top can paint. src/dom/bindings.ts takes the veil over and clears
       data-veil once the app runs; if it never does, the timeout lifts it so the page is never covered.
+      A plain first load of the walk gets the loading screen (#intro) instead, lifted by
+      src/dom/intro.ts when the forest is ready; the same failsafe applies. Tests and stills skip it.
     -->
     <script data-cfasync="false">
       ;(function () {
@@ -116,6 +118,11 @@
           setTimeout(function () {
             d.removeAttribute('data-veil')
           }, 4000)
+        } else if (!r && !/[?&](e2e|still)=/.test(location.search)) {
+          d.setAttribute('data-intro', '')
+          setTimeout(function () {
+            d.removeAttribute('data-intro')
+          }, 8000)
         }
       })()
     </script>
@@ -157,6 +164,12 @@
     <div id="stage" aria-hidden="true"></div>
     <!-- Before #root, so a pre-paint veil (data-veil) is parsed before any content can paint. -->
     <div id="veil" aria-hidden="true"></div>
+    <!-- First-load loading screen (src/dom/intro.ts, src/styles/intro.css). The label is ui.loading. -->
+    <div id="intro" aria-hidden="true">
+      <span class="intro-glyph"></span>
+      <div class="intro-line"></div>
+      <p class="intro-label">Grinding ink…</p>
+    </div>
     <div id="root"><!--content--></div>
     <script type="module" src="/src/main.tsx" data-cfasync="false"></script>
   </body>

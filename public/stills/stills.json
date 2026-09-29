@@ -56,79 +56,79 @@
     "I1": [
       {
         "file": "I1-1600.avif",
-        "bytes": 95030
+        "bytes": 94889
       },
       {
         "file": "I1-1600.webp",
-        "bytes": 117836
+        "bytes": 117934
       },
       {
         "file": "I1-800.avif",
-        "bytes": 30623
+        "bytes": 30676
       },
       {
         "file": "I1-800.webp",
-        "bytes": 45714
+        "bytes": 45710
       },
       {
         "file": "I1-portrait-800.avif",
-        "bytes": 59959
+        "bytes": 59836
       },
       {
         "file": "I1-portrait-800.webp",
-        "bytes": 90056
+        "bytes": 90214
       }
     ],
     "E1": [
       {
         "file": "E1-1600.avif",
-        "bytes": 54879
+        "bytes": 54661
       },
       {
         "file": "E1-1600.webp",
-        "bytes": 67804
+        "bytes": 68416
       },
       {
         "file": "E1-800.avif",
-        "bytes": 15781
+        "bytes": 15878
       },
       {
         "file": "E1-800.webp",
-        "bytes": 20414
+        "bytes": 20614
       },
       {
         "file": "E1-portrait-800.avif",
-        "bytes": 13186
+        "bytes": 13324
       },
       {
         "file": "E1-portrait-800.webp",
-        "bytes": 14558
+        "bytes": 15478
       }
     ],
     "E3": [
       {
         "file": "E3-1600.avif",
-        "bytes": 61609
+        "bytes": 67677
       },
       {
         "file": "E3-1600.webp",
-        "bytes": 83710
+        "bytes": 91506
       },
       {
         "file": "E3-800.avif",
-        "bytes": 17355
+        "bytes": 18615
       },
       {
         "file": "E3-800.webp",
-        "bytes": 24330
+        "bytes": 26310
       },
       {
         "file": "E3-portrait-800.avif",
-        "bytes": 49114
+        "bytes": 51893
       },
       {
         "file": "E3-portrait-800.webp",
-        "bytes": 66292
+        "bytes": 69940
       }
     ]
   }

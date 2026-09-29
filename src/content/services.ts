@@ -3,7 +3,7 @@
  * each service an <article> in document order.
  */
 
-export type ServiceId = 'web-apps' | 'web3' | 'mobile' | 'pipelines-security'
+export type ServiceId = 'web-apps' | 'mobile' | 'backend' | 'devops'
 
 export interface Service {
   readonly id: ServiceId
@@ -14,26 +14,23 @@ export interface Service {
 export const services: readonly Service[] = [
   {
     id: 'web-apps',
-    title: 'Web apps, blank repo to launch',
-    body: "Product idea in, working React and TypeScript app out. Sign-in, payments, realtime data and deploys included. I've built client MVPs since 2017. JRNY and OripaX below are two recent personal builds of the same kind.",
-  },
-  {
-    id: 'web3',
-    title: 'Web3 frontends',
-    // TODO(owner): OK to claim Aptos client work publicly? Evidence is private Cyants repos.
-    body: "Wallet flows, dashboards and dApps that make on-chain data readable. I've shipped on Cosmos and Terra, and built on Aptos, Solana and EVM chains.",
+    title: 'Web apps',
+    body: "React and TypeScript apps with sign-in, payments and realtime data, built for clients since 2017 and for my studio Cyants, whose own products include JRNY. Plenty of it on chain, with wallet flows and dApps across Cosmos, Terra, Ethereum, Aptos, Base and Solana.",
   },
   {
     id: 'mobile',
     title: 'Mobile apps',
-    // TODO(owner): still offering mobile? Newest public evidence is the Terra Flutter dApp.
-    body: 'Cross-platform apps in React Native or Flutter, and native iOS in Swift.',
+    body: 'React Native or Flutter when one codebase should cover both app stores, Swift when it has to feel exactly like iOS. I started out as an iOS developer, and since then I have shipped Harvest in Flutter and NextRare and Pave in React Native.',
   },
   {
-    id: 'pipelines-security',
-    title: 'Pipelines and a security-minded review',
-    // TODO(owner): keep this service? Based on TBSx3 CI/CD, the 2019 Docker talk, degree and CPEH.
-    body: 'CI/CD that tests and deploys on every push, and a second look at an existing codebase before it goes live. My degree is in digital system security and I hold the CPEH (Certified Professional Ethical Hacker) certification.',
+    id: 'backend',
+    title: 'Backend services and APIs',
+    body: "The services behind the apps. APIs in Node.js, NestJS and Next.js, Postgres with Drizzle, Convex and Cloudflare Workers, and serverless on AWS and Azure. I built the backend APIs for NextRare's rewards and pack odds, and the API services behind TBSx3.",
+  },
+  {
+    id: 'devops',
+    title: 'DevOps and a security-minded review',
+    body: 'CI/CD that tests and deploys on every push, Docker, and releases to AWS, Azure, Firebase and Cloudflare. Plus a hard second look at your code before it meets the internet. I studied digital system security and hold the CPEH ethical hacking certification.',
   },
 ]
 

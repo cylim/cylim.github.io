@@ -1,5 +1,8 @@
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import { withMetaCopy } from './src/content/meta.ts'
 
 /** `import src from './x.glsl'` yields the source string, same as `./x.glsl?raw`. */
 function glslAsString(): Plugin {
@@ -44,6 +47,34 @@ function cfasyncOff(): Plugin {
   }
 }
 
+/**
+ * index.html's description and og:description come from src/content/meta.ts, whose copy follows the
+ * feature switches in src/content/features.ts (the grove), so a flip needs no hand edit of the page.
+ */
+function metaCopy(): Plugin {
+  return {
+    name: 'cy:meta-copy',
+    transformIndexHtml: { order: 'pre', handler: withMetaCopy },
+  }
+}
+
+/**
+ * Emits dist/sw.js from scripts/sw/sw.js with a build id: a hash of every output file name, so any
+ * change to the build gives returning visitors a fresh cache (the template explains the strategy).
+ */
+function serviceWorker(): Plugin {
+  return {
+    name: 'cy:service-worker',
+    apply: 'build',
+    generateBundle(options, bundle) {
+      if (options.format !== 'es' || this.environment.name === 'ssr') return
+      const id = createHash('sha256').update(Object.keys(bundle).sort().join('\n')).digest('hex').slice(0, 12)
+      const source = readFileSync(new URL('./scripts/sw/sw.js', import.meta.url), 'utf8').replaceAll('__BUILD_ID__', id)
+      this.emitFile({ type: 'asset', fileName: 'sw.js', source })
+    },
+  }
+}
+
 /** The SSR build (dist-ssr/, read only by scripts/prerender.mjs) needs no copy of public/. */
 function noPublicInSsr(): Plugin {
   return {
@@ -55,7 +86,7 @@ function noPublicInSsr(): Plugin {
 export default defineConfig({
   // User site served at https://cy.my/, not a /repo/ project path.
   base: '/',
-  plugins: [react(), glslAsString(), noPublicInSsr(), cfasyncOff(), sideEffectFree(/[\\/]node_modules[\\/]n8ao[\\/]/)],
+  plugins: [react(), glslAsString(), noPublicInSsr(), metaCopy(), cfasyncOff(), serviceWorker(), sideEffectFree(/[\\/]node_modules[\\/]n8ao[\\/]/)],
   build: {
     sourcemap: 'hidden',
     assetsInlineLimit: 2048,

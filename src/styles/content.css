@@ -80,43 +80,14 @@ p {
 
 /* ------------------------------------------------------------------ hero (design.md §8.1) */
 
-.card-hero {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  column-gap: clamp(1.25rem, 3vw, 2.5rem);
-  align-items: start;
-}
-
-.card-hero > :not(.hero-mark) {
-  grid-column: 2;
-}
-
-.hero-mark {
-  grid-column: 1;
-  grid-row: 1 / span 7;
+.hero-title {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.75rem;
-}
-
-/* 入林, outlined from Ma Shan Zheng at build time (public/glyphs/hero-rulin.svg): no CJK font on first paint. */
-.hero-accent.zh {
-  --glyph: var(--fs-hero-cjk);
-  display: block;
-  text-decoration: none;
-}
-
-.hero-glyph {
-  display: block;
-  width: var(--glyph);
-  height: calc(var(--glyph) * 2);
-  background: var(--ink-jiao);
-  mask: url('/glyphs/hero-rulin.svg') no-repeat center / contain;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
 }
 
 .hero-seal {
-  margin-right: -0.5rem;
+  flex: none;
 }
 
 .card-hero h1 {
@@ -197,8 +168,8 @@ p {
   text-decoration: none;
 }
 
-.socials a:hover .social-label,
-.socials a:focus-visible .social-label {
+.socials a:hover .social-handle,
+.socials a:focus-visible .social-handle {
   text-decoration: underline;
 }
 
@@ -209,15 +180,7 @@ p {
   fill: currentColor;
 }
 
-.social-icon-wen {
-  display: inline-grid;
-  place-items: center;
-  font-family: var(--font-cjk);
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-.social-label {
+.social-handle {
   font-weight: 600;
 }
 
@@ -249,18 +212,22 @@ p {
   background: color-mix(in srgb, var(--paper-shade) 70%, transparent);
 }
 
-.social-display {
-  flex: 1 1 auto;
-  padding-left: 1rem;
-  text-align: right;
-  color: var(--ink-zhong);
-  font-size: var(--fs-body-small);
-}
-
-.stele-line {
+.contact-line {
   font-size: var(--fs-h3);
   line-height: var(--lh-h3);
   color: var(--ink-jiao);
+}
+
+.contact-resume {
+  margin: 0.75rem 0 0;
+}
+
+.contact-resume a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-target);
+  font-weight: 600;
+  color: var(--ink-nong);
 }
 
 .finale-links {
@@ -346,24 +313,8 @@ html[data-mode='immersive'] .card-night:has(> .work-card[data-focus]) {
   min-height: var(--min-target);
 }
 
-/* An entry's links sit in a row under its summary: each a 44 px target, none overlapping the next
-   line's (inline links padded to 44 px stole clicks from the line above once a row had five). */
-.also-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 1rem;
-}
-
-.also-links a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--min-target);
-}
-
 /* A repo path is one long word: at 200% text on a phone it breaks where it must, not off-screen. */
-.also a,
-.work-links a,
-.social-display {
+.work-links a {
   overflow-wrap: anywhere;
 }
 

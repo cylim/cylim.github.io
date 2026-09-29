@@ -43,7 +43,7 @@ describe('ridge ring (wave-2 M7)', () => {
       expect(ringStretch(layer, 0)).toBe(1)
       expect(ringStretch(layer, -Math.PI / 2)).toBeCloseTo(1 + layer.southPush)
     }
-    // From the stele the nearest southern crest is well past the ledge, not 60 m off.
+    // From the signpost the nearest southern crest is well past the ledge, not 60 m off.
     const near = RING_LAYERS[0]!
     expect(cz - near.radius * ringStretch(near, -Math.PI / 2)).toBeLessThan(-300)
   })

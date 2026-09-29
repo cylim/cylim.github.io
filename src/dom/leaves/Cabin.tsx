@@ -82,18 +82,7 @@ function AlsoList() {
           <li key={w.id}>
             <span className="also-title">{w.title}</span>
             {w.years && <span className="also-years"> · {w.years}</span>}
-            <span className="also-summary"> {w.summary}</span>
-            {/* Every link the entry names (the upstream fixes cite five merged PRs, CP-6), in a row of
-                44 px targets under the summary, as on the work cards. */}
-            {w.links.length > 0 && (
-              <span className="also-links">
-                {w.links.map((l) => (
-                  <a key={l.href} href={l.href}>
-                    {l.label}
-                  </a>
-                ))}
-              </span>
-            )}
+            <span className="also-summary"> · {w.oneLine ?? w.summary}</span>
           </li>
         ))}
       </ul>

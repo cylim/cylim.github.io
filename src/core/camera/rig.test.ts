@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { PerspectiveCamera, Vector2, Vector3 } from 'three'
 import { Rig, compassAction, type RigFrame } from './rig'
 import { setPlanFocus } from './planZoom'
@@ -6,6 +6,10 @@ import { planViewport } from './framing'
 import { initialJourneyState, journey, type JourneyState } from '../store/journey'
 import { RIG, beatById, type BeatId } from '../world/journey'
 import { cabin, grove, hall } from '../world/layout'
+
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../../content/features', () => ({ features: { grove: true } }))
 
 const camera = new PerspectiveCamera(40, 1280 / 800, 0.1, 600)
 const frame = (delta = 1 / 60, over: Partial<RigFrame> = {}): RigFrame => ({

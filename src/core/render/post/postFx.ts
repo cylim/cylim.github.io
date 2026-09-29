@@ -1,5 +1,5 @@
 import type { Vec3 } from '../../world/layout'
-import { MARKS } from '../../world/journey'
+import { MARKS, beatSpanById } from '../../world/journey'
 
 /**
  * Look constants of the post chain. Colours come from theme/tokens; these are amounts.
@@ -139,7 +139,7 @@ const smooth01 = (a: number, b: number, x: number) => {
 }
 
 /**
- * Weight of the finale's painting mist over the walk's fog: 0 at the stele, 1 once the orbit has
+ * Weight of the finale's painting mist over the walk's fog: 0 at the signpost, 1 once the orbit has
  * risen clear of the exit trees (design §8.7 E2), and 1 through E3.
  */
 export function finaleMistWeight(jvh: number): number {
@@ -163,15 +163,18 @@ export function forestDepth(jvh: number): number {
   return smooth01(95, 205, jvh) * (1 - smooth01(222, 256, jvh))
 }
 
+const E0_START = beatSpanById('E0').jvh[0]
+
 /**
  * Where the understorey mist lies (0..1): the threshold and the forest walk, fading as the door
- * opens; the path to the grove until the mist wall parts; the southern trees at the stele. Never
+ * opens; the path to the grove until the mist wall parts; the southern trees at the signpost. Never
  * in the grove, whose board must read clean from the seat and in plan, nor in the cabin.
  */
 export function understoreyMist(jvh: number): number {
   const walk = 1 - smooth01(262, 290, jvh)
   const path = smooth01(574, 584, jvh) * (1 - smooth01(626, 640, jvh))
-  const exit = 0.7 * smooth01(850, 868, jvh)
+  // Rises into E0 (862 on the full walk; 645 with the grove paused, just after the mist-wall cut).
+  const exit = 0.7 * smooth01(E0_START - 12, E0_START + 6, jvh)
   return Math.max(walk, path, exit)
 }
 

@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { initialJourneyState, type DivePhase } from '../core/store/journey'
 import { MARKS } from '../core/world/beats'
 import { DETENT_MAX_PER_SECOND } from './cues'
 import { createDetents, createRateGate, createTriggers, groveOnScreen, type Cue, type TriggerState } from './triggers'
+
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../content/features', () => ({ features: { grove: true } }))
 
 const state = (jvh: number, patch: Partial<TriggerState> = {}): TriggerState => {
   const s = initialJourneyState()

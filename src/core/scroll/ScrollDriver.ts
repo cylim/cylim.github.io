@@ -17,11 +17,11 @@
 import type Lenis from 'lenis'
 import { journey } from '../store/journey'
 import { J, SECTION_SPANS, sectionAtJvh } from '../world/beats'
-import { SECTION_HASH, SECTION_IDS } from '../sections/ids'
+import { SECTION_HASH, WALK_SECTION_IDS } from '../sections/ids'
 import { easing, motion } from '../../theme/tokens'
 import { buildScrollMap, jvhAtScroll, linearScrollMap, reanchorScrollY, scrollAtJvh, type ScrollAnchor, type ScrollMap } from './progress'
 
-const ARRIVALS = SECTION_IDS.map((id) => SECTION_SPANS[id].arrivalJvh)
+const ARRIVALS = WALK_SECTION_IDS.map((id) => SECTION_SPANS[id].arrivalJvh)
 
 /** Scrollable height in CSS px (design.md §0: documentHeight − innerHeight). */
 export const scrollRange = () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
@@ -79,7 +79,7 @@ export function pinAlbumLeaf(el: Element | null): void {
 function measure(): ScrollMap {
   const anchors: ScrollAnchor[] = []
   let margin = 0
-  for (const id of SECTION_IDS) {
+  for (const id of WALK_SECTION_IDS) {
     const el = document.getElementById(id)
     if (el && el.offsetHeight > 0) {
       anchors.push({ y: top(el), jvh: SECTION_SPANS[id].jvh[0] })

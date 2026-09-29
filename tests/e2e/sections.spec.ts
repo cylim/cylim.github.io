@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { ARRIVALS, NOW, expectedMode, settled } from './helpers'
+import { ARRIVALS, GROVE, JOURNEY_END, NOW, expectedMode, settled } from './helpers'
 
 // Deep links land on each section (stack.md §12, design.md §6.2). Smoke assertions gate CI;
 // the @visual screenshots are advisory until CI-made baselines are committed.
@@ -39,22 +39,34 @@ test('an unknown hash falls back to the threshold', async ({ page }) => {
   expect(await page.evaluate(() => window.__cy?.state().active)).toBe('threshold')
 })
 
+test('a deep link to the paused grove lands on the lantern', async ({ page }) => {
+  test.skip(GROVE, 'the grove is on (src/content/features.ts)')
+  await page.goto(`/?e2e=1&now=${NOW}#grove`)
+  await settled(page)
+  await expect(page).toHaveURL(/#contact$/)
+  expect(await page.evaluate(() => window.__cy?.state().active)).toBe('contact')
+  await expect(page.locator('#contact')).toBeInViewport()
+  await expect(page.locator('#grove')).toHaveCount(0)
+})
+
 test('back/forward re-dives', async ({ page }) => {
   await page.goto(`/?e2e=1&now=${NOW}`)
   await settled(page)
   const nav = page.getByRole('navigation', { name: 'Jump to a place' })
-  await nav.getByRole('link', { name: /^Grove\b/ }).click()
-  await expect(page).toHaveURL(/#grove$/)
+  // The grove when it is on; else the cabin, the other place before the lantern.
+  const [back, name] = GROVE ? (['grove', /^Grove\b/] as const) : (['cabin', /^Work\b/] as const)
+  await nav.getByRole('link', { name }).click()
+  await expect(page).toHaveURL(new RegExp(`#${back}$`))
   await settled(page)
   await nav.getByRole('link', { name: /^Contact\b/ }).click()
   await expect(page).toHaveURL(/#contact$/)
   await settled(page)
 
   await page.goBack()
-  await expect(page).toHaveURL(/#grove$/)
+  await expect(page).toHaveURL(new RegExp(`#${back}$`))
   await settled(page)
-  await expect(page.locator('#grove-heading')).toBeFocused()
-  expect(await page.evaluate(() => window.__cy?.state().active)).toBe('grove')
+  await expect(page.locator(`#${back}-heading`)).toBeFocused()
+  expect(await page.evaluate(() => window.__cy?.state().active)).toBe(back)
 
   await page.goForward()
   await expect(page).toHaveURL(/#contact$/)
@@ -78,6 +90,6 @@ test('scrolling through the walk passes every section in order', async ({ page }
     jvhs.push(await page.evaluate(() => window.__cy?.state().jvh ?? -1))
   }
   await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }))
-  await expect.poll(() => page.evaluate(() => Math.round(window.__cy?.state().jvh ?? -1)), { timeout: 20_000 }).toBe(1000)
+  await expect.poll(() => page.evaluate(() => Math.round(window.__cy?.state().jvh ?? -1)), { timeout: 20_000 }).toBe(JOURNEY_END)
   expect(jvhs).toEqual(jvhs.toSorted((a, b) => a - b))
 })

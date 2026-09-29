@@ -3,6 +3,7 @@ import { CustomBlending, DoubleSide, Mesh, OneFactor, OneMinusSrcAlphaFactor, Pl
 import { TIERS } from '../../core/render/quality'
 import { useJourney, type Tier } from '../../core/store/journey'
 import { cabin, exit, grove, mountains } from '../../core/world/layout'
+import { features } from '../../content/features'
 import fragGlsl from '../glsl/mist.frag.glsl'
 import vertGlsl from '../glsl/mist.vert.glsl'
 import { baseDefines, inkPrelude } from '../materials/createInkMaterial'
@@ -27,6 +28,8 @@ interface MistSpec {
 }
 
 const G: Hole = [grove.centre[0], grove.centre[2], 22, 34]
+/** The grove's clearing is open only while the grove is on (content/features.ts); paused, the mist lies over it. */
+const groveHole: readonly Hole[] = features.grove ? [G] : []
 const E: Hole = [exit.orbitCentre[0], exit.orbitCentre[2], 14, 26]
 const C: Hole = [cabin.centre[0], cabin.centre[2], 9, 18]
 const peak = mountains.mainPeak
@@ -36,19 +39,19 @@ const peak = mountains.mainPeak
  *
  * Every plane is drawn only from above. Seen from below, a horizontal veil hides everything past
  * the line where the eye ray crosses it, which draws a hard horizon through every trunk and ridge
- * (the walk's "fog curtain", and the flat ridge bands at the stele). From the walk the ink pass's
+ * (the walk's "fog curtain", and the flat ridge bands at the signpost). From the walk the ink pass's
  * fog layers the forest instead; from the grove seat and the finale these planes lie over the
  * forest the way painters lay mist between crowns.
  */
 const PLANES: readonly MistSpec[] = [
-  // Low mist over the forest floor: from above, crowns stand out of it. Clear over the grove and at the stele.
-  { name: 'mist-forest', y: 3.4, opacity: 0.7, scale: 0.035, threshold: 0.34, rect: [-70, 72, 4, -196], holes: [G, E], nearFade: [24, 60], aboveOnly: true },
+  // Low mist over the forest floor: from above, crowns stand out of it. Clear over the grove and at the signpost.
+  { name: 'mist-forest', y: 3.4, opacity: 0.7, scale: 0.035, threshold: 0.34, rect: [-70, 72, 4, -196], holes: [...groveHole, E], nearFade: [24, 60], aboveOnly: true },
   // 山腰云: the belt that cuts the ridge ring at the waist.
   { name: 'mist-ridge-waist', y: 17, opacity: 0.78, scale: 0.012, threshold: 0.3, ring: { centre: [mountains.ridgeRing.centre[0], mountains.ridgeRing.centre[2]], r0: 138, r1: 390, soft: 30 }, aboveOnly: true },
   // The main peak's base, dissolved (§5.1); from below, the peak's own shader dissolves it.
   { name: 'mist-peak', y: 38, opacity: 0.8, scale: 0.014, threshold: 0.28, rect: [peak.centre[0] - 150, peak.centre[0] + 150, peak.centre[2] + 48, peak.centre[2] - 60], aboveOnly: true },
   // A higher layer through the canopy; clear over the grove and the cabin roof for the finale view.
-  { name: 'mist-canopy', y: 9.5, opacity: 0.45, scale: 0.028, threshold: 0.45, rect: [-60, 64, 0, -196], holes: [G, C], nearFade: [20, 50], aboveOnly: true },
+  { name: 'mist-canopy', y: 9.5, opacity: 0.45, scale: 0.028, threshold: 0.45, rect: [-60, 64, 0, -196], holes: [...groveHole, C], nearFade: [20, 50], aboveOnly: true },
 ]
 
 interface MistLook {

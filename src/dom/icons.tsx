@@ -1,12 +1,7 @@
 import type { SocialId } from '../content/socials'
 import { BRAND_GRID, BRAND_PATHS } from '../content/brandMarks'
-import { siteAccents } from '../content/accents'
-import { ZhAccent } from './gloss/Zh'
-
-const WEN = siteAccents.find((t) => t.zh === '文')
 
 export function SocialIcon({ id }: { id: SocialId }) {
-  if (id === 'blog') return WEN ? <ZhAccent term={WEN} className="social-icon social-icon-wen" /> : null
   return (
     <svg className="social-icon" viewBox={`0 0 ${BRAND_GRID} ${BRAND_GRID}`} width="20" height="20" aria-hidden="true" focusable="false">
       <path d={BRAND_PATHS[id]} />

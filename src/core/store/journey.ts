@@ -17,7 +17,7 @@
 import { createStore } from 'zustand/vanilla'
 import { useStore } from 'zustand'
 import { SECTION_IDS, type SectionId } from '../sections/ids'
-import { FOG_COVER, PRELOAD_U, SECTION_SPANS, jvhToU } from '../world/beats'
+import { FOG_COVER, PRELOAD_U, SCENE_SPANS, jvhToU } from '../world/beats'
 import type { PalaceNo } from '../../lib/qimen/types'
 import type { SocialId } from '../../content/socials'
 import type { AlbumReason } from '../../content/ui'
@@ -174,7 +174,7 @@ export interface JourneyState {
   ringSpeed: number
 
   // ---------------------------------------------------------------- contact and finale
-  /** Social row hovered or focused (DOM) or its carved stele row hovered (3D). Writers: DOM contact rows, contact scene. */
+  /** Social row hovered or focused (DOM) or its signpost board hovered (3D). Writers: DOM contact rows, contact scene. */
   contactHover: SocialId | null
   /** Finale once-per-visit events. Writer: contact scene. Reader: DOM (colophon, pins, seal). */
   finale: { mountOpen: boolean; sealStamped: boolean; colophonShown: boolean }
@@ -250,7 +250,7 @@ export const chartInstant = (s: Pick<JourneyState, 'chartInstantMs' | 'nowOverri
 /** Sections the stage shows at this position: within RIG.preloadU of their span (SectionHost's rule). */
 export function visibleSections(u: number): SectionId[] {
   return SECTION_IDS.filter((id) => {
-    const [a, b] = SECTION_SPANS[id].jvh
+    const [a, b] = SCENE_SPANS[id]
     const d = u < jvhToU(a) ? jvhToU(a) - u : u >= jvhToU(b) ? u - jvhToU(b) : 0
     return d < PRELOAD_U
   })

@@ -4,6 +4,8 @@
  * terminalCommands.ts, so the first screen doesn't carry it.
  */
 
+import { features } from './features'
+
 export const terminal = {
   prompt: 'cy@cabin:~$',
   banner: ["cabin terminal. type 'help' to see what it knows."],
@@ -11,8 +13,9 @@ export const terminal = {
   notFound: "{input}: command not found. Try 'help'.",
   inputAriaLabel: 'Cabin terminal. Type a command and press Enter.',
   placeholder: "type 'help'",
-  /** Mobile command chips above the input (design.md §10.2). */
-  chips: ['help', 'whoami', 'services', 'projects', 'qimen', 'contact'],
+  /** Mobile command chips above the input (design.md §10.2). `stack` stands in for `qimen` while the
+   * grove is paused (content/features.ts). */
+  chips: ['help', 'whoami', 'services', 'projects', features.grove ? 'qimen' : 'stack', 'contact'],
   /** With JavaScript off the section shows these commands' output as a static transcript. */
   staticTranscript: ['whoami', 'contact'],
   /** Delay before a `navigate` action dives. */
@@ -30,8 +33,9 @@ export const terminal = {
 /** `whoami` output; also the no-JS static transcript. */
 export const whoamiOutput: readonly string[] = [
   'CY Lim (Chee Yeong Lim)',
-  'Software engineer in Penang, Malaysia.',
-  'React and TypeScript. Blockchain frontends since 2019.',
+  'Full stack software engineer in Penang, Malaysia. Shipping since 2017.',
+  'React and TypeScript by default. Blockchain frontends since 2019.',
+  'Runs Cyants, a small software studio.',
   'Also practises fengshui and Qimen Dunjia.',
 ]
 
@@ -40,7 +44,7 @@ export const contactOutput: readonly string[] = [
   'GitHub    github.com/cylim',
   'X         x.com/seewhy',
   'LinkedIn  linkedin.com/in/cylim226',
-  'Blog      cy.my/blog',
+  'Résumé    cy.my/resources/resume-en.pdf',
   '',
   'Have something to build? Message me on LinkedIn or X.',
 ]

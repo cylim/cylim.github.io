@@ -1,6 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { buildFraming, fovKeys, hFit, planViewport, portraitBaseFov, projection, shiftXKeys, shiftYKeys, vFovFromH } from './framing'
 import { channelKeys, sampleScalar } from '../world/journey'
+
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../../content/features', () => ({ features: { grove: true } }))
 
 const DEG = Math.PI / 180
 const desktop = { width: 1280, height: 720, header: 0 }
@@ -18,7 +22,7 @@ describe('fov', () => {
     expect(fovKeys(false, 16 / 9)).toEqual(channelKeys('fov'))
   })
 
-  it('uses 62° in the hall, 58° at the stele and the base elsewhere in portrait', () => {
+  it('uses 62° in the hall, 58° at the signpost and the base elsewhere in portrait', () => {
     const keys = fovKeys(true, 390 / 844)
     expect(sampleScalar(keys, 10)).toBe(68)
     expect(sampleScalar(keys, 360)).toBe(62)

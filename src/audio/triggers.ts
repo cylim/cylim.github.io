@@ -5,7 +5,7 @@
  */
 
 import type { JourneyState } from '../core/store/journey'
-import { MARKS, SECTION_SPANS } from '../core/world/beats'
+import { GROVE_ON, MARKS, SCENE_SPANS } from '../core/world/beats'
 import { DETENT_MAX_PER_SECOND } from './cues'
 
 export type TriggerState = Pick<JourneyState, 'jvh' | 'dive' | 'insideCabin' | 'ignitionPlayed' | 'finale'>
@@ -105,6 +105,9 @@ export function createDetents(maxPerSecond = DETENT_MAX_PER_SECOND): Detents {
   }
 }
 
-/** The hour chime plays only when the grove is on screen: from the reveal to the end of the grove, not mid-dive. */
+/**
+ * The hour chime plays only when the grove is on screen: from the reveal to the end of the grove, not
+ * mid-dive. Never while the grove is paused (content/features.ts): there is no chart to chime for.
+ */
 export const groveOnScreen = (s: Pick<JourneyState, 'jvh' | 'dive'>): boolean =>
-  s.dive.phase === 'idle' && s.jvh >= MARKS.reveal[0] && s.jvh < SECTION_SPANS.grove.jvh[1]
+  GROVE_ON && s.dive.phase === 'idle' && s.jvh >= MARKS.reveal[0] && s.jvh < SCENE_SPANS.grove[1]

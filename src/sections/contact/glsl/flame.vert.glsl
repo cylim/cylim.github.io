@@ -1,5 +1,5 @@
 // The lantern flame (design.md §8.7 E1): a quad that turns about Y to face the camera, standing on
-// the wick. uLean bends the tip toward the stele when a contact row is hovered.
+// the wick. uLean bends the tip toward the signpost board whose contact row is hovered.
 uniform vec3 uCentre;
 uniform vec2 uSize;     // width, height in metres (the breath scales the height)
 uniform vec3 uLean;     // world offset of the tip, metres

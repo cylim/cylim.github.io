@@ -18,6 +18,7 @@ import {
   whoamiOutput,
 } from './content'
 import { render } from './entry-server'
+import { features } from './content/features'
 
 // renderToString escapes quotes and ampersands; compare against the same escaping.
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;')
@@ -35,9 +36,13 @@ describe('prerendered content layer (design.md §14.2: everything is in the HTML
 
   it('carries services, work, the Also list and the timeline', () => {
     for (const c of forest.cards) for (const id of c.serviceIds) has(serviceById(id).body)
-    for (const w of [...featuredWork, ...alsoWork]) {
+    for (const w of featuredWork) {
       has(w.title)
       has(w.summary)
+    }
+    for (const w of alsoWork) {
+      has(w.title)
+      has(w.oneLine ?? w.summary)
     }
     for (const e of timeline) has(e.org)
     has(cabin.bridge)
@@ -51,7 +56,8 @@ describe('prerendered content layer (design.md §14.2: everything is in the HTML
     }
   })
 
-  it('carries the grove explanation, the noscript line and the whole glossary', () => {
+  // The live page follows content/features.ts: the grove's copy is there exactly when the grove is on.
+  it.runIf(features.grove)('carries the grove explanation, the noscript line and the whole glossary', () => {
     has(groveHeading.heading)
     for (const s of [grove.disclaimer, grove.honesty, grove.noscript, grove.boardNote, grove.luopan]) has(s)
     // Glossary meanings wrap their Chinese runs in <span lang="zh-Hans"> (A11Y-8),
@@ -61,6 +67,18 @@ describe('prerendered content layer (design.md §14.2: everything is in the HTML
       expect(text, t.meaning).toContain(esc(t.meaning))
     }
     expect(html).toContain('<noscript>')
+  })
+
+  it.runIf(!features.grove)('leaves the paused grove out: no section, chart, glossary or Qimen copy', () => {
+    expect(html).not.toContain('id="grove"')
+    expect(html).not.toContain('href="#grove"')
+    expect(html).not.toContain(esc(groveHeading.heading))
+    for (const s of [grove.disclaimer, grove.honesty, grove.noscript, grove.boardNote, grove.luopan, grove.readChart]) {
+      expect(html, s).not.toContain(esc(s))
+    }
+    expect(html).not.toContain('glossary-island')
+    // The terminal's whoami keeps its fengshui and Qimen line; nothing else names it.
+    expect(whoamiOutput.reduce((h, line) => h.replace(esc(line), ''), html)).not.toMatch(/Qimen/)
   })
 
   it('carries the contact and the footer', () => {

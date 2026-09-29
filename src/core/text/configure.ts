@@ -52,7 +52,7 @@ export interface TextMaterialOptions {
  * Base material for troika text in the ink world. Glyph quads must not write depth: the ink
  * pass draws contours on depth discontinuities and would outline every quad as a rectangle
  * (stack.md §5 gotcha). The ink pass fogs text by the depth behind it, so set text on a
- * surface (stele, platform, scroll), never floating against the sky, or the fog erases it.
+ * surface (signpost, platform, scroll), never floating against the sky, or the fog erases it.
  * Pass it as the Text's `material`; troika derives its SDF shader from it.
  */
 export function textMaterial(color: ColorRepresentation, { opacity = 1 }: TextMaterialOptions = {}): MeshBasicMaterial {

@@ -84,7 +84,7 @@ Put these in `src/theme/tokens.ts` and mirror them in `tokens.css`. Contrast rat
 
 | Token | Hex | Use | Contrast |
 |---|---|---|---|
-| `stone` | `#A7A297` | Stele face, luopan apron (R4), stepping stones, rocks | ink-jiao carving on it 7.2:1 |
+| `stone` | `#A7A297` | Stone lantern, luopan apron (R4), stepping stones, rocks | ink-jiao carving on it 7.2:1 |
 | `bluestone` 青石 | `#3A3E40` | Grove platform and the three turning rings | paper glyph on it 8.9:1 |
 | `bluestone-deep` | `#26292B` | Carved recesses on bluestone, unlit ring carvings | decorative |
 
@@ -134,7 +134,7 @@ All fonts are SIL OFL 1.1, self-hosted from `public/fonts/`, subset at build tim
 |---|---|---|---|---|---|
 | Latin display: name, section titles, scroll titles in 3D | Cormorant Garamond | github.com/CatharsisFonts/Cormorant | 600 | Latin subset, about 18 KB woff2, plus a woff for troika | woff2 preloaded; woff with the cabin chunk |
 | Latin body and UI | Source Serif 4 (static text cut) | github.com/adobe-fonts/source-serif | 400, 600 | Latin subset plus pinyin tone vowels (ā á ǎ à … ǖ ǘ ǚ ǜ ü), about 20 KB each | 400 preloaded, 600 on swap |
-| CJK text: nav accents, glosses, chart glyphs, stele, terminal grid | LXGW WenKai 霞鹜文楷 Regular | github.com/lxgw/LxgwWenKai (v1.522 measured in `stack.md`) | 400 | Subset from `glossary.json` and content, about 140–200 glyphs. 29 KB woff2, 33 KB woff | woff2 after first paint with `font-display: swap`; woff with the grove and cabin chunks |
+| CJK text: nav accents, glosses, chart glyphs, terminal grid | LXGW WenKai 霞鹜文楷 Regular | github.com/lxgw/LxgwWenKai (v1.522 measured in `stack.md`) | 400 | Subset from `glossary.json` and content, about 140–200 glyphs. 29 KB woff2, 33 KB woff | woff2 after first paint with `font-display: swap`; woff with the grove and cabin chunks |
 | CJK display: hero accent, section inscriptions, fog-dive title cards | Ma Shan Zheng | github.com/google/fonts/tree/main/ofl/mashanzheng | 400 | 8 glyphs: 入 林 木 屋 九 宫 石 灯. About 10 KB woff2 | lazy; the hero 入林 is inline SVG outlined from this font at build time, so first paint needs no CJK font |
 | Mono: terminal, stack tags, scroll text zones | JetBrains Mono | github.com/JetBrains/JetBrainsMono | 400 | Latin subset, about 20 KB woff2 plus woff | with the cabin chunk |
 
@@ -254,7 +254,7 @@ One world, one coordinate system. Everything below is in world metres with the a
  z −131      ▮ standing stones (−3, −131) and (3, −131) mark the grove entrance
  z −150       (( ( [#] ) ))   grove: platform centre (0, 0.45, −150), rings to r 11.3, clearing r 18
  z −186.5              ○ lantern (1.0, −186.5)
- z −188             ▮ stele (−1.4, −188), faces north
+ z −188             ┼ signpost (−1.4, −188), boards face north
  z −192     ledge; ground falls to y −25 beyond
  z −340         ⛰ main peak card, summit y 115
                                    S (−Z)
@@ -278,7 +278,7 @@ One world, one coordinate system. Everything below is in world metres with the a
 | Lattice window | (2.6, 1.9, −60) | 0.7 × 0.7 m, 步步锦 lattice, screen-left of the door from the approach |
 | Chimney | (6.0, 0, −65.5), top at y 5.4 | Stone, with a thin ink smoke ribbon |
 | Close trunks | (2.0, 0, −67.9), (6.3, 0, −68.7) | 0.5 m radius, 14 m tall, `ink-nong`. They prove the cabin is 6 m deep during the nudge |
-| Main peak | card centred (−20, 0, −340), 220 m wide | Summit y 115, axe-cut strokes, base dissolved in a mist belt. Seen above the cabin roof from the approach and above the stele from the exit |
+| Main peak | card centred (−20, 0, −340), 220 m wide | Summit y 115, axe-cut strokes, base dissolved in a mist belt. Seen above the cabin roof from the approach and above the signpost from the exit |
 | Ridge ring | cards at radii 160, 230 and 320 m around (0, 0, −90) | Three layers (tier-dependent) on every side, because the finale looks north |
 | Hall (interior) | floor x −3 to 11, z −60 to −106, y 0.45 | Physically behind the door, drawn only through the stencil or when inside. Section 8.4 |
 | Moon gate | centre (4, 2.35, −106), radius 1.6 | In the hall's back wall |
@@ -293,7 +293,7 @@ One world, one coordinate system. Everything below is in world metres with the a
 | Platform | 9 × 9 m, centre (0, 0.45, −150) | Section 9 |
 | Needle (天池) | (0, 1.95, −150) | Floats 1.5 m above the centre palace |
 | Lantern | (1.0, 0, −186.5) | 1.8 m octagonal. Flame at (1.0, 1.35, −186.5). Bearing from the grove centre ≈ 181.6°, inside 午 (172.5° to 187.5°), the fire palace |
-| Stele | (−1.4, 0, −188), faces north | Screen-left of the lantern from the approach |
+| Signpost | (−1.4, 0, −188), boards face north | Screen-left of the lantern from the approach. A 2.5 m weathered post, three finger boards pointing south-east and south-west |
 | Ledge | z −192 | Ground drops to y −25 beyond |
 
 Scatter keep-outs, used by Poisson-disc placement: the path corridor (2 m either side of the spline), the lantern sightline corridor, r 10 around the cabin centre (4, 0, −63), r 18 around the grove, r 6 around (−0.2, 0, −187.2).
@@ -338,7 +338,7 @@ The hall overlaps the forest behind the cabin in world space. That is fine: outs
 | G3 read | 740–835 | 742–833 | (0, h_fit, −150.001) | (0, 0, −150) | 40 | 0.008, ground mist → 0 | panel | Plan view. Chart panel, time controls, glosses, compass. No drift |
 | G4 glide | 835–862 | | (0, 12, −156) → (0.6, 3.4, −170) | (0, 0.45, −152) → (1.0, 2.2, −186.5) | 40→45 | 0.012 | none | Over the rings toward the lantern; `up` returns to (0, 1, 0) |
 | E0 warm | 862–880 | | → (0.5, 1.8, −175.5) | (0, 2.6, −188) | 45→48 | 0.020 | none | Lantern light on the nearest trunks |
-| E1 stele | 880–935 | 886–932 | (0.3, 1.2, −179.8) → (0.3, 1.25, −180.2) | (−0.5, 3.6, −188) | 48 | 0.020 | L | Low angle, 高远: stele, lantern, peak above. **`#contact` arrives at 886** |
+| E1 signpost | 880–935 | 886–932 | (0.3, 1.2, −179.8) → (0.3, 1.25, −180.2) | (−0.5, 3.6, −188) | 48 | 0.020 | L | Low angle, 高远: signpost, lantern, peak above. **`#contact` arrives at 886** |
 | E2 the painting | 935–985 | | waypoints (0.3, 1.25, −180.2) → (−9, 6, −184) → (−24, 16, −200) → (−16, 25, −228) → (3, 30, −240) | (−0.5, 3.6, −188) → (−0.4, 2.5, −187.5) → (0, 0, −170) → (1, 0, −150) → (1.5, 0, −142) | 48→45 | 0.020→0.006 | none | Ascending orbit round the east side. The walk lays itself out north of you. Signature moment 3 |
 | E3 signed | 985–1000 | 985–1000 | (3, 30, −240) | (1.5, 0, −142) | 45 | 0.006 | mount | Seal stamps, colophon, map pins, "Walk again" |
 
@@ -391,10 +391,20 @@ The DOM is the scroll track (`stack.md` §2–3). Each `<section>` has a fixed h
   | I3 | Camera frames the pane in the top half; the terminal opens as a sheet (10.2) |
   | G1 | Steeper seat: (0, 14, −137) |
   | G3 | The R4 circle fits the screen width and centres 30% from the top; the chart sheet sits below |
-  | E1 | Stele centred, vFOV 58 |
+  | E1 | Signpost and lantern centred as a pair, vFOV 58 |
   | E2, E3 | Portrait is already a hanging scroll. No mount panels, a 12 px `paper-mount` border only |
 
 Mobile uses the same jvh table as desktop. The copy cards were sized so each hold reads in one thumb-scroll.
+
+### 6.5 The walk with the grove paused
+
+`src/content/features.ts` `features.grove` switches the grove off while it is refined (currently off). Every table above stays written for the full walk; `core/world/beats.ts` and `journey.ts` rebuild them when it is off:
+
+- G0–G4 (645–862) are cut and everything from 862 on moves up by 217 jvh (`afterGrove`): J = 783, E0 645–663, E1 663–718 (hold 669–715, `#contact` arrives at 669), E2 718–768, E3 768–783.
+- The path P0–P2 is unchanged. P2 now ends in full paper (620–627) at the fog peak, and at 628 the camera cuts from the crest to (0.7, 1.9, −159), south of the clearing and facing the lantern. P3 (628–645) is the mist parting on the southern trees with the lantern glowing through them, and it walks on into E0. The clearing is never on screen.
+- DOM sections: threshold, cabin, contact. Contact starts at the moon gate (572), since the path is the way to the lantern. P1 keeps its short pause at the stream but has no card or text zone, so the frame centres. `#grove` and anything else that asks for the grove land on `#contact`.
+- Scenes: the grove chunk still draws the path from 572 to 628 (stream, stones, bamboo, mist wall; no board, ground mist, standing stones or chart glyphs), and the contact scene takes over at 628. While the lantern's scene isn't ready, the mist wall holds its peak through P3.
+- The finale has no grove stand-in and no Grove pin, and the pines don't open onto the clearing. The mist planes lie over it. The E3 still was re-rendered to match.
 
 ---
 
@@ -407,8 +417,8 @@ This follows `stack.md` §5–6: one ink post pass outdoors, one bloom and AgX g
 - `createInkMaterial()`: an unlit `ShaderMaterial`. No three.js lights anywhere outside, and no shadow maps on any tier. Shan shui has no cast shadows, and skipping them is the biggest single performance saving in the project.
 - Painter's light, fixed direction `normalize(−0.5, 0.8, 0.35)`: from the upper left of a south-facing viewer, slightly from behind. Wrapped Lambert `lam = dot(N, L) * 0.5 + 0.5`.
 - Per-object `uInkWeight` from 0 (清) to 1 (焦). Output value `v = inkWeight * mix(1.0, 0.55, smoothstep(0.25, 0.85, lam))`, times baked vertex AO (darker toward trunks and under eaves). The post ramp maps the resulting luminance to the five inks.
-- 皴 texture strokes only on the shaded side (`lam < 0.55`), where painters put them. One `cunStroke()` GLSL helper with two modes: axe-cut (short angular wedges) for rocks, the peak, grove stones and the stele; hemp-fibre (long soft waves) for earth banks. The mountain shader adds 米点 dabs along far ridge crests. Low tier draws strokes on hero rocks and grove stones only.
-- Warm light without a light: `uLanternPos` and a 14 m radius. Within it, lit faces tint toward `lantern-halo` by `(1 − d/14)² × 0.35`. Keep the tint's saturation above the ink pass's accent threshold for trunks within 6 m, or the ramp will grey it out.
+- 皴 texture strokes only on the shaded side (`lam < 0.55`), where painters put them. One `cunStroke()` GLSL helper with two modes: axe-cut (short angular wedges) for rocks, the peak and grove stones; hemp-fibre (long soft waves) for earth banks and, up the signpost's post, timber grain. The mountain shader adds 米点 dabs along far ridge crests. Low tier draws strokes on hero rocks and grove stones only.
+- Warm light without a light: `uLanternPos` and a 14 m radius. Within it, lit faces tint toward `lantern-halo` by `(1 − d/14)² × 0.35`. Keep the tint's saturation above the ink pass's accent threshold for trunks within 6 m, or the ramp will grey it out. The signpost's timber takes only 30% of the term (`lanternWarmth`), so wood beside the lantern stays ink toned, never brown.
 - Cyan spill: the same mechanism with `uSpillPos` at the door, 6 m radius, `cyan-line`, switched on as the door opens (C2). It tints the door frame, steps and nearest ferns.
 - Sway: pine pads 1 to 2 cm at the tips, 4 to 7 s period, in the vertex shader. Off with reduced motion.
 
@@ -590,11 +600,11 @@ The chart itself is section 9. This covers the scene around it.
 
 **E0.** Into the southern trees. The lantern's warm term reaches the nearest trunks and their lit sides turn faintly amber. After 860 jvh of paper and ink this should feel like walking toward a lit window at night.
 
-**E1, the stele, 高远.** A low angle at 1.2 m, looking up. The stele stands left of centre, the lantern right of it and slightly nearer, and above both the main peak rises out of a mist belt into the top 40% of the frame.
+**E1, the signpost, 高远.** A low angle at 1.2 m, looking up. The signpost stands left of centre, the lantern right of it and slightly nearer, and above both the main peak rises out of a mist belt into the top 40% of the frame.
 - Stone lantern in the Chinese octagonal pillar form, after the Northern Qi lamp at Tongzi Temple, Taiyuan: octagonal plinth, octagonal shaft, a lamp chamber with four openings, a flared octagonal eave with only a slight lift at the corners, a pearl finial. `LatheGeometry` with 8 radial segments gives octagons for free. Not the Japanese kasuga silhouette with its broad umbrella roof.
 - Flame: a noise-driven billboard from `lantern-core` to `lantern-flame`, breathing on a 3 to 5 s cycle with fast flicker on top (amplitude kept low for photosensitive visitors). A `lantern-halo` light pool on the ground at 35%. The warm uniform term (7.1) does the rest; no point light.
-- Stele (碑): a Han-style round-headed tablet (圆首碑), 0.9 × 2.6 × 0.28 m, on a plain 0.4 m base. No turtle, no dragons. Face in `stone`: the stele line from content.md §5 and four carved rows, each a brand mark and its "shown as" text, as normal-mapped decals filled with ink. No real geometry is cut.
-- DOM, zone L, sticky through E2: the 石灯 inscription, `<h2>` "Contact" with "The Lantern" as its label, the stele line, then four link rows at least 56 px tall: icon, label, the visible "shown as" text from content.md, `rel="me"`. No email, no form. Hovering or focusing a row lights its carved row with warm light over 250 ms and leans the flame slightly toward the stele. The 3D rows take hover and click too, but the DOM anchors are the real links.
+- Signpost (路牌): where to find me next, not a memorial. One weathered, hand-hewn post, 2.5 m, leaning a couple of degrees, with season checks up its grain, a low pyramid cut on top, a stone propping its foot and moss dots (点苔) round it. A finger board per social link (0.22 m deep, 0.9 to 1 m long, pointed ends, two pegs each) at staggered heights and yaws, pointing south-east and south-west into the mist beyond the ledge. Each board carries its brand mark and username, no product names, cut into the wood and filled with ink over dry-brush grain (one canvas atlas, groove walls lit from a normal derived from the blurred mask; no real geometry is cut). The wood is ink: hemp-fibre strokes as the post's grain, a plain wash on the boards. Three draw calls. It replaced a Han round-headed stele (圆首碑), which read as a gravestone.
+- DOM, zone L, sticky through E2: the 石灯 inscription, `<h2>` "Contact" with "The Lantern" as its label, the contact line, then the link rows at least 56 px tall: logo and username, the platform name for screen readers only, `rel="me"`. No email, no form. Hovering or focusing a row lights its board on the signpost with warm light over 250 ms and leans the flame slightly toward that board. The boards take hover and click too, but the DOM anchors are the real links.
 
 **E2, the painting.** The camera rises in an orbit round the east side and turns to look north, back over the whole walk. At the same time:
 - Fog falls to 0.006 so the whole route shows at once.
@@ -968,7 +978,7 @@ Everything above is prerendered at build time (`stack.md` §10), so crawlers and
 ## 15. Accessibility checklist
 
 - Landmarks: `header` with the nav, `main#content`, one `section` per nav target, `footer`. One h1. An h2 per section, h3 per item.
-- The canvas is `aria-hidden`. Every canvas interaction has a DOM twin: scrolls to cards, palaces to the chart grid, stele rows to links, map pins to links, the 3D pane to the DOM terminal.
+- The canvas is `aria-hidden`. Every canvas interaction has a DOM twin: scrolls to cards, palaces to the chart grid, signpost boards to links, map pins to links, the 3D pane to the DOM terminal.
 - Visible focus everywhere (2.5). Tab order follows reading order. Jumps move focus to the target heading and announce it.
 - Targets at least 44 × 44 px; nav slots 48 px; contact rows 56 px.
 - Body text at least 4.5:1 against its real background, scrims included.
@@ -987,7 +997,7 @@ Everything above is prerendered at build time (`stack.md` §10), so crawlers and
 
 2. **The heavens turn to your hour (608–715 jvh).** The mist thickens until there's nothing, one guqin note rings, and the fog lifts on a dark stone board in a clearing. A brush line inks the Luo Shu path through the nine palaces. Then the stone rings grind round, detent by detent, from their home positions to the visitor's own double-hour, and the lit glyphs lift off the rings and settle into their palaces. A cinnabar plate and a red brush circle mark the 值符 and 值使. South is at the top, as in the books, and it is true south; the lantern glints beyond the fire palace. On a phone, "Follow compass" turns the whole dial with your body.
 
-3. **The painting signs itself (935–1000 jvh).** At the stele the camera rises in a slow orbit and turns north, the fog thins, mist belts slide in, and the whole walk flattens into one picture: the lantern at the bottom, the grove's rings, a speck of cyan at the cabin, the forest edge, the far ridges. A colophon writes itself, dated for this visit in the traditional calendar, and the red 林 seal stamps the corner. Lim is 林. Two trees make a forest. The cabin and grove below are links, so the finale is also a map.
+3. **The painting signs itself (935–1000 jvh).** At the signpost the camera rises in a slow orbit and turns north, the fog thins, mist belts slide in, and the whole walk flattens into one picture: the lantern at the bottom, the grove's rings, a speck of cyan at the cabin, the forest edge, the far ridges. A colophon writes itself, dated for this visit in the traditional calendar, and the red 林 seal stamps the corner. Lim is 林. Two trees make a forest. The cabin and grove below are links, so the finale is also a map.
 
 ---
 
@@ -995,7 +1005,7 @@ Everything above is prerendered at build time (`stack.md` §10), so crawlers and
 
 Cut from the three drafts, or ruled out up front. Some of these could come back after launch; none ship in v1.
 
-- A second warm light: the porch lantern, lanterns that drop to embers as wayfinding, a point light at the stele.
+- A second warm light: the porch lantern, lanterns that drop to embers as wayfinding, a point light at the signpost.
 - Dusk or time-of-day lighting in the path and grove.
 - 3D signposts in the forest walk. Services are DOM inscriptions.
 - The cliff mesh, waterfall and ledge pine behind the cabin. The peak is one card.
@@ -1077,7 +1087,7 @@ The usability spec is the backbone. It is the only one a client-facing site coul
 
 - **Usable (backbone):** the 20-second contract and its six rules; DOM sections as the scroll track; plain-word nav with a mobile bottom bar; links on the first screen; services in the forest walk; the stencil door; the lag-driven catch-up fog; the tier gate, hidden benchmark and device budgets; the DOM chart as source of truth; the terminal as a real DOM element with a canvas mirror and command chips; `visualViewport` for the mobile keyboard; the finale map pins; the verified test fixture; the accessibility checklist and the 20-second hallway test.
 - **Cinematic:** the one-take rule and mist as the editor; 三远 as shot grammar; the beat-table format with holds and text zones; the lantern glint visible from frame one and placed in the fire palace; the nudge; the ignition from under your feet; the moon gate; the stream, the mist wall and the single guqin note; the mist parting on the platform; the Luo Shu brush path; engine-derived `ringOffsets`; fog as the level-of-detail system with tier changes queued for fog cover; the hanging-scroll finale looking back north with mist belts and the cyan pinprick; the section inscriptions and fog-dive title cards; the sound cue sheet (trimmed); cross-threads in compass mode.
-- **Craft:** the five-ink palette with verified contrast; the cinnabar invariant; `night` as the exact inverse of `paper`; the scholar's study translated into light (desk, inkstone, brush rest, paper and seal); 斗拱 brackets in line work; project scrolls with real mount proportions; the Han divination board as the grove's model, round heaven over square earth; dark bluestone with paper glyphs like a rubbing; glyphs lifting off the rings and settling into the palaces; the 值符 plate for legibility; luopan conventions (radial ring glyphs, cinnabar-tipped needle, 天心十道, dial turning in a square base); the octagonal Chinese lantern and Han round-headed stele; the dated colophon; the cultural checklist; the avoid list for Japanese stand-ins.
+- **Craft:** the five-ink palette with verified contrast; the cinnabar invariant; `night` as the exact inverse of `paper`; the scholar's study translated into light (desk, inkstone, brush rest, paper and seal); 斗拱 brackets in line work; project scrolls with real mount proportions; the Han divination board as the grove's model, round heaven over square earth; dark bluestone with paper glyphs like a rubbing; glyphs lifting off the rings and settling into the palaces; the 值符 plate for legibility; luopan conventions (radial ring glyphs, cinnabar-tipped needle, 天心十道, dial turning in a square base); the octagonal Chinese lantern and the weathered wooden signpost; the dated colophon; the cultural checklist; the avoid list for Japanese stand-ins.
 
 ### B.2 Conflicts and how they were settled
 
@@ -1126,6 +1136,7 @@ Check before any release that touches the grove, the seals or the copy.
 - [ ] No machine-translated Chinese. Every Chinese string is in `glossary.json` or content.md with owner sign-off.
 - [ ] Year turns at 立春; months at each 节 instant; 拆补法 uses real solar-term instants (`calendar.md`).
 - [ ] The lantern is the octagonal Chinese pillar form, not a Japanese tōrō. No Japanese signifiers anywhere.
+- [ ] Nothing funereal at the end of the path: the contact marker is a wooden signpost (路牌) pointing onward, not a stele, tablet or anything else that reads as a grave marker, and no offerings, incense or white-paper mourning signs.
 - [ ] The grove copy calls the platform a design built on the Han divination board and the luopan, not a traditional instrument. Nothing predicts or sells.
 
 ## Appendix D. Test fixture

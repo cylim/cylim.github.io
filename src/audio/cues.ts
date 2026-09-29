@@ -12,7 +12,7 @@
  * integrated target, and the limiter holds every peak under LEVEL.ceiling.
  */
 
-import { J, MARKS, SECTION_SPANS } from '../core/world/beats'
+import { J, MARKS, SCENE_SPANS } from '../core/world/beats'
 import { motion } from '../theme/tokens'
 
 export const dbToGain = (db: number): number => (db === -Infinity ? 0 : 10 ** (db / 20))
@@ -51,23 +51,27 @@ export const MASTER_DB = -3
 export type BedId = 'wind' | 'pine' | 'stream' | 'hum' | 'crackle'
 export type Span = readonly [number, number]
 
-/** Where each bed plays, in jvh (§12 table). Inner edges crossfade over ±BED_EDGE. */
+/**
+ * Where each bed plays, in jvh (§12 table), by where the scenes draw (SCENE_SPANS: with the grove
+ * paused, the path's pines run to the cut in the mist wall and the lantern's crackle starts there).
+ * Inner edges crossfade over ±BED_EDGE.
+ */
 export const BED_SPANS: Record<BedId, readonly Span[]> = {
   wind: [
     [0, 322],
-    [SECTION_SPANS.grove.jvh[0], J],
+    [SCENE_SPANS.grove[0], J],
   ],
   pine: [
-    [90, SECTION_SPANS.threshold.jvh[1]],
-    [584, SECTION_SPANS.grove.jvh[1]],
+    [90, SCENE_SPANS.threshold[1]],
+    [584, SCENE_SPANS.grove[1]],
   ],
   stream: [[580, 612]],
-  hum: [SECTION_SPANS.cabin.jvh],
-  crackle: [SECTION_SPANS.contact.jvh],
+  hum: [SCENE_SPANS.cabin],
+  crackle: [SCENE_SPANS.contact],
 }
 
 /** The crackle rises from LEVEL.crackle[0] to [1] across this span. */
-export const CRACKLE_RISE: Span = SECTION_SPANS.contact.jvh
+export const CRACKLE_RISE: Span = SCENE_SPANS.contact
 
 export const BED_EDGE = 8
 

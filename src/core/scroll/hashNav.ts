@@ -5,22 +5,26 @@
  */
 
 import { journey } from '../store/journey'
-import { SECTION_HASH, isSectionId, type SectionId } from '../sections/ids'
+import { SECTION_HASH, isSectionId, walkSection, type SectionId } from '../sections/ids'
 import { prefetchSection } from '../sections/prefetch'
 import { diveTo } from './dive'
 import { watchModality } from './modality'
 import { scrollToJvh, scrollToYInstant, scrollYAtJvh, sectionUrl, watchScrollIntent } from './ScrollDriver'
 import { SECTION_SPANS } from '../world/beats'
 
-/** The section a hash names, or null for hashes that aren't sections. '' and '#threshold' are the threshold. */
+/**
+ * The section a hash names, or null for hashes that aren't sections. '' and '#threshold' are the
+ * threshold. A paused section's hash (#grove while the grove is paused) names where it lands instead.
+ */
 export function sectionOfHash(hash: string): SectionId | null {
   const id = hash.replace(/^#/, '')
   if (id === '') return 'threshold'
-  return isSectionId(id) ? id : null
+  return isSectionId(id) ? walkSection(id) : null
 }
 
 /** Fog-dive to a section and record it in history (pushState, or replaceState with `replace`). */
-export function jumpTo(id: SectionId, opts: { replace?: boolean } = {}): Promise<void> {
+export function jumpTo(target: SectionId, opts: { replace?: boolean } = {}): Promise<void> {
+  const id = walkSection(target)
   const hash = SECTION_HASH[id]
   const url = sectionUrl(hash)
   if (opts.replace) history.replaceState(history.state, '', url)
@@ -89,6 +93,8 @@ export function initHashNav(): () => void {
 
   if (location.hash === '#threshold') history.replaceState(history.state, '', sectionUrl(''))
   const id = location.hash ? sectionOfHash(location.hash) : null
+  // A deep link to a paused section (#grove): the URL names where it lands.
+  if (id && location.hash !== SECTION_HASH[id] && id !== 'threshold') history.replaceState(history.state, '', sectionUrl(SECTION_HASH[id]))
   if (id && id !== 'threshold') {
     journey.setState({ active: id })
     void diveTo(id, { fromLoad: true })

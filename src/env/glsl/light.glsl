@@ -42,8 +42,13 @@ float glowAmount(vec3 wp, vec3 n, vec3 pos, float radius) {
   return k * k * 0.35 * smoothstep(-0.15, 0.45, dot(n, to / max(d, 1e-3)));
 }
 
+// How much of the lantern's warmth a material takes (createInkMaterial `lanternWarmth`).
+#ifndef LANTERN_WARMTH
+#define LANTERN_WARMTH 1.0
+#endif
+
 vec3 applyLantern(vec3 col, vec3 wp, vec3 n) {
-  float amt = glowAmount(wp, n, uLanternPos, uLanternRadius) * uLanternIntensity;
+  float amt = glowAmount(wp, n, uLanternPos, uLanternRadius) * uLanternIntensity * LANTERN_WARMTH;
   if (amt <= 0.0) return col;
   vec3 c = mix(col, uLanternColor, amt);
   // The ink pass greys anything below its accent threshold (saturation 0.12 to 0.3, stack.md §5).
@@ -51,7 +56,7 @@ vec3 applyLantern(vec3 col, vec3 wp, vec3 n) {
   float mx = max(c.r, max(c.g, c.b));
   float mn = min(c.r, min(c.g, c.b));
   float sat = (mx - mn) / max(mx, 1e-4);
-  float want = 0.34 * smoothstep(6.5, 5.5, distance(wp, uLanternPos));
+  float want = 0.34 * LANTERN_WARMTH * smoothstep(6.5, 5.5, distance(wp, uLanternPos));
   if (sat < want) {
     vec3 hue = uLanternColor / max(uLanternColor.r, max(uLanternColor.g, uLanternColor.b));
     float hueSat = 1.0 - min(hue.r, min(hue.g, hue.b));

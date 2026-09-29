@@ -1,7 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { BEATS, MARKS } from '../core/world/journey'
 import { CARDS, cardOpacity, focusJvh, rollProgress, trackJvh } from './cards'
 import { INSCRIPTION_WINDOWS, inscriptionAt } from './chrome/Inscriptions'
+
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../content/features', () => ({ features: { grove: true } }))
 
 const card = (id: string) => {
   const c = CARDS.find((x) => x.beat === id)
@@ -71,7 +75,7 @@ describe('card timing in the walk', () => {
     }
   })
 
-  it('the stele card stays through E2 and the finale', () => {
+  it('the contact card stays through E2 and the finale', () => {
     const e1 = CARDS.find((c) => c.beat === 'E1')
     if (!e1) throw new Error('no E1')
     for (const j of [900, 960, 1000]) expect(cardOpacity(e1, j)).toBe(1)

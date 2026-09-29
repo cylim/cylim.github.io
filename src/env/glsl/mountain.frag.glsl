@@ -58,7 +58,7 @@ void main() {
     ink *= smoothstep(uBelt.y * 0.35, uBelt.y, abs(y - uBelt.x + edge));
   }
 
-  // The main peak is the stele's 高远; from the meadow, 364 m off, it should be a ghost behind the
+  // The main peak is the signpost's 高远; from the meadow, 364 m off, it should be a ghost behind the
   // level distance (平远), not a second subject.
   float far = smoothstep(uFarFade.x, uFarFade.y, distance(cameraPosition, vWorld)) * uFarFade.z;
   // Seen only from its own stretch of the walk: it condenses out of the mist and dissolves again.

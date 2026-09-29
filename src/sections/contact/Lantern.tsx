@@ -4,22 +4,24 @@ import { PlaneGeometry, Vector3, type BufferGeometry, type Camera, type Group } 
 import { motionTime } from '../../core/render'
 import { journey } from '../../core/store/journey'
 import { exit, glints, terrainHeight } from '../../core/world/layout'
+import type { SocialId } from '../../content/socials'
 import { alpha } from '../../theme/tokens'
 import { createInkMaterial, setLanternIntensity, type InkMaterial } from '../../env'
 import { useDisposeOnUnmount } from '../shared/lifetime'
 import { approach, flameHeight, flameLevel } from './flame'
 import { buildLanternGeometry } from './lanternGeometry'
 import { createFlameMaterial, createPoolMaterial, type FlameMaterial, type PoolMaterial } from './materials'
+import { BOARDS, boardFaceCentre } from './signpostGeometry'
 
 const { base, flame } = exit.lantern
 const GROUND = terrainHeight(base[0], base[2])
 const FLAME_SIZE = [0.12, 0.16] as const
 const POOL_RADIUS = 2.6
-/** How far the flame's tip bends toward the stele at full hover lean, metres. */
+/** How far the flame's tip bends toward the hovered board at full hover lean, metres. */
 const LEAN = 0.035
 /** The warm term rises this much with the lean: the row seems to draw the light. */
 const LEAN_WARMTH = 0.1
-/** Hover lean: 0 → 1 in 250 ms, like the carved row's glow. */
+/** Hover lean: 0 → 1 in 250 ms, like the board's glow. */
 const LEAN_RATE = 4
 /** The post glint (slot 0) fades in from this camera distance to +5 m; the flame fades out across it. */
 const HANDOVER = glints.lanternMinDistance
@@ -37,14 +39,22 @@ class LanternParts {
   readonly flameGeo = new PlaneGeometry(1, 1).translate(0.5, 0.5, 0)
   readonly pool: PoolMaterial = createPoolMaterial()
   readonly poolGeo = new PlaneGeometry(POOL_RADIUS * 2, POOL_RADIUS * 2).rotateX(-Math.PI / 2)
-  /** Toward the stele, in the ground plane. */
-  private readonly leanDir = new Vector3(exit.stele.base[0] - flame[0], 0, exit.stele.base[2] - flame[2]).normalize()
+  /** From the flame toward each board's face, in the ground plane. */
+  private readonly toward = new Map<SocialId, Vector3>(
+    BOARDS.map((b) => {
+      const c = boardFaceCentre(b).add(new Vector3(...exit.signpost.base))
+      return [b.id, new Vector3(c.x - flame[0], 0, c.z - flame[2]).normalize()]
+    }),
+  )
+  /** The last board leaned toward: the flame straightens back along it. */
+  private leanDir = this.toward.values().next().value ?? new Vector3(-1, 0, 0)
   private lean = 0
 
   frame(elapsed: number, delta: number, camera: Camera): void {
     const s = journey.getState()
     const t = motionTime(elapsed, s)
     const still = s.reducedMotion
+    if (s.contactHover) this.leanDir = this.toward.get(s.contactHover) ?? this.leanDir
     this.lean = approach(this.lean, s.contactHover ? 1 : 0, LEAN_RATE, Math.min(delta, 0.1))
     const level = flameLevel(t, still)
     const u = this.flame.uniforms
@@ -68,8 +78,8 @@ class LanternParts {
  * its eave. The flame is a billboard; the ground pool is a stain; nothing is a three.js light.
  *
  * Every frame the flame breathes (3 to 5 s) and flickers (0.92 to 1.0), and the shared warm term
- * follows it through setLanternIntensity, so the E0 trunks and the stele breathe with it. A hovered
- * contact row leans the flame toward the stele.
+ * follows it through setLanternIntensity, so the E0 trunks and the signpost breathe with it. A
+ * hovered contact row leans the flame toward its board on the signpost.
  */
 export function Lantern() {
   const parts = useMemo(() => new LanternParts(), [])

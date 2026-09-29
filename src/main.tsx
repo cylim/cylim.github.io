@@ -13,6 +13,7 @@ import { probeWebgl2 } from './core/boot/webgl'
 import { startViewportWatch } from './core/boot/viewport'
 import { exposeE2E } from './core/boot/e2e'
 import { initHashNav, scrollToJvh, startScrollDriver } from './core/scroll'
+import { startIntro } from './dom/intro'
 import { startSectionPrefetch } from './core/sections/prefetch'
 import { stillJvh } from './core/world/beats'
 
@@ -80,6 +81,9 @@ else {
 }
 
 const immersive = decision.mode === 'immersive'
+// The head script raised the loading screen; boot's probe may have overturned the walk since.
+if (immersive && !deterministic) startIntro()
+else delete html.dataset.intro
 // Wheel smoothing on desktop only; touch stays native, and motion-sensitive and test runs get plain scroll.
 startScrollDriver({ smoothWheel: immersive && !reducedMotion && !deterministic && matchMedia('(pointer: fine)').matches })
 startViewportWatch()
@@ -87,6 +91,11 @@ if (deterministic) exposeE2E()
 initHashNav()
 if (immersive) startSectionPrefetch()
 if (params.still) void scrollToJvh(stillJvh(params.still))
+
+// Production only, and never for test or still runs: see scripts/sw/sw.js.
+if (import.meta.env.PROD && !deterministic && 'serviceWorker' in navigator) {
+  addEventListener('load', () => void navigator.serviceWorker.register('/sw.js').catch(() => {}), { once: true })
+}
 
 if (immersive) {
   const mount = () => {

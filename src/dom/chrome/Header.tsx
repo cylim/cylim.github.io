@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useJourney } from '../../core/store/journey'
-import { SECTION_IDS, type SectionId } from '../../core/sections/ids'
+import { WALK_SECTION_IDS, type SectionId } from '../../core/sections/ids'
 import { homeMark, nav } from '../../content/site'
 import { ui } from '../../content/ui'
 import { layout, sealSize } from '../../theme/tokens'
@@ -37,7 +37,7 @@ function useAlbumActive(enabled: boolean): SectionId | null {
       },
       { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] },
     )
-    for (const sid of SECTION_IDS) {
+    for (const sid of WALK_SECTION_IDS) {
       const el = document.getElementById(sid)
       if (el) io.observe(el)
     }

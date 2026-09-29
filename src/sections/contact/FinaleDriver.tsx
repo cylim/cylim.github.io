@@ -4,11 +4,13 @@ import { Matrix4, PerspectiveCamera, Vector3, type Camera } from 'three'
 import { glintSlots, setGlint } from '../../core/render'
 import { journey, type JourneyState } from '../../core/store/journey'
 import { exit, glints } from '../../core/world/layout'
+import { features } from '../../content/features'
 import { FINALE, albumWindow, finaleShowing, insideRect, pinMoved, type Pin } from './finale'
 import { FinaleFlags } from './finaleFlags'
 
 type PinId = keyof JourneyState['pins']
-const PIN_IDS: readonly PinId[] = ['threshold', 'cabin', 'grove']
+/** No grove pin while the grove is paused (content/features.ts). */
+const PIN_IDS: readonly PinId[] = features.grove ? ['threshold', 'cabin', 'grove'] : ['threshold', 'cabin']
 /** The pins keep their place for this long after the scroll moves, while the camera damps in. */
 const PRECISE_MS = 2000
 /** A pin this close to the window's edge hides rather than hang half over the mount. */
@@ -17,9 +19,10 @@ const PIN_MARGIN = 8
 const GLINT_NEAR = 30
 
 /**
- * Projects the three E3 map pins into `journey.pins` (CSS px) while the finale shows. While the
- * scroll moves and the camera damps in, pins follow to half a pixel; once it only breathes they
- * move in steps of FINALE.pinSlop, so the store goes quiet and the frame governor can idle.
+ * Projects the E3 map pins (three; two with the grove paused) into `journey.pins` (CSS px) while the
+ * finale shows. While the scroll moves and the camera damps in, pins follow to half a pixel; once it
+ * only breathes they move in steps of FINALE.pinSlop, so the store goes quiet and the frame governor
+ * can idle.
  */
 class PinProjector {
   private readonly v = new Vector3()
@@ -62,7 +65,7 @@ class PinProjector {
  * Glint slot 1, the cabin's speck of cyan. From the finale camera the cabin stands behind the forest,
  * and the glint hides wherever the scene is nearer than it (one depth tap in the ink pass). So the
  * glint rides the camera's line of sight to the cabin, GLINT_NEAR metres out: it lands on the
- * cabin's pixel, as a painter's dot would, and only the lantern, the stele and the exit pines, which
+ * cabin's pixel, as a painter's dot would, and only the lantern, the signpost and the exit pines, which
  * really do stand in front of it, can still hide it.
  */
 class CabinGlint {

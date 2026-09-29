@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { color, inkRamp } from '../../../theme/tokens'
 import { MARKS } from '../../world/journey'
 import { glints as anchors } from '../../world/layout'
@@ -6,6 +6,10 @@ import { POST, autoFlatten, finaleMistWeight, fogBreath, forestDepth, forestFogT
 import { FOG_COVER } from '../../world/journey'
 import { LANTERN_FOG_FADE, glintFrame, glintSlots, lanternFlicker, resetGlints, setGlint } from './glints'
 import { rampBands, srgbLumaOfHex } from './InkEffect'
+
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../../../content/features', () => ({ features: { grove: true } }))
 
 describe('glints (design.md §7.3.2)', () => {
   it('sit on the lantern flame and the cabin leak', () => {

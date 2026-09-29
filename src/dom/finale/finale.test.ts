@@ -1,6 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { stillAt } from '../album/LostStill'
 import { finaleWindow, insideWindow } from './window'
+
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../../content/features', () => ({ features: { grove: true } }))
 
 describe('the finale window (design.md §8.7 E2)', () => {
   it('leaves a centred 3:4 window between the mounts on landscape screens, under the header', () => {

@@ -1,11 +1,12 @@
 /**
  * Site-level copy: nav, hero, per-section headings and lines, seals, colophon.
  * Source: content.md §2, §3, §5, §7 with design.md §18.1 proposals applied as defaults
- * (hero accent 入林, links row in the hero, services as two forest cards, Work/Grove/Contact nav,
+ * (links row in the hero, services as two forest cards, Work/Grove/Contact nav,
  * cabin bridge line, four featured scrolls plus "Also", colophon on).
  */
 
 import type { SectionId } from '../core/sections/ids'
+import { features } from './features'
 import type { Accent, Link } from './types'
 
 // ---------------------------------------------------------------------------- nav (design.md §4.1, §4.2)
@@ -29,7 +30,7 @@ export const homeMark = {
   href: '/',
 } as const
 
-export const nav: readonly NavItem[] = [
+const allNav: readonly NavItem[] = [
   {
     id: 'threshold',
     href: '/',
@@ -60,27 +61,31 @@ export const nav: readonly NavItem[] = [
   },
 ]
 
+/** The nav, desktop header and mobile bar alike: no Grove while the grove is paused (content/features.ts). */
+export const nav: readonly NavItem[] = allNav.filter((item) => item.id !== 'grove' || features.grove)
+
 // ---------------------------------------------------------------------------- hero (content.md §2, design.md §8.1)
 
 const positioningOptions = [
   'I build web apps and web3 frontends, from a blank repo to launch.',
   'Software engineer in Penang. I turn product ideas into shipped React and TypeScript apps.',
   'The parts of software people touch. Web, mobile and web3, since 2017.',
+  'Full stack since 2017. Web and mobile apps, the services behind them, and the pipelines that ship them.',
 ] as const
 
 export const hero = {
   name: 'CY Lim',
   /** Meta and JSON-LD only. */
   fullName: 'Chee Yeong Lim',
-  role: 'Software engineer in Penang, Malaysia.',
+  role: 'Full stack software engineer in Penang, Malaysia.',
   positioningOptions,
-  positioning: positioningOptions[2],
-  subline:
-    'Walk in. The work is in the cabin, a live Qimen chart is in the grove, and my links hang by the lantern at the end.',
+  positioning: positioningOptions[3],
+  /** Two variants: with the grove on the walk, and while it is paused (content/features.ts). */
+  subline: features.grove
+    ? 'Walk in. My work hangs in the cabin, the grove holds a live Qimen chart for this hour, and a signpost at the end of the path shows where to find me.'
+    : 'Walk in. My work hangs in the cabin, and a signpost at the end of the path shows where to find me.',
   // TODO(owner): e.g. 'Taking on a small number of freelance projects.' Only if true. Hidden while null.
   availability: null as string | null,
-  /** design.md §18.1: accepted default over content.md's 入山. */
-  accent: { zh: '入林', pinyin: 'rù lín', en: 'into the forest (林 is also Lim)' } satisfies Accent,
   /** design.md §18.1: a small social-links row on the first screen. */
   showSocialRow: true,
   scrollHint: 'Scroll to walk in',
@@ -92,8 +97,8 @@ export const forest = {
   servicesHeading: 'What I build',
   /** Services in two sticky cards, split by the pine wipe (F2). Ids from services.ts. */
   cards: [
-    { beat: 'F1', serviceIds: ['web-apps', 'web3'] },
-    { beat: 'F3', serviceIds: ['mobile', 'pipelines-security'] },
+    { beat: 'F1', serviceIds: ['web-apps', 'mobile'] },
+    { beat: 'F3', serviceIds: ['backend', 'devops'] },
   ],
 } as const
 
@@ -109,11 +114,9 @@ export const cabin = {
     "In old landscape paintings there's always a hut, and in the hut there's always a scholar at a desk. This one writes software.",
   /** I1, zone L. "The panels in here" stays as written; the panels are the scrolls. */
   intro: [
-    // TODO(owner): Cyants (2018–2024) is "Software Engineer" on LinkedIn, so this no longer says "set up
-    // my own studio". Put the studio back only if you want to claim it.
-    "I've been shipping software since 2017. I started by leading six-week MVP builds for agency clients, then ran the Penang team at a blockchain startup. From 2018 to 2024 I also took on agency coding projects and small Upwork jobs. I've worked on blockchain frontends since 2019, and most of what I write now is React and TypeScript.",
+    "I've been building full stack since 2017. Web and mobile apps, the APIs and services behind them, and the pipelines that deploy them. Close to seven years of it went into blockchain products at Kysen, and in 2018 I started my own studio, Cyants, for client builds and products of our own.",
     // Backticks mark inline code.
-    'The panels in here are selected work. The terminal answers questions. Type `help`.',
+    "Lately that's meant compliance tooling for tokenised gold at Tokenyze, the NextRare card app and its backend, and health apps with Miroma Project Factory. The scrolls hanging in here are the details. The terminal answers questions, so type `help`.",
   ],
   workHeading: 'Selected work',
   alsoHeading: 'Also',
@@ -145,10 +148,12 @@ export const contact = {
   label: 'The Lantern',
   heading: 'Contact',
   accent: { zh: '石灯', pinyin: 'shí dēng', en: 'stone lantern' } satisfies Accent,
-  /** Carved on the stele and shown in the DOM. */
+  /** Shown in the contact card, above the link rows. */
   line: 'End of the path. If you have something to build, find me here.',
   footer: '© 2026 CY Lim. Built with React Three Fiber.',
   source: { label: 'Source on GitHub', href: 'https://github.com/cylim/cylim.github.io' } satisfies Link,
+  /** Printed from scripts/resume/resume-en.html by scripts/make-resume.mjs. */
+  resume: { label: 'Résumé (PDF)', href: '/resources/resume-en.pdf' } satisfies Link,
   walkAgain: 'Walk again',
   /** E3 map pins; real links that fog-dive. */
   mapPins: {
@@ -165,7 +170,7 @@ export const contact = {
  * English name under it. Ma Shan Zheng is subset to 入 林 木 屋 九 宫 石 灯 only.
  */
 export const inscriptions: Record<SectionId, { readonly accent: Accent; readonly name: string }> = {
-  threshold: { accent: hero.accent, name: 'The edge of the forest' },
+  threshold: { accent: { zh: '林', pinyin: 'lín', en: 'forest (also the surname Lim)' }, name: 'The edge of the forest' },
   cabin: { accent: cabin.accent, name: 'The Cabin' },
   grove: { accent: groveHeading.accent, name: 'The Grove' },
   contact: { accent: contact.accent, name: 'Contact' },

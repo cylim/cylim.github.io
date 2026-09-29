@@ -1,9 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { contactOutput, fortunes, grove, terminal, terminalCommands, whoamiOutput } from '../../content'
 import { inscriptionBand, qimenVars } from '../chart/format'
 import { FIXTURE_A_MS, castPenang } from '../test/fixtures'
 import { complete, completable, findCommand, interruptLines, normalize, outputLine, runCommand, tabCompletion, type RunContext } from './commands'
 import { linkIn } from './links'
+
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../../content/features', () => ({ features: { grove: true } }))
 
 const ctx = (over: Partial<RunContext> = {}): RunContext => ({
   now: () => FIXTURE_A_MS,
@@ -73,7 +77,7 @@ describe('runCommand', () => {
       'https://github.com/cylim',
       'https://x.com/seewhy',
       'https://www.linkedin.com/in/cylim226',
-      'https://cy.my/blog/',
+      'https://cy.my/resources/resume-en.pdf',
     ])
   })
 
@@ -82,9 +86,13 @@ describe('runCommand', () => {
       .lines.filter((l) => l.kind === 'link')
       .map((l) => l.href)
     expect(hrefs).toEqual([
-      'https://github.com/cylim/oripax',
+      'https://nextrare.cards',
+      'https://tokenyze.co',
+      'https://mercury.eco',
+      'https://www.kysenpool.io',
       'https://github.com/cylim/supreme-dollop',
       'https://github.com/cylim/jrny-app-demo',
+      'https://github.com/cylim/oripax',
     ])
   })
 
@@ -170,7 +178,7 @@ describe('lines', () => {
   })
 
   it('linkIn splits a line around a known URL only on whole path segments', () => {
-    expect(linkIn('Blog      cy.my/blog')).toEqual({ before: 'Blog      ', display: 'cy.my/blog', after: '', href: 'https://cy.my/blog/' })
+    expect(linkIn('X         x.com/seewhy')).toEqual({ before: 'X         ', display: 'x.com/seewhy', after: '', href: 'https://x.com/seewhy' })
     expect(linkIn('see github.com/cylimx')).toBeNull()
     expect(outputLine('plain text')).toEqual({ kind: 'output', text: 'plain text' })
   })

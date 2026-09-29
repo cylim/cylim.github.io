@@ -112,7 +112,7 @@ async function addOgCard(page) {
         <h1><span></span><img src="/seals/lin-baiwen-hero.svg" alt="" width="58" height="58"></h1>
         <p></p>`
       card.querySelector('h1 span').textContent = name
-      // One sentence per line: "The parts of software people touch." / "Web, mobile and web3, since 2017."
+      // One sentence per line: "Full stack since 2017." / "Web and mobile apps, the services behind them, …"
       const p = card.querySelector('p')
       line.split(/(?<=\.) /).forEach((sentence, i) => {
         if (i) p.append(document.createElement('br'))

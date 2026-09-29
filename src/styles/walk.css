@@ -474,7 +474,7 @@ html[data-mode='immersive'][data-seal] .finale-seal .seal {
   }
 }
 
-/* At E3 the stele card moves onto the right mount with the link rows, Walk again and the footer.
+/* At E3 the contact card moves onto the right mount with the link rows, Walk again and the footer.
    Contact.tsx renders Walk again twice; a phone's finale uses the copy under the colophon. */
 .finale-links {
   display: none;
@@ -485,7 +485,7 @@ html[data-mode='immersive'] .finale-links-card {
   display: flex;
 }
 
-/* Before E3 they wait out of sight under the rows, still the next Tab after Blog, and show while
+/* Before E3 they wait out of sight under the rows, still the next Tab after the last link, and show while
    they have focus, so a keyboard walk reaches them before the footer (§15: tab order is reading
    order). */
 html[data-mode='immersive']:not([data-beat='E3']) .finale-links-card:not(:focus-within) {
@@ -498,7 +498,7 @@ html[data-mode='immersive']:not([data-beat='E3']) .finale-links-card:not(:focus-
 }
 
 @media (min-width: 768px) and (min-aspect-ratio: 1/1) {
-  /* On the mounts the cards sit on paper-mount, not on the painting: no mist pocket. The stele card
+  /* On the mounts the cards sit on paper-mount, not on the painting: no mist pocket. The contact card
      moves onto the right mount as soon as the mounts slide in (Finale.tsx sets html[data-mounts]
      from E2), not at E3, or it straddles the left mount and the window in between. */
   html[data-mode='immersive']:is([data-beat='E3'], [data-mounts]) .card-contact,
@@ -511,7 +511,7 @@ html[data-mode='immersive']:not([data-beat='E3']) .finale-links-card:not(:focus-
   /*
    * Both cards stay on their mount at any text size (§15: 200% text, A11Y-5): the column is the mount
    * less 24 px either side (px, like the mount), its padding gives way first, and a card that still
-   * doesn't fit scrolls inside itself. It never reaches into the painting, and the stele card stops
+   * doesn't fit scrolls inside itself. It never reaches into the painting, and the contact card stops
    * above the footer (Finale.tsx measures --footer-h). At 100% on 1280 × 800 nothing moves.
    */
   html[data-mode='immersive']:is([data-beat='E3'], [data-mounts]) .beat[data-beat='E1'] .card-frame {
@@ -523,12 +523,6 @@ html[data-mode='immersive']:not([data-beat='E3']) .finale-links-card:not(:focus-
   /* The footer keeps to the right mount too (its padding and alignment are the base rule's below). */
   html[data-mode='immersive'] .site-footer {
     width: var(--mount-w);
-  }
-
-  html[data-mode='immersive']:is([data-beat='E3'], [data-mounts]) .card-contact .social-display {
-    padding-left: 0;
-    text-align: left;
-    flex-basis: 100%;
   }
 
   html[data-mode='immersive']:is([data-beat='E3'], [data-mounts]) .card-contact {
@@ -652,7 +646,7 @@ html[data-mode='immersive'][data-beat='E3'] .site-footer {
     margin-bottom: 0.25rem;
   }
 
-  /* The four links fit one line on phones from 360 px, spread across the card; else they wrap. */
+  /* The links fit one line on phones from 360 px, spread across the card; else they wrap. */
   html[data-mode='immersive'] .card-hero .socials-row {
     justify-content: space-between;
     gap: 0;
@@ -671,22 +665,6 @@ html[data-mode='immersive'][data-beat='E3'] .site-footer {
     }
   }
 
-
-  html[data-mode='immersive'] .card-hero > :not(.hero-mark) {
-    position: relative;
-  }
-
-  html[data-mode='immersive'] .hero-mark {
-    position: absolute;
-    top: calc(env(safe-area-inset-top) + 64px);
-    left: 4vw;
-    flex-direction: row;
-    align-items: flex-end;
-  }
-
-  html[data-mode='immersive'] .hero-accent.zh {
-    --glyph: 18vw;
-  }
 
   html[data-mode='immersive'] .card-extra {
     display: none;
@@ -751,13 +729,16 @@ html[data-mode='immersive'][data-beat='E3'] .site-footer {
   }
 
   /*
-   * The stele card in zone B (E1, E2): the four link rows as a 2 × 2 grid of 56 px tiles, icon beside
-   * label and "shown as", so the card stays under 45% of the height.
+   * The contact card in zone B (E1, E2): the links as one row of 56 px tiles, logo beside username,
+   * so the card stays under 45% of the height.
    */
   html[data-mode='immersive'] .card-contact .socials-rows {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 1rem;
+    /* Columns as wide as their usernames, spread across the card: equal thirds wrap "@seewhy". */
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    justify-content: space-between;
+    column-gap: 0.5rem;
     margin-top: 0.5rem;
   }
 
@@ -765,28 +746,20 @@ html[data-mode='immersive'][data-beat='E3'] .site-footer {
     border-top: 0;
   }
 
-  html[data-mode='immersive'] .card-contact .socials-rows li:nth-child(n + 3) {
-    border-top: 1px solid var(--ink-qing);
-  }
-
   html[data-mode='immersive'] .card-contact .socials-rows a {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-content: center;
-    column-gap: 0.5rem;
-    padding: 0.3rem 0.5rem;
+    column-gap: 0.45rem;
+    padding: 0.3rem 0.25rem;
+  }
+
+  html[data-mode='immersive'] .card-contact .socials-rows .social-handle {
+    white-space: nowrap;
   }
 
   html[data-mode='immersive'] .card-contact .socials-rows .social-icon {
     align-self: center;
-  }
-
-  html[data-mode='immersive'] .card-contact .socials-rows .social-display {
-    grid-column: 2;
-    padding: 0;
-    text-align: left;
-    font-size: var(--fs-label);
-    line-height: var(--lh-label);
   }
 
   /*
@@ -794,11 +767,11 @@ html[data-mode='immersive'][data-beat='E3'] .site-footer {
    * fills the frame inside a 12 px border and the scene leaves paper at the top, its sky. So:
    * - the colophon writes itself on that paper, vertical WenKai with the English beside it and
    *   "Walk again" and "Still version" under the English, with no panel of its own;
-   * - the link rows fold into four icons in the top-left corner (where the section chip was), each
+   * - the link rows fold into icons in the top-left corner (where the section chip was), each
    *   a 44 px target whose label and "shown as" text stay as its accessible name;
    * - the seal stamps bottom-right and the footer sits bottom-left, above the bar;
    * so the painting in between (map pins, the cabin's cyan speck, the grove, the lantern) is clear.
-   * As the mounts open (E2, 968 on) the stele card fades out and lets the finished picture show
+   * As the mounts open (E2, 968 on) the contact card fades out and lets the finished picture show
    * before it is signed.
    */
   html[data-mode='immersive'] .card-frame.zone-mount {
@@ -884,7 +857,7 @@ html[data-mode='immersive'][data-beat='E3'] .site-footer {
     bottom: calc(var(--bar-h) + env(safe-area-inset-bottom) + 0.75rem);
   }
 
-  /* The picture completes itself without the stele card, then gets signed (E2m → E3). */
+  /* The picture completes itself without the contact card, then gets signed (E2m → E3). */
   html[data-mode='immersive'][data-mounts]:not([data-beat='E3']) .card-contact:not(:focus-within) {
     opacity: 0 !important;
     pointer-events: none;
@@ -900,11 +873,11 @@ html[data-mode='immersive'][data-beat='E3'] .site-footer {
   }
 
   /*
-   * At E3 the stele card keeps only what §8.7 lists (the links; Walk again and Still version are
+   * At E3 the contact card keeps only what §8.7 lists (the links; Walk again and Still version are
    * under the colophon): its label, heading and line step out of sight. They stay for screen readers.
    */
-  html[data-mode='immersive'][data-beat='E3'] .card-contact > :is(.label, h2, .stele-line),
-  html[data-mode='immersive'][data-beat='E3'] .card-contact .socials :is(.social-label, .social-display) {
+  html[data-mode='immersive'][data-beat='E3'] .card-contact > :is(.label, h2, .contact-line, .contact-resume),
+  html[data-mode='immersive'][data-beat='E3'] .card-contact .socials .social-handle {
     position: absolute;
     width: 1px;
     height: 1px;

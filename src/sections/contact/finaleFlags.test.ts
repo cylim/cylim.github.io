@@ -6,6 +6,10 @@ import { MARKS } from '../../core/world/journey'
 import { FINALE } from './finale'
 import { FinaleFlags } from './finaleFlags'
 
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../../content/features', () => ({ features: { grove: true } }))
+
 const at = (jvh: number) => journey.setState({ jvh, u: jvh / 1000 })
 
 describe('FinaleFlags', () => {

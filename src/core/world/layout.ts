@@ -214,8 +214,11 @@ export const exit = {
   lantern: { base: [1.0, 0, -186.5] as Vec3, height: 1.8, flame: [1.0, 1.35, -186.5] as Vec3 },
   /** Lit faces within this radius tint toward lantern-halo by (1 − d/r)² × 0.35 (§7.1). */
   lanternWarmRadius: 14,
-  /** Han round-headed stele, faces north; screen-left of the lantern from the approach. */
-  stele: { base: [-1.4, 0, -188] as Vec3, width: 0.9, height: 2.6, depth: 0.28, plinth: 0.4, facing: NORTH },
+  /**
+   * Weathered wooden signpost (路牌), its finger boards facing north; screen-left of the lantern from
+   * the approach. `height` is the post's, to the foot of its cap (sections/contact/signpostGeometry.ts).
+   */
+  signpost: { base: [-1.4, 0, -188] as Vec3, height: 2.5, facing: NORTH },
   ledgeZ: -192,
   beyondLedgeY: -25,
   /** E2 orbit centre if the spline wobbles: yaw 0° → 180° via the east, radius 8 → 53 m, height 1.25 → 30 m. */
@@ -249,7 +252,7 @@ export const exit = {
   /**
    * From E2 on, pines in this corridor stand aside so the finale camera sees the grove's rings over
    * the south arc of the old-pine ring (x −8.5 to 11.5, z −162.5 to −177.5; the exit pines stay).
-   * It opens as E2 starts, while the camera at the stele faces south and has them behind it.
+   * It opens as E2 starts, while the camera at the signpost faces south and has them behind it.
    */
   finaleOpening: { points: [[-1, -170], [4, -170]] as readonly Vec2[], halfWidth: 7.5 },
 } as const
@@ -257,7 +260,7 @@ export const exit = {
 // ---------------------------------------------------------------------------- mountains and light
 
 export const mountains = {
-  /** Main peak card, 220 m wide, summit y 115, base dissolved in a mist belt. The stele's 高远 (E1). */
+  /** Main peak card, 220 m wide, summit y 115, base dissolved in a mist belt. The signpost's 高远 (E1). */
   mainPeak: { centre: [-20, 0, -340] as Vec3, width: 220, summitY: 115 },
   /**
    * The cabin's 高远 (design §8.3 C1, after Fan Kuan): a massif straight behind the roof from the
@@ -270,7 +273,7 @@ export const mountains = {
   /**
    * Ridge ring cards on every side; the finale looks north. Layers shown depend on tier.
    * `southPush`: in the south each layer stands further out (radius × (1 + push), easing in over
-   * the southern half), so from the stele (E0, E1) the nearest is 140 m past the ledge, not 60:
+   * the southern half), so from the signpost (E0, E1) the nearest is 140 m past the ledge, not 60:
    * at 60 m a card reads as a flat cut-out. Heights scale with the distance from K0, so the
    * threshold's 平远 crests keep their place in the first frame.
    */
@@ -350,7 +353,7 @@ export const CREST_SADDLE = { clearance: 0.35, flat: 0.3, edge: 0.65 } as const
 
 /**
  * The ledge is not ruled: its edge wanders up to about 1.3 m north or south of z −192 away from the
- * stele and lantern (it stays straight for |x| < 3). Positive moves the edge north.
+ * signpost and lantern (it stays straight for |x| < 3). Positive moves the edge north.
  */
 export function ledgeWobble(x: number): number {
   const a = Math.abs(x)

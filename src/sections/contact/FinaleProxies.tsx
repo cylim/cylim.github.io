@@ -4,6 +4,7 @@ import { BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, MeshBas
 import { journey, visibleSections } from '../../core/store/journey'
 import { cabin, grove } from '../../core/world/layout'
 import { color } from '../../theme/tokens'
+import { features } from '../../content/features'
 import { createInkMaterial } from '../../env'
 import { useDisposeOnUnmount } from '../shared/lifetime'
 import { finaleShowing } from './finale'
@@ -16,7 +17,8 @@ import { mergeFlat } from './lanternGeometry'
  * speck of cyan, the forest edge, the ridges. From 90 and 180 m these are a few dozen pixels wide,
  * so a roofed box and flat annuli carry them. Shown only while the real section is hidden. They
  * mount visible so SectionHost's prewarm compiles them (compile skips hidden objects); the first
- * frame hides them.
+ * frame hides them. With the grove paused (content/features.ts) there is no grove stand-in: the
+ * painting shows the old pines and the mist over their clearing.
  */
 
 function cabinGeometry(): BufferGeometry {
@@ -96,10 +98,12 @@ export function FinaleProxies() {
       <group ref={cabinRef} name="cabin-far">
         <mesh geometry={parts.cabinGeo} material={parts.cabinMat} />
       </group>
-      <group ref={groveRef} name="grove-far">
-        <mesh geometry={parts.darkGeo} material={parts.darkMat} />
-        <mesh geometry={parts.stoneGeo} material={parts.stoneMat} />
-      </group>
+      {features.grove && (
+        <group ref={groveRef} name="grove-far">
+          <mesh geometry={parts.darkGeo} material={parts.darkMat} />
+          <mesh geometry={parts.stoneGeo} material={parts.stoneMat} />
+        </group>
+      )}
     </>
   )
 }

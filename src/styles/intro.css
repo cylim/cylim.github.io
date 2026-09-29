@@ -1,0 +1,86 @@
+/* --------------------------------------------------------------- first-load loading screen (#intro)
+   index.html's head script sets html[data-intro] on a plain first load of the walk; src/dom/intro.ts
+   drives the ink line from the stage phase and lifts the screen (data-intro="out", then removed).
+   It covers the page (the header lives inside #root's stacking context) but takes no pointer
+   events, so a tap on the nav still lands, and any tap, key, wheel or touch lifts it. */
+
+#intro {
+  display: none;
+}
+
+html[data-mode='immersive'][data-intro] #intro {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-intro);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.75rem;
+  background: radial-gradient(ellipse at 50% 42%, var(--paper-light), var(--paper) 72%);
+  pointer-events: none;
+}
+
+html[data-mode='immersive'][data-intro='out'] #intro {
+  opacity: 0;
+  filter: blur(6px);
+  transition:
+    opacity var(--dur-intro-out) var(--ease-out-cubic),
+    filter var(--dur-intro-out) var(--ease-out-cubic);
+}
+
+/* 林, cropped from the hero's build-time 入林 outline (public/glyphs/hero-rulin.svg, 林 is the lower
+   square). Two trees make a forest, so it brushes in one 木 at a time, left then right. */
+.intro-glyph {
+  display: block;
+  width: clamp(88px, 11vw, 136px);
+  aspect-ratio: 1;
+  background: var(--ink-jiao);
+  mask: url('/glyphs/hero-rulin.svg') no-repeat center bottom / 100% 200%;
+  animation: intro-brush var(--dur-intro-brush) var(--ease-in-out-cubic) both;
+}
+
+@keyframes intro-brush {
+  from {
+    clip-path: inset(0 100% 0 0);
+    filter: blur(2px);
+  }
+  45% {
+    clip-path: inset(0 50% 0 0);
+  }
+  55% {
+    clip-path: inset(0 50% 0 0);
+  }
+  80% {
+    filter: none;
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+/* Real progress, not a timer: intro.ts sets --p from the stage phase. */
+.intro-line {
+  width: min(12rem, 50vw);
+  height: 1px;
+  background: var(--ink-qing);
+}
+
+.intro-line::after {
+  content: '';
+  display: block;
+  height: 100%;
+  background: var(--ink-nong);
+  transform: scaleX(var(--p, 0.12));
+  transform-origin: left;
+  transition: transform 700ms var(--ease-out-cubic);
+}
+
+.intro-label {
+  margin: 0;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--tracking-label);
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  color: var(--ink-zhong);
+}

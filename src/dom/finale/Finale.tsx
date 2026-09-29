@@ -3,19 +3,22 @@ import { createPortal } from 'react-dom'
 import { journey, useJourney, type JourneyState } from '../../core/store/journey'
 import { MARKS } from '../../core/world/beats'
 import { contact } from '../../content/site'
+import { features } from '../../content/features'
 import { breakpoint } from '../../theme/tokens'
 import { leaderOf, placePins, speckKeepOut, type PinPoint, type PinSize, type Rect } from './pins'
 import { finaleWindow, insideWindow } from './window'
 
 type PinId = keyof JourneyState['pins']
+/** A paused section (content/features.ts) has no pin. */
+const onMap = (id: PinId) => id !== 'grove' || features.grove
 /** Walk order, which is also the tab order. */
 const PINS: readonly { id: PinId; href: string }[] = [
   { id: 'threshold', href: '/' },
   { id: 'cabin', href: '#cabin' },
   { id: 'grove', href: '#grove' },
-]
+].filter((p) => onMap(p.id as PinId)) as { id: PinId; href: string }[]
 /** Who gets the clear spot when labels collide: Work, then Grove, then Start ("Walk again" also goes there). */
-const PRIORITY: readonly PinId[] = ['cabin', 'grove', 'threshold']
+const PRIORITY: readonly PinId[] = (['cabin', 'grove', 'threshold'] as const).filter(onMap)
 /** What holds the paper at the top of a phone's painting at E3 (walk.css). */
 const TOP_BLOCK = ['.card-finale', '.card-contact .socials'] as const
 
@@ -40,8 +43,8 @@ const setFlag = (name: string, on: boolean) => {
  *   the latest at E3, never before E2.
  * - The seal and the colophon live in the E3 card; this marks `html[data-seal]` and
  *   `html[data-colophon]` once per visit, and walk.css stamps and writes them.
- * - Three map pins float over their projected world points (`journey.pins`, written by the scene
- *   every frame): real links that fog-dive, shown at E3 while the point is inside the window. Each
+ * - Map pins (three; two with the grove paused) float over their projected world points
+ *   (`journey.pins`, written by the scene every frame): real links that fog-dive, shown at E3 while the point is inside the window. Each
  *   is a dot on the point and a label beside it, tied by a hairline leader; pins.ts keeps the labels
  *   off each other, off the other dots and off the cabin's cyan speck, lifting one when it has to,
  *   and hides the lesser pin when nothing fits.
@@ -67,13 +70,13 @@ export function Finale() {
   }, [signed, fallback])
 
   const open = inFinale && (mountOpen || signed)
-  // The stele card moves onto the right mount with the mounts, not at E3 (walk.css).
+  // The contact card moves onto the right mount with the mounts, not at E3 (walk.css).
   useEffect(() => {
     document.documentElement.toggleAttribute('data-mounts', open)
     return () => document.documentElement.removeAttribute('data-mounts')
   }, [open])
 
-  // The stele card on the right mount stops above the footer, however tall a large text size makes
+  // The contact card on the right mount stops above the footer, however tall a large text size makes
   // it (walk.css reads --footer-h).
   useEffect(() => {
     const footer = document.querySelector<HTMLElement>('.site-footer')

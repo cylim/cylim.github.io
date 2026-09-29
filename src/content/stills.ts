@@ -9,6 +9,8 @@
  * A missing file is fine: the album shows a paper-and-mist placeholder instead.
  */
 
+import { features } from './features'
+
 export type StillId = 'T0' | 'C3' | 'I1' | 'E1' | 'E3'
 
 export interface Still {
@@ -33,11 +35,14 @@ export const stills: Readonly<Record<StillId, Still>> = {
   },
   E1: {
     id: 'E1',
-    alt: 'A round-headed stone stele beside an octagonal stone lantern, seen from low down, with the peak rising out of the mist above.',
+    alt: 'A weathered wooden signpost with three finger boards beside an octagonal stone lantern, seen from low down, with the peak rising out of the mist above.',
   },
   E3: {
     id: 'E3',
-    alt: 'The whole walk seen from above as one hanging scroll: the lantern, the stone rings of the grove, the cabin and the forest edge.',
+    // Two variants: with the grove on the walk, and while it is paused (content/features.ts).
+    alt: features.grove
+      ? 'The whole walk seen from above as one hanging scroll: the lantern, the stone rings of the grove, the cabin and the forest edge.'
+      : 'The whole walk seen from above as one hanging scroll: the lantern, the old pines in the mist, the cabin and the forest edge.',
   },
 }
 

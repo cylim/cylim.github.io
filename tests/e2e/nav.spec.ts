@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test'
-import { NOW, settled } from './helpers'
+import { GROVE, NOW, settled } from './helpers'
 
 // The jump nav, skip link, home mark and contact links (design.md §4, §8.7, §15).
 
 const PLACES = [
   { name: /^Work\b/, href: '#cabin', id: 'cabin' },
-  { name: /^Grove\b/, href: '#grove', id: 'grove' },
+  ...(GROVE ? [{ name: /^Grove\b/, href: '#grove', id: 'grove' } as const] : []),
   { name: /^Contact\b/, href: '#contact', id: 'contact' },
 ] as const
 
@@ -24,9 +24,12 @@ test('the skip link is the first stop and targets #content', async ({ page }, in
   await expect(page.locator('main#content')).toHaveCount(1)
 })
 
-test('one jump nav with plain-word links to the three places', async ({ page }) => {
+test('one jump nav with plain-word links to the places', async ({ page }) => {
   const nav = page.getByRole('navigation', { name: 'Jump to a place' })
   await expect(nav).toHaveCount(1)
+  // The places (Top is the bare path); no Grove while it is paused (src/content/features.ts).
+  await expect(nav.locator('a[href^="#"]')).toHaveCount(PLACES.length)
+  await expect(nav.getByRole('link', { name: /^Grove\b/ })).toHaveCount(GROVE ? 1 : 0)
   for (const place of PLACES) {
     const link = nav.getByRole('link', { name: place.name })
     await expect(link).toBeVisible()
@@ -53,7 +56,7 @@ for (const place of PLACES) {
 }
 
 test('the home mark goes back to the edge of the forest', async ({ page }, info) => {
-  await page.goto(`/?e2e=1&tier=medium&now=${NOW}#grove`)
+  await page.goto(`/?e2e=1&tier=medium&now=${NOW}${GROVE ? '#grove' : '#contact'}`)
   await settled(page)
   // Under 768 px the home mark hides and "Top" leads the bottom bar (design.md §4.2).
   const home =
@@ -72,7 +75,6 @@ test('contact is social links only, each rel="me"', async ({ page }) => {
     ['GitHub', 'https://github.com/cylim'],
     ['X', 'https://x.com/seewhy'],
     ['LinkedIn', 'https://www.linkedin.com/in/cylim226'],
-    ['Blog', 'https://cy.my/blog/'],
   ] as const
   for (const [label, href] of expected) {
     const link = contact.locator(`a[href="${href}"]`).first()

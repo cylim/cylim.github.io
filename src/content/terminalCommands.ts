@@ -3,7 +3,14 @@
  * (src/dom/terminal/commands.ts) matches input against these and never invents text.
  */
 
+import { features } from './features'
 import { contactOutput, whoamiOutput } from './terminal'
+
+/**
+ * `help` lines for the grove's two commands. While the grove is paused (content/features.ts) they are
+ * hidden and left out of `help` and `ls`, but still answer when typed.
+ */
+const groveHelp: readonly string[] = features.grove ? ['qimen      cast a Qimen chart for right now', 'grove      walk on to the grove'] : []
 
 export type TerminalAction =
   | { readonly type: 'print' }
@@ -38,8 +45,7 @@ export const terminalCommands: readonly TerminalCommand[] = [
       'stack      tools I reach for',
       "timeline   where I've worked and studied",
       'contact    where to find me',
-      'qimen      cast a Qimen chart for right now',
-      'grove      walk on to the grove',
+      ...groveHelp,
       'clear      wipe the screen',
       '',
       "Not every command is listed. It's a cabin, not a manual.",
@@ -58,14 +64,14 @@ export const terminalCommands: readonly TerminalCommand[] = [
     description: 'what I build for clients',
     hidden: false,
     output: [
-      '1. Web apps, blank repo to launch',
-      '   React + TypeScript, auth, payments, realtime, deploys.',
-      '2. Web3 frontends',
-      '   Wallet flows, dashboards, dApps. Cosmos, Terra, Aptos, Solana, EVM.',
-      '3. Mobile apps',
+      '1. Web apps',
+      '   React + TypeScript, auth, payments, realtime, dApps on six chains.',
+      '2. Mobile apps',
       '   React Native, Flutter, native iOS.',
-      '4. Pipelines and a security-minded review',
-      '   CI/CD that tests and deploys. Security degree, CPEH.',
+      '3. Backend services and APIs',
+      '   Node.js, NestJS, Postgres + Drizzle, Convex, Workers, AWS, Azure.',
+      '4. DevOps and a security-minded review',
+      '   CI/CD, Docker, cloud releases. Security degree, CPEH.',
     ],
     action: { type: 'print' },
   },
@@ -75,17 +81,29 @@ export const terminalCommands: readonly TerminalCommand[] = [
     description: 'selected work',
     hidden: false,
     output: [
-      '2026  OripaX           on-chain gacha, x402 + NFTs (personal)',
-      '                       github.com/cylim/oripax',
-      '2026  JRNY Plan        group scheduling (personal)',
-      '                       github.com/cylim/supreme-dollop',
-      "2025  JRNY             travel log, who's in town (personal)",
-      '                       github.com/cylim/jrny-app-demo',
-      '2019+ Cosmos insights  React frontend, at Kysen',
-      '      Terra dApp       Flutter swaps and investing, at Kysen',
+      '2025  NextRare         card-pack app, iOS + Android (Cyants client)',
+      '                       nextrare.cards',
+      '2024  Tokenyze         agent dashboard, compliant gold trading',
+      '                       tokenyze.co',
+      '2024  Asterix          DN404 web apps + Amaterasu on Aptos (Cyants client)',
+      '2023  Mercury Labs     tokenised wine, Hedera supplier dashboard',
+      '                       mercury.eco',
+      '2022  atticc           web3 social network, CyberConnect + XMTP',
+      '2021+ Liv, Pave        health apps, with Miroma Project Factory',
+      '2019+ Kysen            PoS validators, and products for chain teams:',
+      '                       Cosmos Outpost, Harvest (Flutter), Mirror Wallet',
+      '                       kysenpool.io',
       '2017  TBSx3            anti-counterfeit, led the Penang team',
       '',
-      'The panels around you have the details.',
+      'Our own products:',
+      '2026  JRNY Plan        group scheduling (Cyants)',
+      '                       github.com/cylim/supreme-dollop',
+      "2025  JRNY             travel log, who's in town (Cyants)",
+      '                       github.com/cylim/jrny-app-demo',
+      '2026  OripaX           on-chain gacha, x402 + NFTs (personal)',
+      '                       github.com/cylim/oripax',
+      '',
+      'The scrolls around you have the details.',
     ],
     action: { type: 'print' },
   },
@@ -94,12 +112,12 @@ export const terminalCommands: readonly TerminalCommand[] = [
     description: 'tools I reach for',
     hidden: false,
     output: [
-      'lang      TypeScript, JavaScript, Dart, Swift, Solidity',
+      'lang      TypeScript, JavaScript, Dart, Swift, Solidity, Move',
       'frontend  React, TanStack, Next.js, Tailwind, StyleX',
-      'mobile    React Native, Flutter, iOS',
-      'backend   Node.js, Convex, Cloudflare Workers + D1, Drizzle',
-      'web3      Cosmos, Terra, Aptos, Solana, EVM, x402',
-      'ship      Bun, Vite, Vitest, Playwright, GitHub Actions, Docker',
+      'mobile    React Native, Expo, Flutter, iOS',
+      'backend   Node.js, NestJS, Postgres + Drizzle, Convex, Workers + D1',
+      'web3      Cosmos, Terra, Ethereum, Base, Aptos, Solana, Hedera',
+      'devops    GitHub Actions, GitLab CI, Docker, AWS, Azure, Cloudflare',
       'this site React Three Fiber, three.js, GitHub Pages',
     ],
     action: { type: 'print' },
@@ -134,7 +152,7 @@ export const terminalCommands: readonly TerminalCommand[] = [
   {
     name: 'qimen',
     description: 'cast a Qimen chart for right now',
-    hidden: false,
+    hidden: !features.grove,
     output: [],
     action: { type: 'dynamic', id: 'qimen' },
   },
@@ -142,9 +160,10 @@ export const terminalCommands: readonly TerminalCommand[] = [
     name: 'grove',
     aliases: ['cd grove', 'exit', 'logout'],
     description: 'walk on to the grove',
-    hidden: false,
+    hidden: !features.grove,
     output: ['You step out of the cabin. The mist closes behind you.'],
-    action: { type: 'navigate', hash: '#grove' },
+    // Paused, the grove's link lands on the lantern (core/sections/ids.ts walkSection).
+    action: { type: 'navigate', hash: features.grove ? '#grove' : '#contact' },
   },
   {
     name: 'clear',
@@ -191,7 +210,7 @@ export const terminalCommands: readonly TerminalCommand[] = [
     name: 'ls',
     description: '',
     hidden: true,
-    output: ['services  projects  stack  timeline  contact  qimen  .mist'],
+    output: [features.grove ? 'services  projects  stack  timeline  contact  qimen  .mist' : 'services  projects  stack  timeline  contact  .mist'],
     action: { type: 'print' },
   },
   {

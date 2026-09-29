@@ -9,8 +9,39 @@
  */
 
 import type { SectionId } from '../sections/ids'
+import { features } from '../../content/features'
 
-export const J = 1000
+// ---------------------------------------------------------------------------- the grove switch
+
+/**
+ * The grove is on the walk (content/features.ts). Every table below is written for the full walk
+ * (design.md §6 numbers) and, with the grove paused, rebuilt from it: G0–G4 are cut, the path from
+ * the moon gate cuts through the mist wall to the southern trees and belongs to contact, and
+ * everything from the exit on moves up by the grove's length (`afterGrove`).
+ */
+export const GROVE_ON = features.grove
+
+/** The grove's own beats (G0–G4) on the full walk, 645–862 jvh. */
+export const GROVE_CUT = [645, 862] as const
+
+/** How far everything after the grove moves up while it is paused: 0, or 217 jvh. */
+export const GROVE_GAP = GROVE_ON ? 0 : GROVE_CUT[1] - GROVE_CUT[0]
+
+/**
+ * A full-walk jvh (design.md §6, the tables here and in journey.ts) → the same place on this walk.
+ * The identity with the grove on; with it paused, positions from the exit (862) on move up by 217.
+ * Positions inside the grove have no place on a groveless walk and are returned unchanged.
+ */
+export const afterGrove = (jvh: number) => (jvh >= GROVE_CUT[1] ? jvh - GROVE_GAP : jvh)
+
+/**
+ * Grove paused only: where the camera cuts from the mist wall to the southern trees, under a flash of
+ * paper at the fog's peak (journey.ts P2 and P3). The grove chunk draws the path up to here and the
+ * contact scene takes over.
+ */
+export const MIST_CUT = 628
+
+export const J = afterGrove(1000)
 
 export const jvhToU = (jvh: number) => jvh / J
 export const uToJvh = (u: number) => u * J
@@ -27,13 +58,48 @@ export interface SectionSpan {
   readonly heightSvh: number
 }
 
-export const SECTION_SPANS = {
+const FULL_SECTION_SPANS = {
   threshold: { id: 'threshold', jvh: [0, 245], arrivalJvh: 0, heightSvh: 245 },
   cabin: { id: 'cabin', jvh: [245, 572], arrivalJvh: 345, heightSvh: 327 },
   grove: { id: 'grove', jvh: [572, 862], arrivalJvh: 666, heightSvh: 290 },
   contact: { id: 'contact', jvh: [862, 1000], arrivalJvh: 886, heightSvh: 238 },
 } as const satisfies Record<SectionId, SectionSpan>
 
+/**
+ * The DOM sections: scroll track, nav, hash and `active`. With the grove paused there is no grove
+ * section: contact runs from the moon gate (the path is the way to the lantern), and grove keeps an
+ * empty span there whose arrival is contact's, so a #grove link lands on the lantern.
+ */
+export const SECTION_SPANS: Readonly<Record<SectionId, SectionSpan>> = GROVE_ON
+  ? FULL_SECTION_SPANS
+  : {
+      threshold: FULL_SECTION_SPANS.threshold,
+      cabin: FULL_SECTION_SPANS.cabin,
+      grove: { id: 'grove', jvh: [572, 572], arrivalJvh: afterGrove(886), heightSvh: 0 },
+      contact: { id: 'contact', jvh: [572, J], arrivalJvh: afterGrove(886), heightSvh: J - 572 + 100 },
+    }
+
+/**
+ * The stretch of the walk each section's scene draws: SectionHost mounts it within RIG.preloadU of
+ * this span, and the store's `visibleSections`, the finale stand-ins and the sound beds follow it.
+ * The DOM spans with the grove on. With it paused the grove chunk still draws the path, from the
+ * moon gate to the cut in the mist wall, and the contact scene takes over there.
+ */
+export const SCENE_SPANS: Readonly<Record<SectionId, readonly [number, number]>> = GROVE_ON
+  ? {
+      threshold: FULL_SECTION_SPANS.threshold.jvh,
+      cabin: FULL_SECTION_SPANS.cabin.jvh,
+      grove: FULL_SECTION_SPANS.grove.jvh,
+      contact: FULL_SECTION_SPANS.contact.jvh,
+    }
+  : {
+      threshold: FULL_SECTION_SPANS.threshold.jvh,
+      cabin: FULL_SECTION_SPANS.cabin.jvh,
+      grove: [572, MIST_CUT],
+      contact: [MIST_CUT, J],
+    }
+
+/** The DOM section at a journey position. Never 'grove' while the grove is paused. */
 export function sectionAtJvh(jvh: number): SectionId {
   if (jvh < SECTION_SPANS.cabin.jvh[0]) return 'threshold'
   if (jvh < SECTION_SPANS.grove.jvh[0]) return 'cabin'
@@ -63,7 +129,7 @@ export type TextZone = 'L' | 'R' | 'TL' | 'pane' | 'panel' | 'mount' | 'B'
 export interface BeatSpan {
   readonly id: BeatId
   readonly section: SectionId
-  /** [start, end) in jvh. Beats tile 0..1000 with no gaps. */
+  /** [start, end) in jvh. Beats tile 0..J with no gaps. */
   readonly jvh: readonly [number, number]
   /** Scroll range where the camera barely moves so the copy can be read. */
   readonly hold: readonly [number, number] | null
@@ -78,7 +144,7 @@ const span = (
   zone: TextZone | null,
 ): BeatSpan => ({ id, section, jvh, hold, zone })
 
-export const BEAT_SPANS: readonly BeatSpan[] = [
+const FULL_BEAT_SPANS: readonly BeatSpan[] = [
   span('T0', 'threshold', [0, 40], [0, 35], 'L'),
   span('T1', 'threshold', [40, 90], null, null),
   span('F1', 'threshold', [90, 150], [100, 142], 'L'),
@@ -112,6 +178,24 @@ export const BEAT_SPANS: readonly BeatSpan[] = [
   span('E3', 'contact', [985, 1000], [985, 1000], 'mount'),
 ]
 
+/** The grove's own beats, cut from the walk while it is paused. */
+export const isGroveBeat = (id: BeatId) => id[0] === 'G'
+
+const shiftRange = (r: readonly [number, number]): readonly [number, number] => [afterGrove(r[0]), afterGrove(r[1])]
+
+/**
+ * A full-walk beat's place on the groveless walk: the path beats belong to contact (P1 keeps its
+ * short hold at the stream but has no card: the grove intro sat there), and the exit moves up.
+ */
+export function withoutGrove<B extends BeatSpan>(b: B): B {
+  if (b.section === 'grove') return { ...b, section: 'contact', zone: b.id === 'P1' ? null : b.zone }
+  return { ...b, jvh: shiftRange(b.jvh), hold: b.hold && shiftRange(b.hold) }
+}
+
+export const BEAT_SPANS: readonly BeatSpan[] = GROVE_ON
+  ? FULL_BEAT_SPANS
+  : FULL_BEAT_SPANS.filter((b) => !isGroveBeat(b.id)).map(withoutGrove)
+
 export const BEAT_IDS: readonly BeatId[] = BEAT_SPANS.map((b) => b.id)
 
 export function beatSpanAt(jvh: number): BeatSpan {
@@ -119,11 +203,15 @@ export function beatSpanAt(jvh: number): BeatSpan {
   return BEAT_SPANS.find((b) => clamped >= b.jvh[0] && clamped < b.jvh[1]) ?? (BEAT_SPANS[BEAT_SPANS.length - 1] as BeatSpan)
 }
 
+/** A beat's span. A paused grove beat answers with its full-walk span, so the grove's modules still load. */
 export function beatSpanById(id: BeatId): BeatSpan {
-  const b = BEAT_SPANS.find((x) => x.id === id)
+  const b = BEAT_SPANS.find((x) => x.id === id) ?? FULL_BEAT_SPANS.find((x) => x.id === id)
   if (!b) throw new Error(`unknown beat ${id}`)
   return b
 }
+
+/** The beat is on this walk (false for G0–G4 while the grove is paused). */
+export const onWalk = (id: BeatId) => BEAT_SPANS.some((b) => b.id === id)
 
 /** The beat's hold, or the whole beat when it has none. */
 export const holdOf = (id: BeatId): readonly [number, number] => {
@@ -159,9 +247,17 @@ export const MARKS = {
   castStart: 655,
   /** "Read the chart" smooth-scrolls here. */
   readChart: 742,
-  finaleStart: 935,
-  sealStamp: 985,
+  finaleStart: afterGrove(935),
+  sealStamp: afterGrove(985),
 } as const
+
+/**
+ * The mist wall waits (design.md §8.5 P2): past the reveal, the fog holds at its peak until the scene
+ * the mist opens on is ready. The grove with it on; with it paused, the lantern's scene, through P3.
+ */
+export const MIST_WAIT: { readonly section: SectionId; readonly jvh: readonly [number, number] } = GROVE_ON
+  ? { section: 'grove', jvh: [MARKS.reveal[0], FULL_SECTION_SPANS.grove.jvh[1]] }
+  : { section: 'contact', jvh: MARKS.reveal }
 
 /** Fog above this density counts as cover for quality changes and mount/unmount (§11.1, §11.3). */
 export const FOG_COVER = 0.12
@@ -194,8 +290,8 @@ export const STILLS: Partial<Record<BeatId, number>> = {
   T0: 0,
   C3: 301,
   I1: 360,
-  E1: 909,
-  E3: 1000,
+  E1: afterGrove(909),
+  E3: J,
 }
 
 /** Journey position for a still: the table above, else the middle of the beat's hold (or of the beat). */

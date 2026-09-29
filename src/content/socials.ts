@@ -1,21 +1,22 @@
 /**
  * Social links: the only contact channels (no email, no form). Shown in the hero row,
- * on the stele and in the terminal's `contact` output.
+ * on the signpost's boards and in the terminal's `contact` output.
  */
 
-export type SocialId = 'github' | 'x' | 'linkedin' | 'blog'
+export type SocialId = 'github' | 'x' | 'linkedin'
 
 export interface SocialLink {
   readonly id: SocialId
+  /** The platform, kept for screen readers; the logo stands in for it on screen. */
   readonly label: string
-  /** Visible "shown as" text next to the label. */
+  /** Visible username next to the logo (also cut on its signpost board). */
   readonly display: string
   readonly href: string
   readonly rel: 'me'
 }
 
 export const socials: readonly SocialLink[] = [
-  { id: 'github', label: 'GitHub', display: 'github.com/cylim', href: 'https://github.com/cylim', rel: 'me' },
+  { id: 'github', label: 'GitHub', display: 'cylim', href: 'https://github.com/cylim', rel: 'me' },
   {
     id: 'x',
     label: 'X',
@@ -26,16 +27,8 @@ export const socials: readonly SocialLink[] = [
   {
     id: 'linkedin',
     label: 'LinkedIn',
-    display: 'linkedin.com/in/cylim226',
+    display: 'cylim226',
     href: 'https://www.linkedin.com/in/cylim226',
-    rel: 'me',
-  },
-  {
-    id: 'blog',
-    label: 'Blog',
-    // TODO(owner): cy.my/blog/ is a 2016 Hexo blog with two posts (a separate repo). Keep, repoint or drop?
-    display: 'cy.my/blog',
-    href: 'https://cy.my/blog/',
     rel: 'me',
   },
 ]

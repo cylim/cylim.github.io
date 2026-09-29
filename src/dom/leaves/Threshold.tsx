@@ -3,8 +3,6 @@ import { forest, hero } from '../../content/site'
 import { sealSize } from '../../theme/tokens'
 import { Still } from '../album/Still'
 import { Seal } from '../Seal'
-import { accentGloss } from '../gloss/lookup'
-import { Zh } from '../gloss/Zh'
 import { Leaf, type Cards } from './Leaf'
 import { SocialLinks } from './bits'
 
@@ -32,16 +30,12 @@ const cards: Cards = {
     className: 'card-hero',
     body: (
       <>
-        <div className="hero-mark">
-          <Zh term={accentGloss(hero.accent)} className="hero-accent">
-            <span className="hero-glyph" aria-hidden="true" />
-            <span className="visually-hidden">{hero.accent.zh}</span>
-          </Zh>
+        <div className="hero-title">
+          <h1 id="threshold-heading" tabIndex={-1}>
+            {hero.name}
+          </h1>
           <Seal placement="hero" size={sealSize.hero} className="hero-seal" />
         </div>
-        <h1 id="threshold-heading" tabIndex={-1}>
-          {hero.name}
-        </h1>
         <p className="hero-role">{hero.role}</p>
         <p className="hero-positioning">{hero.positioning}</p>
         <p className="hero-subline">{hero.subline}</p>

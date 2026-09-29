@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { CustomBlending, DoubleSide, OneFactor, OneMinusSrcAlphaFactor, PlaneGeometry, ShaderMaterial, SrcAlphaFactor, ZeroFactor, type Group, type Mesh } from 'three'
 import { postFx, TIERS } from '../../../core/render'
 import { journey } from '../../../core/store/journey'
+import { MIST_WAIT } from '../../../core/world/journey'
 import { terrainHeight } from '../../../core/world/layout'
 import { worldUniforms } from '../../../env'
 import { useDisposeOnUnmount } from '../../shared/lifetime'
@@ -47,7 +48,7 @@ class FogHold {
 
   update(dt: number) {
     const s = journey.getState()
-    const target = mistHoldBoost(s.jvh, s.fogBase, TIERS[s.tier].fogMultiplier, s.ready.grove === true)
+    const target = mistHoldBoost(s.jvh, s.fogBase, TIERS[s.tier].fogMultiplier, s.ready[MIST_WAIT.section] === true)
     if (target === this.boost) return
     const k = 1 - Math.exp(-Math.min(dt, 0.25) / (target > this.boost ? HOLD_RISE : HOLD_FALL))
     const next = Math.abs(target - this.boost) < 1e-4 ? target : this.boost + (target - this.boost) * k

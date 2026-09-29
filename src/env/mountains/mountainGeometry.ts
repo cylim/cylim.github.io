@@ -42,7 +42,7 @@ export const RING_LAYERS: readonly RingLayer[] = [
 function ringRidge(layer: RingLayer, s: number, bearing: number): number {
   const f = fbm1(s / layer.wavelength, layer.seed)
   let h = lerp(layer.low, layer.high, Math.pow(Math.min(1, Math.max(0, (f - 0.25) / 0.55)), 1.4))
-  // The near ring dips in the south, under the main peak, so the peak rises clear of it from the stele
+  // The near ring dips in the south, under the main peak, so the peak rises clear of it from the signpost
   // (E1). Only a little: pushed out to 230 m it sits low under the peak anyway, and a deep dip
   // flattens its crest into a ruled line.
   if (layer.radius < 200) h *= 1 - 0.25 * Math.exp(-(((bearing - 180) / 35) ** 2))
@@ -101,7 +101,7 @@ function band(columns: { x: number; z: number; top: number; s: number; n: Vector
 /**
  * One ridge layer as a closed band facing the ring centre. The southern arc stands further out
  * (`ringStretch`) and its heights scale with its distance from K0, so the threshold's crests keep
- * their elevation while the stele (E0, E1) sees them far off.
+ * their elevation while the signpost (E0, E1) sees them far off.
  */
 export function buildRing(layer: RingLayer): BufferGeometry {
   const [cx, , cz] = mountains.ridgeRing.centre

@@ -26,7 +26,9 @@ import { journey, type JourneyState, type PostGroup } from '../store/journey'
 import {
   BEATS,
   EMERGE,
+  GROVE_ON,
   MARKS,
+  MIST_WAIT,
   RIG,
   SECTION_SPANS,
   beatAt,
@@ -63,10 +65,11 @@ const MIST_HOLD = { rise: 0.2, fall: 0.6 }
 
 /**
  * Design §8.5 P2: "if the grove isn't ready, the fog holds at peak while the DOM keeps scrolling".
- * 1 while the camera is past the reveal and the grove (chunk, glyphs or prewarm) is not ready.
+ * 1 while the camera is past the reveal and the scene the mist opens on (MIST_WAIT.section: the
+ * grove's chunk, glyphs or prewarm; the lantern's while the grove is paused) is not ready.
  */
-export function mistHoldTarget(jvh: number, groveReady: boolean): number {
-  return !groveReady && jvh >= MARKS.reveal[0] && jvh < SECTION_SPANS.grove.jvh[1] ? 1 : 0
+export function mistHoldTarget(jvh: number, revealReady: boolean): number {
+  return !revealReady && jvh >= MIST_WAIT.jvh[0] && jvh < MIST_WAIT.jvh[1] ? 1 : 0
 }
 
 /** The G3 read hold: the plan view the touch zoom and compass mode work in. */
@@ -90,7 +93,7 @@ type CompassFields = Pick<JourneyState, 'jvh' | 'active' | 'mode' | 'compass' | 
  */
 export function compassAction(s: CompassFields, prev: CompassFields): CompassAction {
   const none = { glideTo: null, off: false }
-  if (s.mode !== 'immersive' || s.compass.status !== 'active') return none
+  if (!GROVE_ON || s.mode !== 'immersive' || s.compass.status !== 'active') return none
   if (s.active !== 'grove') return { glideTo: null, off: true }
   if (prev.compass.status === 'active' || s.dive.phase !== 'idle') return none
   const [g0, g1] = SECTION_SPANS.grove.jvh
@@ -286,7 +289,7 @@ export class Rig {
     } else if (snap) this.fog.lag = lagTarget
     else moving = damp(this.fog, 'lag', lagTarget, lagTarget > this.fog.lag ? c.rise : c.fall, dt) || moving
 
-    const holdTarget = mistHoldTarget(jvh, s.ready.grove === true)
+    const holdTarget = mistHoldTarget(jvh, s.ready[MIST_WAIT.section] === true)
     if (s.e2e || snap) this.fog.hold = holdTarget
     else if (this.fog.hold !== holdTarget) {
       damp(this.fog, 'hold', holdTarget, holdTarget > this.fog.hold ? MIST_HOLD.rise : MIST_HOLD.fall, dt)

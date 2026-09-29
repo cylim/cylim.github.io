@@ -72,6 +72,7 @@
   --z-terminal-overlay: 22;
   --z-veil: 30;
   --z-title-card: 31;
+  --z-intro: 35;
   --z-header: 40;
   --z-bottom-bar: 40;
   --z-sheet: 45;
@@ -105,6 +106,8 @@
   --dur-seal-press: 120ms;
   --dur-seal-bleed: 400ms;
   --dur-scroll-cue: 3000ms;
+  --dur-intro-brush: 1100ms;
+  --dur-intro-out: 600ms;
   --dur-terminal-settle: 120ms;
   --dur-caret: 1200ms;
   --dur-sound-wave: 500ms;

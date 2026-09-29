@@ -1,4 +1,4 @@
-import { MARKS } from '../../core/world/journey'
+import { MARKS, afterGrove } from '../../core/world/journey'
 import { breakpoint, layout } from '../../theme/tokens'
 
 /**
@@ -11,8 +11,8 @@ import { breakpoint, layout } from '../../theme/tokens'
  *   at once. Scrolling back never unstamps.
  */
 export const FINALE = {
-  /** Mount panels in from here (jvh); the camera faces north by about 960. */
-  mountOpenAt: 968,
+  /** Mount panels in from here (jvh); the camera faces north by about 960 (full walk; `afterGrove`). */
+  mountOpenAt: afterGrove(968),
   /** The DOM slides the panels over 900 ms (walk.css .mount); scissor only once they cover the sides. */
   mountSlideMs: 900,
   /** E3 arrival → the colophon starts writing. */

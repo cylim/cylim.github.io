@@ -14,7 +14,7 @@ const CUN_CLASS: Record<CunClass, number> = { hero: 0, stone: 1, earth: 2 }
 export interface InkMaterialOptions {
   /** Ink weight 0 (清) to 1 (焦). Instanced meshes multiply it per instance with the `iInk` attribute. Default 0.8. */
   inkWeight?: number
-  /** 皴 strokes on the shaded side: 'axe' (斧劈, rock, peak, stele) or 'hemp' (披麻, earth banks). */
+  /** 皴 strokes on the shaded side: 'axe' (斧劈, rock, peak, stones) or 'hemp' (披麻, earth banks, timber grain). */
   cun?: 'axe' | 'hemp'
   /** Which tiers draw the strokes. Default 'stone'. */
   cunClass?: CunClass
@@ -33,6 +33,13 @@ export interface InkMaterialOptions {
   needles?: boolean
   /** Hero pines: full 鳞皴 Voronoi bark on wood (`rim` < 0), reading `uv` as (around 0..1, up in metres). */
   bark?: boolean
+  /**
+   * How much of the lantern's warm term the material takes, 0..1: the tint and the lift of lit
+   * faces within 6 m to the halo's hue. Default 1 (near trunks turn amber). A dark prop right
+   * beside the lantern that must stay ink toned (the signpost's timber) takes less, so it stays
+   * under the ink pass's accent threshold and reads as faintly warm, not as a colour.
+   */
+  lanternWarmth?: number
   /** Render both faces (normals flip on back faces). Default true: most ink props are thin or open. */
   doubleSided?: boolean
   name?: string
@@ -98,6 +105,7 @@ export function createInkMaterial(opts: InkMaterialOptions = {}): InkMaterial {
   if (opts.ragged) defines.INK_RAGGED = ''
   if (opts.needles) defines.INK_NEEDLES = ''
   if (opts.bark) defines.INK_BARK = ''
+  if (opts.lanternWarmth !== undefined) defines.LANTERN_WARMTH = opts.lanternWarmth.toFixed(3)
 
   const own: InkMaterialUniforms = {
     uInkWeight: { value: opts.inkWeight ?? 0.8 },

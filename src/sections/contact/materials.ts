@@ -28,7 +28,7 @@ import uvVert from './glsl/uv.vert.glsl'
  * stay ours to write each frame.
  *
  * The stored alpha matters: the ink pass reads alpha < 0.5 as "leave this pixel alone" (the cabin
- * interior flag, core/render/post/interior.ts). The pool and the carving keep it at 1 (alpha takes
+ * interior flag, core/render/post/interior.ts). The pool and the board carving keep it at 1 (alpha takes
  * Zero·src + One·dst). The flame clears it where its body is solid (One−srcAlpha·dst): seen through
  * the chamber's openings there is nothing near behind it, and the fog would erase it to paper.
  */
@@ -81,18 +81,19 @@ export type PoolMaterial = ReturnType<typeof createPoolMaterial>
 type Vec4 = readonly [number, number, number, number]
 
 export function createCarvedMaterial(map: Texture, texel: readonly [number, number], rowV0: Vec4, rowV1: Vec4) {
-  const mat = blended('stele-carving', uvVert, carvedFrag, {
+  const mat = blended('signpost-carving', uvVert, carvedFrag, {
     uMap: { value: map },
     uTexel: { value: new Vector2(...texel) },
     uLight: { value: new Vector3(...PAINTER_LIGHT).normalize() },
     uInk: { value: new Color(color.inkJiao) },
     uLit: { value: new Color(color.paperLight) },
     uWarm: { value: new Color(color.lanternHalo) },
+    uGrain: { value: 0.4 },
     uRowV0: { value: new Vector4(...rowV0) },
     uRowV1: { value: new Vector4(...rowV1) },
     uGlow: { value: new Vector4() },
   })
-  // The face plane sits a few millimetres proud of the stone; pull it forward in depth as well.
+  // The face overlay sits a few millimetres proud of the boards; pull it forward in depth as well.
   mat.polygonOffset = true
   mat.polygonOffsetFactor = -2
   mat.polygonOffsetUnits = -2

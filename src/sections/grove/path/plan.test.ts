@@ -1,5 +1,5 @@
 import { Vector3 } from 'three'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { buildCameraPath } from '../../../core/camera/path'
 import { beatById, MARKS, SECTION_SPANS } from '../../../core/world/journey'
 import { KEEP_OUTS, inKeepOut, pathZone, type Vec3 } from '../../../core/world/layout'
@@ -16,6 +16,10 @@ import {
   veilOpacity,
   VEILS,
 } from './plan'
+
+// The full walk, grove included: these tests pin the design tables and the grove's code, whatever
+// content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
+vi.mock('../../../content/features', () => ({ features: { grove: true } }))
 
 const { centreZ, width } = pathZone.stream
 const bankZ = centreZ - width / 2

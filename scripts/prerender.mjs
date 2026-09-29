@@ -26,14 +26,18 @@ const ssrPath = pathToFileURL(resolve(flag('ssr', resolve(repo, 'dist-ssr')), 'e
 
 const SLOT = '<!--content-->'
 
-const { render } = await import(ssrPath.href)
+const { render, features } = await import(ssrPath.href)
 const html = await readFile(htmlPath, 'utf8')
 if (!html.includes(SLOT)) throw new Error(`prerender: ${SLOT} not found in dist/index.html (already prerendered?)`)
 
 const body = render()
 if (typeof body !== 'string' || body.length < 1000) throw new Error('prerender: render() returned too little markup')
-for (const must of ['id="threshold-heading"', 'CY Lim', 'https://github.com/cylim', 'id="content"', 'id="grove-heading"']) {
+for (const must of ['id="threshold-heading"', 'CY Lim', 'https://github.com/cylim', 'id="content"', 'id="contact-heading"']) {
   if (!body.includes(must)) throw new Error(`prerender: output is missing ${must}`)
+}
+// The grove section is there exactly when it is on (src/content/features.ts).
+if (body.includes('id="grove-heading"') !== Boolean(features?.grove)) {
+  throw new Error(`prerender: the grove section should be ${features?.grove ? 'on' : 'off'} (src/content/features.ts)`)
 }
 
 const out = html.replace(SLOT, body)

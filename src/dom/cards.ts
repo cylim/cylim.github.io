@@ -1,4 +1,5 @@
-import { MARKS, beatSpanById, holdOf, type BeatId } from '../core/world/beats'
+import { J, MARKS, beatSpanById, holdOf, type BeatId } from '../core/world/beats'
+import { features } from '../content/features'
 
 /**
  * When each copy card shows in the immersive walk (design.md §6.1, §6.4, §8). Pure data plus the
@@ -28,7 +29,7 @@ export interface CardSpec {
 
 const FADE = 6
 
-export const CARDS: readonly CardSpec[] = [
+const ALL_CARDS: readonly CardSpec[] = [
   // Hero holds 0–35 and fades out 40–65 while the camera steps in.
   { beat: 'T0', zone: 'L', show: [0, MARKS.heroFadeOut[0]], fade: [0, MARKS.heroFadeOut[1] - MARKS.heroFadeOut[0]] },
   { beat: 'F1', zone: 'L', show: holdOf('F1'), fade: [FADE, FADE] },
@@ -45,10 +46,15 @@ export const CARDS: readonly CardSpec[] = [
   { beat: 'P1', zone: 'R', show: holdOf('P1'), fade: [4, FADE] },
   { beat: 'G1', zone: 'L', show: holdOf('G1'), fade: [FADE, 3], underInscription: true },
   { beat: 'G3', zone: 'panel', show: holdOf('G3'), fade: [2, 2] },
-  // The stele card stays through E2; at E3 it moves onto the right mount (css: html[data-beat=E3]).
-  { beat: 'E1', zone: 'L', show: [holdOf('E1')[0], 1000], fade: [FADE, 0], trackJvh: 1000 - beatSpanById('E1').jvh[0], underInscription: true },
+  // The contact card stays through E2; at E3 it moves onto the right mount (css: html[data-beat=E3]).
+  { beat: 'E1', zone: 'L', show: [holdOf('E1')[0], J], fade: [FADE, 0], trackJvh: J - beatSpanById('E1').jvh[0], underInscription: true },
   { beat: 'E3', zone: 'mount', show: holdOf('E3'), fade: [4, 0] },
 ]
+
+/** The grove's cards: its intro by the stream, the seat and the chart panel. Gone while it is paused. */
+const GROVE_CARDS: ReadonlySet<BeatId> = new Set(['P1', 'G1', 'G3'])
+
+export const CARDS: readonly CardSpec[] = features.grove ? ALL_CARDS : ALL_CARDS.filter((c) => !GROVE_CARDS.has(c.beat))
 
 export const cardByBeat = (id: BeatId): CardSpec | undefined => CARDS.find((c) => c.beat === id)
 
