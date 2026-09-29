@@ -9,11 +9,13 @@ const ci = !!process.env.CI
 
 export default defineConfig({
   testDir: 'tests/e2e',
-  // SwiftShader compiles the ink shaders on the CPU, so the first stage mount is slow.
-  timeout: 60_000,
+  // SwiftShader compiles the ink shaders on the CPU, so the first stage mount is slow. GitHub's
+  // 2-core runners are several times slower than a dev machine, and two software-GL browsers in
+  // parallel starve each other: CI runs one worker with a longer budget.
+  timeout: ci ? 180_000 : 60_000,
   forbidOnly: ci,
   retries: ci ? 1 : 0,
-  workers: ci ? 2 : undefined,
+  workers: ci ? 1 : undefined,
   reporter: ci ? [['list'], ['html', { open: 'never' }]] : 'list',
   webServer: {
     command: 'npm run preview',

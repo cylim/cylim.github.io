@@ -34,7 +34,7 @@ export async function booted(page: Page): Promise<void> {
 }
 
 /** Waits for `window.__cy.settled`: no dive running and the active section ready (?e2e=1 only). */
-export async function settled(page: Page, timeout = 30_000): Promise<void> {
+export async function settled(page: Page, timeout = process.env.CI ? 120_000 : 30_000): Promise<void> {
   await page.waitForFunction(() => window.__cy?.settled === true, null, { timeout })
 }
 
