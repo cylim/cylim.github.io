@@ -10,9 +10,9 @@ import { features } from './features.ts'
 
 export const meta = {
   title: 'CY Lim, software engineer in Penang',
-  // Two variants: with the grove on the walk, and while it is paused (content/features.ts). The
-  // build writes whichever is live into index.html (vite.config.ts `metaCopy`).
-  description: features.grove
+  // Two variants: with the grove on the map (on the walk or a detour), and while it is off
+  // (content/features.ts). The build writes whichever is live into index.html (vite.config.ts `metaCopy`).
+  description: features.grove !== 'off'
     ? 'Software engineer in Penang, Malaysia, shipping since 2017. I build React and TypeScript web apps, web3 frontends and mobile apps for clients, and practise fengshui and Qimen Dunjia.'
     : 'Software engineer in Penang, Malaysia, shipping since 2017. I build React and TypeScript web apps, web3 frontends and mobile apps for clients, and practise fengshui.',
   canonical: 'https://cy.my/',
@@ -22,7 +22,7 @@ export const meta = {
   pinterestVerify: '006fe72c99b1a79d71240d11c25793aa',
   og: {
     title: 'CY Lim · A walk into the mist',
-    description: features.grove
+    description: features.grove !== 'off'
       ? 'Walk through an ink-wash forest. My work hangs in a cabin, a live Qimen Dunjia chart waits in a grove, and a signpost at the end of the path shows where to find me.'
       : 'Walk through an ink-wash forest. My work hangs in a cabin, and a signpost at the end of the path shows where to find me.',
     type: 'website',

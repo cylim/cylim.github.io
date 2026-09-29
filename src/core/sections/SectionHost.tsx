@@ -74,6 +74,11 @@ export function SectionHost({ def }: { def: SectionDefinition }) {
   if (isNear && !mounted) setMounted(true)
   if (mounted && canDrop) setMounted(false)
 
+  // The grove scene is a different scene on each walk (the path alone, or the path and the chart). A
+  // detour joining the grove walk remounts it, so it suspends on the chart and prewarms again; the
+  // join has already dropped ready.grove (core/scroll/dive.ts).
+  const generation = useJourney((s) => (def.id === 'grove' && s.groveWalk ? 'walk' : 'base'))
+
   const group = useRef<Group>(null)
   useEffect(() => {
     if (!mounted) return
@@ -85,7 +90,7 @@ export function SectionHost({ def }: { def: SectionDefinition }) {
   return (
     <Activity mode={isNear ? 'visible' : 'hidden'}>
       <group ref={group} name={`section:${def.id}`}>
-        <SceneBoundary id={def.id}>
+        <SceneBoundary key={generation} id={def.id}>
           <Suspense fallback={null}>
             <def.Scene id={def.id} />
             <Prewarm id={def.id} target={group} />

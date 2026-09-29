@@ -4,7 +4,7 @@ import { channelKeys, sampleScalar } from '../world/journey'
 
 // The full walk, grove included: these tests pin the design tables and the grove's code, whatever
 // content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
-vi.mock('../../content/features', () => ({ features: { grove: true } }))
+vi.mock('../../content/features', () => ({ features: { grove: 'walk' } }))
 
 const DEG = Math.PI / 180
 const desktop = { width: 1280, height: 720, header: 0 }

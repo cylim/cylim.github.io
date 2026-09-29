@@ -14,8 +14,8 @@ export const terminal = {
   inputAriaLabel: 'Cabin terminal. Type a command and press Enter.',
   placeholder: "type 'help'",
   /** Mobile command chips above the input (design.md §10.2). `stack` stands in for `qimen` while the
-   * grove is paused (content/features.ts). */
-  chips: ['help', 'whoami', 'services', 'projects', features.grove ? 'qimen' : 'stack', 'contact'],
+   * grove is off (content/features.ts). */
+  chips: ['help', 'whoami', 'services', 'projects', features.grove !== 'off' ? 'qimen' : 'stack', 'contact'],
   /** With JavaScript off the section shows these commands' output as a static transcript. */
   staticTranscript: ['whoami', 'contact'],
   /** Delay before a `navigate` action dives. */

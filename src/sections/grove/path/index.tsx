@@ -1,4 +1,4 @@
-import { features } from '../../../content/features'
+import { useJourney } from '../../../core/store/journey'
 import { Bamboo } from './Bamboo'
 import { MistWall } from './MistWall'
 import { StandingStones, SteppingStones } from './Stones'
@@ -13,20 +13,21 @@ import { Stream } from './Stream'
  * - P2: the mist wall. Paper sheets turn near trees into ghosts; if the grove is not ready the fog
  *   holds at its peak through postFx.fogBoost (released on unmount or when hidden).
  * - P3: the mist parts; two curtains rise past the crest, and the standing stones mark the entrance.
- *   With the grove paused (content/features.ts) the camera cuts from the wall to the lantern at
+ *   With the grove off the walk (content/features.ts) the camera cuts from the wall to the lantern at
  *   628, so the standing stones, which mark an entrance to nothing, stay out.
  *
  * Draw calls: ripples, two stone groups and the bamboo are one each; veils show only while ahead
  * of the camera and within 18 m (13 m on low), so at most four at a time.
  */
 export function GrovePath() {
+  const groveWalk = useJourney((s) => s.groveWalk)
   return (
     <group name="grove-path">
       <Stream />
       <SteppingStones />
       <Bamboo />
       <MistWall />
-      {features.grove && <StandingStones />}
+      {groveWalk && <StandingStones />}
     </group>
   )
 }

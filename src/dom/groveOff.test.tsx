@@ -7,13 +7,13 @@ import { Header } from './chrome/Header'
 import { Progress } from './chrome/Progress'
 import { runCommand, type RunContext } from './terminal/commands'
 
-// The DOM with the grove paused, whatever content/features.ts says today (cards.test.ts and the
-// rest pin the grove-on walk).
-vi.mock('../content/features', () => ({ features: { grove: false } }))
+// The DOM on the walk without the grove, as a detour starts it, whatever content/features.ts says
+// today (cards.test.ts and the rest pin the grove-on walk).
+vi.mock('../content/features', () => ({ features: { grove: 'detour' } }))
 
 const ctx: RunContext = { now: () => 0, random: () => 0, qimen: () => null }
 
-describe('the DOM with the grove paused (content/features.ts)', () => {
+describe('the DOM without the grove on the walk (a detour, content/features.ts)', () => {
   it('has no grove cards, and the contact card runs to the end of the shorter walk', () => {
     expect(CARDS.some((c) => c.beat === 'G1' || c.beat === 'G3' || c.beat === 'P1')).toBe(false)
     const e1 = CARDS.find((c) => c.beat === 'E1')
@@ -27,20 +27,20 @@ describe('the DOM with the grove paused (content/features.ts)', () => {
     expect(inscriptionAt(700)).toBe('contact')
   })
 
-  it('shows Work and Contact in the nav, and three progress ticks', () => {
+  it('keeps Grove in the nav, with three progress ticks for the three places on the walk', () => {
     const header = renderToString(<Header />)
-    expect(header).not.toContain('#grove')
+    expect(header).toContain('#grove')
     expect(header).toContain('#cabin')
     expect(header).toContain('#contact')
     const ticks = renderToString(<Progress />).match(/progress-tick/g) ?? []
     expect(ticks).toHaveLength(3)
   })
 
-  it('keeps qimen and grove typable but out of help; grove walks on to the lantern', () => {
+  it('offers qimen and grove in help; grove and exit take the detour to the grove', () => {
     const help = runCommand('help', ctx).lines.map((l) => l.text).join('\n')
-    expect(help).not.toMatch(/qimen|grove/i)
-    const r = runCommand('grove', ctx)
-    expect(r.navigate).toBe('#contact')
-    expect(runCommand('exit', ctx).navigate).toBe('#contact')
+    expect(help).toMatch(/qimen/)
+    expect(help).toMatch(/grove/)
+    expect(runCommand('grove', ctx).navigate).toBe('#grove')
+    expect(runCommand('exit', ctx).navigate).toBe('#grove')
   })
 })

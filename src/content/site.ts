@@ -61,8 +61,11 @@ const allNav: readonly NavItem[] = [
   },
 ]
 
-/** The nav, desktop header and mobile bar alike: no Grove while the grove is paused (content/features.ts). */
-export const nav: readonly NavItem[] = allNav.filter((item) => item.id !== 'grove' || features.grove)
+/**
+ * The nav, desktop header and mobile bar alike. Grove is there while it is on the map, on the walk or
+ * as a detour; not while it is off (content/features.ts).
+ */
+export const nav: readonly NavItem[] = allNav.filter((item) => item.id !== 'grove' || features.grove !== 'off')
 
 // ---------------------------------------------------------------------------- hero (content.md §2, design.md §8.1)
 
@@ -80,8 +83,8 @@ export const hero = {
   role: 'Full stack software engineer in Penang, Malaysia.',
   positioningOptions,
   positioning: positioningOptions[3],
-  /** Two variants: with the grove on the walk, and while it is paused (content/features.ts). */
-  subline: features.grove
+  /** Two variants: with the grove on the map (on the walk or a detour), and while it is off (content/features.ts). */
+  subline: features.grove !== 'off'
     ? 'Walk in. My work hangs in the cabin, the grove holds a live Qimen chart for this hour, and a signpost at the end of the path shows where to find me.'
     : 'Walk in. My work hangs in the cabin, and a signpost at the end of the path shows where to find me.',
   // TODO(owner): e.g. 'Taking on a small number of freelance projects.' Only if true. Hidden while null.

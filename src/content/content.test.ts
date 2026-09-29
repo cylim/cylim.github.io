@@ -37,14 +37,14 @@ describe('owner defaults (design.md §18.1)', () => {
     expect(hero.showSocialRow).toBe(true)
   })
 
-  it.runIf(features.grove)('nav reads Work / Grove / Contact with 木屋 / 九宫 / 石灯', () => {
+  it.runIf(features.grove !== 'off')('nav reads Work / Grove / Contact with 木屋 / 九宫 / 石灯', () => {
     const places = nav.filter((n) => n.id !== 'threshold')
     expect(places.map((n) => n.label)).toEqual(['Work', 'Grove', 'Contact'])
     expect(places.map((n) => n.accent.zh)).toEqual(['木屋', '九宫', '石灯'])
     expect(places.map((n) => n.href)).toEqual(['#cabin', '#grove', '#contact'])
   })
 
-  it.runIf(!features.grove)('nav reads Work / Contact with 木屋 / 石灯 while the grove is paused', () => {
+  it.runIf(features.grove === 'off')('nav reads Work / Contact with 木屋 / 石灯 while the grove is off', () => {
     const places = nav.filter((n) => n.id !== 'threshold')
     expect(places.map((n) => n.label)).toEqual(['Work', 'Contact'])
     expect(places.map((n) => n.accent.zh)).toEqual(['木屋', '石灯'])

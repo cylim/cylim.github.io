@@ -39,8 +39,9 @@ export const stills: Readonly<Record<StillId, Still>> = {
   },
   E3: {
     id: 'E3',
-    // Two variants: with the grove on the walk, and while it is paused (content/features.ts).
-    alt: features.grove
+    // Two variants: with the grove on the map (the painting shows its rings), and while it is off
+    // (content/features.ts).
+    alt: features.grove !== 'off'
       ? 'The whole walk seen from above as one hanging scroll: the lantern, the stone rings of the grove, the cabin and the forest edge.'
       : 'The whole walk seen from above as one hanging scroll: the lantern, the old pines in the mist, the cabin and the forest edge.',
   },

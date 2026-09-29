@@ -277,7 +277,7 @@ export const BAMBOO_BOUNDS: { readonly centre: Vec3; readonly radius: number } =
  * Extra fog density (after the tier multiplier) that holds the mist wall at its peak while the
  * grove is not ready: "the mist waits for you" (§8.5 P2). Before the reveal the beat fog is still
  * climbing, so nothing is added there; from the reveal on it holds the peak until the grove is
- * ready or the walk leaves the grove. With the grove paused it waits for the lantern's scene
+ * ready or the walk leaves the grove. With the grove off the walk it waits for the lantern's scene
  * through P3 instead (MIST_WAIT).
  */
 export function mistHoldBoost(jvh: number, fogBase: number, fogMultiplier: number, revealReady: boolean): number {

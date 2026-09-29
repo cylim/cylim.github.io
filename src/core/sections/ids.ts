@@ -1,19 +1,29 @@
-import { features } from '../../content/features'
+import { groveOnWalk, groveReachable, onWalkChange } from '../world/walk'
 
 /** The four scroll sections, in walk order. Canonical; everything else imports from here. */
 export const SECTION_IDS = ['threshold', 'cabin', 'grove', 'contact'] as const
 
 export type SectionId = (typeof SECTION_IDS)[number]
 
-/**
- * The sections this walk has, in order: SECTION_IDS without a paused one (content/features.ts). The
- * DOM sections, nav, hashes, progress ticks and `active` use these. Scenes still load for all four:
- * with the grove paused its chunk draws the path through the mist wall.
- */
-export const WALK_SECTION_IDS: readonly SectionId[] = SECTION_IDS.filter((id) => id !== 'grove' || features.grove)
+const buildWalkSectionIds = (): readonly SectionId[] => SECTION_IDS.filter((id) => id !== 'grove' || groveOnWalk())
 
-/** Where a link to a paused section lands instead: the grove's hash goes on to the lantern. */
-export const walkSection = (id: SectionId): SectionId => (WALK_SECTION_IDS.includes(id) ? id : 'contact')
+/**
+ * The sections this walk has, in order: SECTION_IDS without the grove while it is off the walk
+ * (core/world/walk.ts). The DOM sections, progress ticks and `active` use these. Scenes still load
+ * for all four: without the grove its chunk draws the path through the mist wall. A live binding,
+ * reassigned when a detour joins the grove walk.
+ */
+export let WALK_SECTION_IDS = buildWalkSectionIds()
+
+onWalkChange(() => {
+  WALK_SECTION_IDS = buildWalkSectionIds()
+})
+
+/**
+ * Where a link to a section lands. The grove is always itself while it is reachable, on the walk or a
+ * detour (the dive joins the walk); only a grove that is off sends its links on to the lantern.
+ */
+export const walkSection = (id: SectionId): SectionId => (id !== 'grove' || groveReachable() ? id : 'contact')
 
 /** URL hash per section. The threshold has none: its canonical URL is the bare path. */
 export const SECTION_HASH = {
@@ -31,7 +41,7 @@ export function isSectionId(value: unknown): value is SectionId {
 
 /**
  * Map a location hash to a section. Unknown or empty hashes are the threshold;
- * `#threshold` is accepted as an alias (design.md §6.2). A paused section's hash lands on `walkSection`.
+ * `#threshold` is accepted as an alias (design.md §6.2). An off grove's hash lands on `walkSection`.
  */
 export function sectionFromHash(hash: string): SectionId {
   const id = hash.replace(/^#/, '')

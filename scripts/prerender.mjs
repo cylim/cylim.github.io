@@ -35,9 +35,11 @@ if (typeof body !== 'string' || body.length < 1000) throw new Error('prerender: 
 for (const must of ['id="threshold-heading"', 'CY Lim', 'https://github.com/cylim', 'id="content"', 'id="contact-heading"']) {
   if (!body.includes(must)) throw new Error(`prerender: output is missing ${must}`)
 }
-// The grove section is there exactly when it is on (src/content/features.ts).
-if (body.includes('id="grove-heading"') !== Boolean(features?.grove)) {
-  throw new Error(`prerender: the grove section should be ${features?.grove ? 'on' : 'off'} (src/content/features.ts)`)
+// The grove section is prerendered exactly when it is on the walk (src/content/features.ts): a detour
+// grove is rendered by the client when a dive joins it, and an off grove not at all.
+const groveOnWalk = features?.grove === 'walk'
+if (body.includes('id="grove-heading"') !== groveOnWalk) {
+  throw new Error(`prerender: the grove section should be ${groveOnWalk ? 'in' : 'out of'} the page (src/content/features.ts grove: ${features?.grove})`)
 }
 
 const out = html.replace(SLOT, body)

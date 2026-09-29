@@ -108,27 +108,27 @@
     "E3": [
       {
         "file": "E3-1600.avif",
-        "bytes": 67677
+        "bytes": 61896
       },
       {
         "file": "E3-1600.webp",
-        "bytes": 91506
+        "bytes": 83828
       },
       {
         "file": "E3-800.avif",
-        "bytes": 18615
+        "bytes": 17423
       },
       {
         "file": "E3-800.webp",
-        "bytes": 26310
+        "bytes": 24532
       },
       {
         "file": "E3-portrait-800.avif",
-        "bytes": 51893
+        "bytes": 49071
       },
       {
         "file": "E3-portrait-800.webp",
-        "bytes": 69940
+        "bytes": 66238
       }
     ]
   }

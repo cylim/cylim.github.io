@@ -7,10 +7,10 @@ import { features } from './features'
 import { contactOutput, whoamiOutput } from './terminal'
 
 /**
- * `help` lines for the grove's two commands. While the grove is paused (content/features.ts) they are
+ * `help` lines for the grove's two commands. While the grove is off (content/features.ts) they are
  * hidden and left out of `help` and `ls`, but still answer when typed.
  */
-const groveHelp: readonly string[] = features.grove ? ['qimen      cast a Qimen chart for right now', 'grove      walk on to the grove'] : []
+const groveHelp: readonly string[] = features.grove !== 'off' ? ['qimen      cast a Qimen chart for right now', 'grove      walk on to the grove'] : []
 
 export type TerminalAction =
   | { readonly type: 'print' }
@@ -152,7 +152,7 @@ export const terminalCommands: readonly TerminalCommand[] = [
   {
     name: 'qimen',
     description: 'cast a Qimen chart for right now',
-    hidden: !features.grove,
+    hidden: features.grove === 'off',
     output: [],
     action: { type: 'dynamic', id: 'qimen' },
   },
@@ -160,10 +160,11 @@ export const terminalCommands: readonly TerminalCommand[] = [
     name: 'grove',
     aliases: ['cd grove', 'exit', 'logout'],
     description: 'walk on to the grove',
-    hidden: !features.grove,
+    hidden: features.grove === 'off',
     output: ['You step out of the cabin. The mist closes behind you.'],
-    // Paused, the grove's link lands on the lantern (core/sections/ids.ts walkSection).
-    action: { type: 'navigate', hash: features.grove ? '#grove' : '#contact' },
+    // As a detour the dive joins the grove walk; off, the grove's link lands on the lantern
+    // (core/sections/ids.ts walkSection).
+    action: { type: 'navigate', hash: features.grove !== 'off' ? '#grove' : '#contact' },
   },
   {
     name: 'clear',
@@ -210,7 +211,7 @@ export const terminalCommands: readonly TerminalCommand[] = [
     name: 'ls',
     description: '',
     hidden: true,
-    output: [features.grove ? 'services  projects  stack  timeline  contact  qimen  .mist' : 'services  projects  stack  timeline  contact  .mist'],
+    output: [features.grove !== 'off' ? 'services  projects  stack  timeline  contact  qimen  .mist' : 'services  projects  stack  timeline  contact  .mist'],
     action: { type: 'print' },
   },
   {

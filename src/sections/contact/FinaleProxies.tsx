@@ -17,7 +17,7 @@ import { mergeFlat } from './lanternGeometry'
  * speck of cyan, the forest edge, the ridges. From 90 and 180 m these are a few dozen pixels wide,
  * so a roofed box and flat annuli carry them. Shown only while the real section is hidden. They
  * mount visible so SectionHost's prewarm compiles them (compile skips hidden objects); the first
- * frame hides them. With the grove paused (content/features.ts) there is no grove stand-in: the
+ * frame hides them. With the grove off (content/features.ts) there is no grove stand-in: the
  * painting shows the old pines and the mist over their clearing.
  */
 
@@ -98,7 +98,7 @@ export function FinaleProxies() {
       <group ref={cabinRef} name="cabin-far">
         <mesh geometry={parts.cabinGeo} material={parts.cabinMat} />
       </group>
-      {features.grove && (
+      {features.grove !== 'off' && (
         <group ref={groveRef} name="grove-far">
           <mesh geometry={parts.darkGeo} material={parts.darkMat} />
           <mesh geometry={parts.stoneGeo} material={parts.stoneMat} />

@@ -7,6 +7,7 @@ import type { JourneyState } from '../core/store/journey'
 import { J, MARKS } from '../core/world/beats'
 import { channelKeys, sampleScalar, type Key } from '../core/world/journey'
 import { pathZone, type Vec3 } from '../core/world/layout'
+import { onWalkChange } from '../core/world/walk'
 import { smoothstep } from './dsp'
 import { BED_EDGE, BED_SPANS, CRACKLE_RISE, CUTOFF, GRIND_FULL_SPEED, HUM_THROUGH_DOOR, LEVEL, SILENCE_AFTER_SEAL, WIND_INSIDE, dbToGain, type Span } from './cues'
 
@@ -69,10 +70,17 @@ const doorOpen = (jvh: number) => clamp01((jvh - MARKS.doorSwing[0]) / (MARKS.do
 // place a sound, and it follows any retuning of the path.
 const track = (channel: 'pos' | 'look', axis: 0 | 2): Key<number>[] =>
   channelKeys(channel).map((k: Key<Vec3>) => ({ at: k.at, v: k.v[axis], ...(k.cut ? { cut: k.cut } : {}) }))
-const posX = track('pos', 0)
-const posZ = track('pos', 2)
-const lookX = track('look', 0)
-const lookZ = track('look', 2)
+let posX = track('pos', 0)
+let posZ = track('pos', 2)
+let lookX = track('look', 0)
+let lookZ = track('look', 2)
+// A detour joining the grove walk moves the camera keys (core/world/walk.ts).
+onWalkChange(() => {
+  posX = track('pos', 0)
+  posZ = track('pos', 2)
+  lookX = track('look', 0)
+  lookZ = track('look', 2)
+})
 const STONES = { x: (pathZone.steppingStones.x0 + pathZone.steppingStones.x1) / 2, z: pathZone.steppingStones.z }
 /** Metres at which the stones' pan is halved. */
 const STREAM_NEAR = 3

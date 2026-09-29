@@ -26,11 +26,12 @@ import { buildModel, type ChartModel } from './model'
 import { ChartMotion } from './motion'
 
 const G4_START = beatSpanById('G4').jvh[0]
-const GROVE_END = SECTION_SPANS.grove.jvh[1]
+/** Where the grove section ends on this walk. Per call: a detour can join the grove walk. */
+const groveEnd = () => SECTION_SPANS.grove.jvh[1]
 
 /** The board is in view: past the mist wall, before the glide to the lantern, not under paper. */
 export function chartOnScreen(s: Pick<JourneyState, 'jvh' | 'dive' | 'paper'>): boolean {
-  return s.jvh >= MARKS.reveal[0] && s.jvh < GROVE_END && s.dive.amount < 0.5 && s.paper < 0.5
+  return s.jvh >= MARKS.reveal[0] && s.jvh < groveEnd() && s.dive.amount < 0.5 && s.paper < 0.5
 }
 
 /** The grove's chart clock: casting, stepping (hour marker) and the live recast timing, as the DOM chart has it. */
@@ -151,7 +152,7 @@ export class Director {
     const s = journey.getState()
     const t = now()
 
-    if (this.cast === 'waiting' && s.jvh >= MARKS.castStart && s.jvh < GROVE_END && s.dive.amount < 0.5) {
+    if (this.cast === 'waiting' && s.jvh >= MARKS.castStart && s.jvh < groveEnd() && s.dive.amount < 0.5) {
       journey.setState({ groveCastPlayed: true })
       this.freeze = frozenCastAt(s.e2e)
       const skip = (s.reducedMotion || s.e2e) && this.freeze === null

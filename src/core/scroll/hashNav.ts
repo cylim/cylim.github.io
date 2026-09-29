@@ -14,7 +14,8 @@ import { SECTION_SPANS } from '../world/beats'
 
 /**
  * The section a hash names, or null for hashes that aren't sections. '' and '#threshold' are the
- * threshold. A paused section's hash (#grove while the grove is paused) names where it lands instead.
+ * threshold. An off grove's hash names where it lands instead (the lantern). A detour grove's hash
+ * is the grove: the dive joins the grove walk (dive.ts).
  */
 export function sectionOfHash(hash: string): SectionId | null {
   const id = hash.replace(/^#/, '')
@@ -93,7 +94,7 @@ export function initHashNav(): () => void {
 
   if (location.hash === '#threshold') history.replaceState(history.state, '', sectionUrl(''))
   const id = location.hash ? sectionOfHash(location.hash) : null
-  // A deep link to a paused section (#grove): the URL names where it lands.
+  // A deep link to an off grove: the URL names where it lands.
   if (id && location.hash !== SECTION_HASH[id] && id !== 'threshold') history.replaceState(history.state, '', sectionUrl(SECTION_HASH[id]))
   if (id && id !== 'threshold') {
     journey.setState({ active: id })

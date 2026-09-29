@@ -16,7 +16,7 @@ import { SECTION_IDS } from '../sections/ids'
 
 // The full walk, grove included: these tests pin the design tables and the grove's code, whatever
 // content/features.ts says (the live, groveless walk is covered by core/world/groveOff.test.ts).
-vi.mock('../../content/features', () => ({ features: { grove: true } }))
+vi.mock('../../content/features', () => ({ features: { grove: 'walk' } }))
 
 const ARRIVALS = SECTION_IDS.map((id) => SECTION_SPANS[id].arrivalJvh)
 

@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test'
-import { GROVE, NOW, settled } from './helpers'
+import { GROVE_REACHABLE, NOW, settled } from './helpers'
 
 // The jump nav, skip link, home mark and contact links (design.md §4, §8.7, §15).
 
 const PLACES = [
   { name: /^Work\b/, href: '#cabin', id: 'cabin' },
-  ...(GROVE ? [{ name: /^Grove\b/, href: '#grove', id: 'grove' } as const] : []),
+  ...(GROVE_REACHABLE ? [{ name: /^Grove\b/, href: '#grove', id: 'grove' } as const] : []),
   { name: /^Contact\b/, href: '#contact', id: 'contact' },
 ] as const
 
@@ -27,9 +27,9 @@ test('the skip link is the first stop and targets #content', async ({ page }, in
 test('one jump nav with plain-word links to the places', async ({ page }) => {
   const nav = page.getByRole('navigation', { name: 'Jump to a place' })
   await expect(nav).toHaveCount(1)
-  // The places (Top is the bare path); no Grove while it is paused (src/content/features.ts).
+  // The places (Top is the bare path); no Grove while it is off (src/content/features.ts).
   await expect(nav.locator('a[href^="#"]')).toHaveCount(PLACES.length)
-  await expect(nav.getByRole('link', { name: /^Grove\b/ })).toHaveCount(GROVE ? 1 : 0)
+  await expect(nav.getByRole('link', { name: /^Grove\b/ })).toHaveCount(GROVE_REACHABLE ? 1 : 0)
   for (const place of PLACES) {
     const link = nav.getByRole('link', { name: place.name })
     await expect(link).toBeVisible()
@@ -56,7 +56,7 @@ for (const place of PLACES) {
 }
 
 test('the home mark goes back to the edge of the forest', async ({ page }, info) => {
-  await page.goto(`/?e2e=1&tier=medium&now=${NOW}${GROVE ? '#grove' : '#contact'}`)
+  await page.goto(`/?e2e=1&tier=medium&now=${NOW}${GROVE_REACHABLE ? '#grove' : '#contact'}`)
   await settled(page)
   // Under 768 px the home mark hides and "Top" leads the bottom bar (design.md §4.2).
   const home =

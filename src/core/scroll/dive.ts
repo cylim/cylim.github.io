@@ -12,19 +12,31 @@
  * - Within 100 jvh there is no dive: the page glides along the path for 1.2 s.
  * - Reduced motion: a short crossfade through paper, no dolly. e2e: 50 ms each way.
  * - The album (static mode) has no dives: plain jumps to the leaf top, just under the header.
+ * - The grove as a detour (content/features.ts): a dive to it while it is off the walk joins the
+ *   grove walk under full paper (`joinWalk`), then jumps on the new walk. The album joins, then jumps.
  */
 
 import { CY_EVENT, emit } from '../events'
 import { journey, type DiveState, type JourneyState } from '../store/journey'
 import { J, SECTION_SPANS } from '../world/beats'
 import { SECTION_HASH, walkSection, type SectionId } from '../sections/ids'
+import { groveOnWalk, joinGroveWalk } from '../world/walk'
 import { registry } from '../sections/registry'
 import { prefetchSection } from '../sections/prefetch'
 import { easing, motion } from '../../theme/tokens'
 import { ui } from '../../content/ui'
 import { fill } from '../../content/format'
 import { lastModality } from './modality'
-import { albumTopY, pinAlbumLeaf, scrollToYInstant, scrollYAtJvh, sectionUrl, smoothScrollToY, watchScrollIntent } from './ScrollDriver'
+import {
+  albumTopY,
+  pinAlbumLeaf,
+  remeasureScroll,
+  scrollToYInstant,
+  scrollYAtJvh,
+  sectionUrl,
+  smoothScrollToY,
+  watchScrollIntent,
+} from './ScrollDriver'
 
 /** Jumps closer than this glide instead of diving (§11.1). */
 export const NEAR_JUMP_JVH = 100
@@ -165,6 +177,40 @@ function onHandScroll(): void {
   else if (phase === 'hold') interruptHold?.()
 }
 
+/** Joining the grove walk gives up on the grove's leaf only after this many frames as well as the dive's give-up time... */
+const JOIN_MIN_FRAMES = 30
+/** ...and waits no longer than this, however slow the frames (a chunk that never arrives). */
+const JOIN_CAP_MS = 20_000
+
+const nextFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+
+/**
+ * Put the grove on the walk (core/world/walk.ts): every table is rebuilt, the store flips `groveWalk`
+ * so React renders the grove section and the rig and the grove scene start over, and `ready.grove`
+ * drops so the dive waits for the chart. Once the new track has rendered, the scroll map is measured
+ * again. Called under full paper (or in the album, before the jump).
+ */
+async function joinWalk(): Promise<void> {
+  if (!joinGroveWalk()) return
+  journey.setState((s) => ({ groveWalk: true, ready: { ...s.ready, grove: false } }))
+  // React commits the new track within a frame; the grove's leaf is a lazy chunk (dom/ContentLayer.tsx),
+  // so wait for its section too. The scroll map is measured from the sections, so measuring without
+  // it would land the arrival in the cabin. A main thread busy compiling shaders can starve the frames
+  // for seconds, so giving up takes the dive's give-up time and a run of frames, within a hard cap.
+  const t0 = performance.now()
+  let frames = 0
+  const waiting = () => {
+    const ms = performance.now() - t0
+    return ms < JOIN_CAP_MS && (ms < motion.dive.giveUp || frames < JOIN_MIN_FRAMES)
+  }
+  await nextFrame()
+  while (!document.getElementById('grove') && waiting()) {
+    await nextFrame()
+    frames++
+  }
+  remeasureScroll()
+}
+
 export interface DiveOptions {
   /** First load with a deep link: start in full paper and run only the emerge (§6.2). */
   fromLoad?: boolean
@@ -172,16 +218,25 @@ export interface DiveOptions {
 
 /** Fog-dive to a section's arrival. Resolves when it has settled or was superseded. History is the caller's job. */
 export async function diveTo(target: SectionId, opts: DiveOptions = {}): Promise<void> {
-  // A paused section (the grove) lands where its links do.
+  // An off grove lands where its links do (the lantern).
   const id = walkSection(target)
   const my = ++token
   interruptHold?.()
   const s = journey.getState()
-  const arrival = SECTION_SPANS[id].arrivalJvh
+  // A detour: the grove is reachable but not on this walk yet.
+  const joining = id === 'grove' && !groveOnWalk()
 
   if (s.mode === 'static') {
     cancelAnimationFrame(raf)
     if (s.dive.phase !== 'idle') setDive({ phase: 'idle', amount: 0, to: null, waiting: false })
+    if (joining) {
+      // Not settled while the grove's leaf renders (isSettled, e2e): the album has no paper to show,
+      // so the hold is state only.
+      setDive({ phase: 'hold', amount: 0, to: id, waiting: true })
+      await joinWalk()
+      if (my !== token) return
+      setDive({ phase: 'idle', amount: 0, to: null, waiting: false })
+    }
     const section = document.getElementById(id)
     if (section) {
       const y = albumTopY(section)
@@ -196,8 +251,9 @@ export async function diveTo(target: SectionId, opts: DiveOptions = {}): Promise
   }
 
   prefetchSection(id)
-  if (!opts.fromLoad && s.dive.phase === 'idle' && Math.abs(s.jvh - arrival) < NEAR_JUMP_JVH) {
-    const y = scrollYAtJvh(arrival)
+  const near = SECTION_SPANS[id].arrivalJvh
+  if (!opts.fromLoad && !joining && s.dive.phase === 'idle' && Math.abs(s.jvh - near) < NEAR_JUMP_JVH) {
+    const y = scrollYAtJvh(near)
     if (s.reducedMotion || s.e2e) scrollToYInstant(y)
     else if (!(await smoothScrollToY(y)) || my !== token) return
     settle(id)
@@ -215,8 +271,14 @@ export async function diveTo(target: SectionId, opts: DiveOptions = {}): Promise
       if (!(await tween(1, d.in, easing.inCubic, my))) return
     }
 
-    // Swap under full paper: jump the scroll, place the camera on the emerge pose.
+    // Swap under full paper: join the grove walk if this is a detour, jump the scroll, place the
+    // camera on the emerge pose. The arrival is read on the walk we land on.
     setDive({ phase: 'hold', amount: 1 })
+    if (joining) {
+      await joinWalk()
+      if (my !== token) return
+    }
+    const arrival = SECTION_SPANS[id].arrivalJvh
     scrollToYInstant(scrollYAtJvh(arrival))
     journey.setState({ u: arrival / J, jvh: arrival, active: id, snap: true })
     await waitReady(id, my)

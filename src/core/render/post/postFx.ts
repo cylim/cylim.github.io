@@ -163,8 +163,6 @@ export function forestDepth(jvh: number): number {
   return smooth01(95, 205, jvh) * (1 - smooth01(222, 256, jvh))
 }
 
-const E0_START = beatSpanById('E0').jvh[0]
-
 /**
  * Where the understorey mist lies (0..1): the threshold and the forest walk, fading as the door
  * opens; the path to the grove until the mist wall parts; the southern trees at the signpost. Never
@@ -173,7 +171,9 @@ const E0_START = beatSpanById('E0').jvh[0]
 export function understoreyMist(jvh: number): number {
   const walk = 1 - smooth01(262, 290, jvh)
   const path = smooth01(574, 584, jvh) * (1 - smooth01(626, 640, jvh))
-  // Rises into E0 (862 on the full walk; 645 with the grove paused, just after the mist-wall cut).
+  // Rises into E0 (862 on the full walk; 645 without the grove, just after the mist-wall cut). Read
+  // per call: a detour can join the grove walk.
+  const E0_START = beatSpanById('E0').jvh[0]
   const exit = 0.7 * smooth01(E0_START - 12, E0_START + 6, jvh)
   return Math.max(walk, path, exit)
 }
