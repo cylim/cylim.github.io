@@ -5,7 +5,8 @@
  * - The jvh mapping is measured from the DOM section tops with a ResizeObserver, piecewise-linear
  *   between them, so a jump lands exactly on its arrival whatever the viewport does to the layout.
  *   Beats are not measured: they are fixed fractions of their section (design.md §6.2), and a
- *   mis-sized beat must not bend the camera's pacing.
+ *   mis-sized beat must not bend the camera's pacing. In the walk, each hold edge inside a section
+ *   is a knot too, at its scroll-length place, since holds scroll HOLD_STRETCH times slower.
  * - Lenis smooths the wheel on desktop only. Touch stays native (syncTouch off), and reduced motion,
  *   e2e and the album skip Lenis entirely. Lenis is imported lazily so it stays out of the boot chunk.
  *   Its frames run only while it animates (a wheel's inertia, a glide), not forever: an idle-stopped
@@ -16,7 +17,7 @@
 
 import type Lenis from 'lenis'
 import { journey } from '../store/journey'
-import { J, SECTION_SPANS, sectionAtJvh } from '../world/beats'
+import { HOLD_EDGES, J, SECTION_SPANS, scrollSvhBetween, sectionAtJvh, sectionHeightSvh } from '../world/beats'
 import { SECTION_HASH, WALK_SECTION_IDS } from '../sections/ids'
 import { easing, motion } from '../../theme/tokens'
 import { buildScrollMap, jvhAtScroll, linearScrollMap, reanchorScrollY, scrollAtJvh, type ScrollAnchor, type ScrollMap } from './progress'
@@ -78,12 +79,19 @@ export function pinAlbumLeaf(el: Element | null): void {
 
 function measure(): ScrollMap {
   const anchors: ScrollAnchor[] = []
+  const walk = journey.getState().mode === 'immersive'
   let margin = 0
   for (const id of WALK_SECTION_IDS) {
     const el = document.getElementById(id)
     if (el && el.offsetHeight > 0) {
-      anchors.push({ y: top(el), jvh: SECTION_SPANS[id].jvh[0] })
+      const y = top(el)
+      const [a, b] = SECTION_SPANS[id].jvh
+      anchors.push({ y, jvh: a })
       margin = Math.max(margin, scrollMargin(el))
+      // The album's leaves are ordinary flow, not scroll lengths: only its section tops are knots.
+      if (!walk) continue
+      const pxPerSvh = el.offsetHeight / sectionHeightSvh(id)
+      for (const h of HOLD_EDGES) if (h > a && h < b) anchors.push({ y: y + scrollSvhBetween(a, h) * pxPerSvh, jvh: h })
     }
   }
   albumProbe = Math.max(margin + 8, window.innerHeight / 4)

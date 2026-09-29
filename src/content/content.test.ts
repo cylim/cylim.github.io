@@ -66,11 +66,12 @@ describe('owner defaults (design.md §18.1)', () => {
     expect(ids.toSorted()).toEqual(services.map((s) => s.id).toSorted())
   })
 
-  it('socials only: GitHub, X, LinkedIn (no blog)', () => {
+  it('socials only: GitHub, X, LinkedIn, Telegram (no blog)', () => {
     expect(socials.map((s) => s.href)).toEqual([
       'https://github.com/cylim',
       'https://x.com/seewhy',
       'https://www.linkedin.com/in/cylim226',
+      'https://t.me/cyants',
     ])
     expect(socials.find((s) => s.id === 'x')?.label).toBe('X')
   })

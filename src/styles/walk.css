@@ -1,6 +1,7 @@
 /*
- * The walk (html[data-mode='immersive']), design.md §6.2 and §6.4: each section is its jvh length in
- * svh; each beat is a div of its jvh length whose card sits in a sticky one-viewport frame (see
+ * The walk (html[data-mode='immersive']), design.md §6.2 and §6.4: each section is its scroll length
+ * in svh (1 svh per jvh, more inside holds: beats.ts HOLD_STRETCH); each beat is a div of its scroll
+ * length whose card sits in a sticky one-viewport frame (see
  * src/dom/cards.ts for the track maths). Card opacity is written per frame by src/dom/bindings.ts.
  * Zones: L and R are 30rem columns 6vw in, vertically centred; pane is the terminal; panel is the grove
  * chart on the right third; mount is the finale's left mount. Under 768 px every zone is B.
@@ -646,10 +647,13 @@ html[data-mode='immersive'][data-beat='E3'] .site-footer {
     margin-bottom: 0.25rem;
   }
 
-  /* The links fit one line on phones from 360 px, spread across the card; else they wrap. */
+  /* Four links don't fit one line on a phone: two by two (design.md §8.1), the columns spread
+     across the card. */
   html[data-mode='immersive'] .card-hero .socials-row {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
     justify-content: space-between;
-    gap: 0;
+    gap: 0 1rem;
     margin-top: 0.25rem;
   }
 
@@ -729,14 +733,13 @@ html[data-mode='immersive'][data-beat='E3'] .site-footer {
   }
 
   /*
-   * The contact card in zone B (E1, E2): the links as one row of 56 px tiles, logo beside username,
-   * so the card stays under 45% of the height.
+   * The contact card in zone B (E1, E2): the links as two rows of tiles, logo beside username,
+   * so the card stays under 45% of the height. Four in one row overflow a 360 px phone.
    */
   html[data-mode='immersive'] .card-contact .socials-rows {
     display: grid;
-    /* Columns as wide as their usernames, spread across the card: equal thirds wrap "@seewhy". */
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
+    /* Columns as wide as their usernames, spread across the card: equal halves waste the room. */
+    grid-template-columns: repeat(2, max-content);
     justify-content: space-between;
     column-gap: 0.5rem;
     margin-top: 0.5rem;

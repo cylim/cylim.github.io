@@ -3,7 +3,7 @@
  * on the signpost's boards and in the terminal's `contact` output.
  */
 
-export type SocialId = 'github' | 'x' | 'linkedin'
+export type SocialId = 'github' | 'x' | 'linkedin' | 'telegram'
 
 export interface SocialLink {
   readonly id: SocialId
@@ -31,6 +31,7 @@ export const socials: readonly SocialLink[] = [
     href: 'https://www.linkedin.com/in/cylim226',
     rel: 'me',
   },
+  { id: 'telegram', label: 'Telegram', display: '@cyants', href: 'https://t.me/cyants', rel: 'me' },
 ]
 
 export function socialById(id: SocialId): SocialLink {

@@ -54,15 +54,13 @@ export interface SectionSpan {
   readonly jvh: readonly [number, number]
   /** Where a jump lands. */
   readonly arrivalJvh: number
-  /** DOM <section> height in svh. The last section adds the final 100 svh viewport. */
-  readonly heightSvh: number
 }
 
 const FULL_SECTION_SPANS = {
-  threshold: { id: 'threshold', jvh: [0, 245], arrivalJvh: 0, heightSvh: 245 },
-  cabin: { id: 'cabin', jvh: [245, 572], arrivalJvh: 345, heightSvh: 327 },
-  grove: { id: 'grove', jvh: [572, 862], arrivalJvh: 666, heightSvh: 290 },
-  contact: { id: 'contact', jvh: [862, 1000], arrivalJvh: 886, heightSvh: 238 },
+  threshold: { id: 'threshold', jvh: [0, 245], arrivalJvh: 0 },
+  cabin: { id: 'cabin', jvh: [245, 572], arrivalJvh: 345 },
+  grove: { id: 'grove', jvh: [572, 862], arrivalJvh: 666 },
+  contact: { id: 'contact', jvh: [862, 1000], arrivalJvh: 886 },
 } as const satisfies Record<SectionId, SectionSpan>
 
 /**
@@ -75,8 +73,8 @@ export const SECTION_SPANS: Readonly<Record<SectionId, SectionSpan>> = GROVE_ON
   : {
       threshold: FULL_SECTION_SPANS.threshold,
       cabin: FULL_SECTION_SPANS.cabin,
-      grove: { id: 'grove', jvh: [572, 572], arrivalJvh: afterGrove(886), heightSvh: 0 },
-      contact: { id: 'contact', jvh: [572, J], arrivalJvh: afterGrove(886), heightSvh: J - 572 + 100 },
+      grove: { id: 'grove', jvh: [572, 572], arrivalJvh: afterGrove(886) },
+      contact: { id: 'contact', jvh: [572, J], arrivalJvh: afterGrove(886) },
     }
 
 /**
@@ -221,6 +219,34 @@ export const holdOf = (id: BeatId): readonly [number, number] => {
 
 /** True inside any beat's hold range. */
 export const inHold = (jvh: number) => BEAT_SPANS.some((b) => b.hold !== null && jvh >= b.hold[0] && jvh <= b.hold[1])
+
+// ---------------------------------------------------------------------------- scroll length (§6.2)
+
+/**
+ * Scroll svh per jvh inside a hold. Elsewhere 1 jvh is 1 svh of scroll; a hold gets more, so the
+ * camera rests on a card longer while every jvh table (camera keys, marks, cards, sound) stays as
+ * written. Only the DOM track (section, beat and card-track heights) and the scroll map read this.
+ */
+export const HOLD_STRETCH = 1.5
+
+/** The jvh where a hold starts or ends: where the scroll map changes pace. */
+export const HOLD_EDGES: readonly number[] = BEAT_SPANS.flatMap((b) => b.hold ?? [])
+
+/** Scroll length in svh from the top of the walk to `jvh`: hold jvh count HOLD_STRETCH times. */
+export function scrollSvh(jvh: number): number {
+  let held = 0
+  for (const b of BEAT_SPANS) if (b.hold && jvh > b.hold[0]) held += Math.min(jvh, b.hold[1]) - b.hold[0]
+  return jvh + (HOLD_STRETCH - 1) * held
+}
+
+/** Scroll length in svh of [a, b] jvh. */
+export const scrollSvhBetween = (a: number, b: number) => scrollSvh(b) - scrollSvh(a)
+
+/** DOM <section> height in svh: its scroll length. The last section adds the final 100 svh viewport. */
+export function sectionHeightSvh(id: SectionId): number {
+  const [a, b] = SECTION_SPANS[id].jvh
+  return scrollSvhBetween(a, b) + (b === J && b > a ? 100 : 0)
+}
 
 // ---------------------------------------------------------------------------- marks and seams (§8, §11.2)
 

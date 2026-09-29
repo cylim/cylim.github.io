@@ -44,7 +44,8 @@ export const contactOutput: readonly string[] = [
   'GitHub    github.com/cylim',
   'X         x.com/seewhy',
   'LinkedIn  linkedin.com/in/cylim226',
+  'Telegram  t.me/cyants',
   'Résumé    cy.my/resources/resume-en.pdf',
   '',
-  'Have something to build? Message me on LinkedIn or X.',
+  'Have something to build? Message me on Telegram, LinkedIn or X.',
 ]

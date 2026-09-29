@@ -226,7 +226,7 @@ Everything fixed is DOM. It is drawn in ink on the ink world and in cyan on nigh
 ### 4.5 Iconography
 
 - One style: filled SVG paths with tapered brush ends, 24 px grid, about 1.5 px visual stroke. Every icon sits next to a text label or has an accessible name.
-- GitHub, X and LinkedIn use the official marks from Simple Icons (CC0), flat in `ink-nong`, unmodified. Redrawing them as brushwork breaks the brands' rules and makes them harder to spot. Blog uses the character 文 in WenKai, with its gloss "wén · writing".
+- GitHub, X, LinkedIn and Telegram use the official marks from Simple Icons (CC0), flat in `ink-nong`, unmodified. Redrawing them as brushwork breaks the brands' rules and makes them harder to spot. Blog uses the character 文 in WenKai, with its gloss "wén · writing".
 - Trigrams are bars, never the Unicode ☰–☷ glyphs, whose rendering varies by font. A yin line is two bars with a gap of 28% of the line length. In circular layouts the bottom line sits nearest the centre.
 
 ---
@@ -353,6 +353,8 @@ Check for E2: from (3, 30, −240) at 17° pitch, the lantern sits about 11° be
 
 The DOM is the scroll track (`stack.md` §2–3). Each `<section>` has a fixed height in `svh`. Inside it, each beat is a `div.beat` whose height is the beat's jvh span, holding a `position: sticky` copy card, so the card holds while the camera holds.
 
+Holds scroll slower than the rest of the walk: each hold jvh takes `HOLD_STRETCH` (1.5) svh of scroll, every other jvh takes 1 svh (`scrollSvh` in `core/world/beats.ts`). The jvh numbers in every table stay as written; only the DOM heights (sections, beats, card tracks) and the scroll map's knots at the hold edges use the scroll length, so the heights in the table below are before the stretch.
+
 | Hash | Section id | Span (jvh) | Height | Arrival jvh (u) | Jump emerges from | Nav active |
 |---|---|---|---|---|---|---|
 | none (`#threshold` accepted as an alias, then replaced with the bare path) | `threshold` | 0–245 | 245 svh | 0 (0.000) | T0 pose pulled 3 m back | "Top" on mobile, nothing on desktop |
@@ -465,7 +467,7 @@ Each section lists composition, elements, materials, light and fog, animation, i
 3. Role line: "Software engineer in Penang, Malaysia."
 4. Positioning line, content.md §2 option 1.
 5. Sub-line, content.md §2.
-6. Links row: GitHub, X, LinkedIn, Blog as icon plus short label, each at least 44 px tall, `rel="me"`. Wraps 2 × 2 on mobile.
+6. Links row: GitHub, X, LinkedIn, Telegram as icon plus short label, each at least 44 px tall, `rel="me"`. Wraps 2 × 2 on mobile.
 7. Scroll cue at the bottom centre: "Scroll to walk in" in `label` type over a 1 px `ink-zhong` line that grows 24 px downward over 3 s and loops. Static under reduced motion. No bouncing arrow, no mouse icon.
 
 **Mobile.** T0 portrait override (6.4). Accent top-left at 18vw; items 2 to 6 in zone B.
@@ -617,7 +619,7 @@ Read bottom to top, the frame is the walk in reverse: the lantern glowing at the
 
 **E3, signed.** Time-based, once per visit:
 - The 林 seal (朱文, 64 px) stamps into the lower-right corner of the window, with a thud if sound is on. Silence after it.
-- The colophon (题跋) writes itself in the empty upper left, vertical, in WenKai, dated for this visit in the traditional calendar, for example `丙午年 秋分后五日 戌时 · 林 写于槟城`. English under it in `body`: "Inscribed in Penang for your visit, five days after the autumn equinox, in the Bing-Wu year, at the hour of the Dog. 林 is Lim. Two trees make a forest." Rules: the sexagenary year turns at 立春, not 1 January; the term day reads 秋分日 on day 0 and 后N日 in Chinese numerals for days 1 to 14; values come from the same calendar adapter as the chart, and the term day counts on the chart's day boundary, so under zi23 the 23:00 hour already belongs to the next day (23:30 on the eve of 秋分 reads 秋分日 子时; wave3c CD-6). On landscape the colophon sits on the left mount.
+- The colophon (题跋) writes itself in the empty upper left, vertical, in WenKai, dated for this visit in the traditional calendar, for example `丙午年 秋分后五日 戌时 · 林`. English under it in `body`: "Inscribed in Penang for your visit, five days after the autumn equinox, in the Bing-Wu year, at the hour of the Dog." Rules: the sexagenary year turns at 立春, not 1 January; the term day reads 秋分日 on day 0 and 后N日 in Chinese numerals for days 1 to 14; values come from the same calendar adapter as the chart, and the term day counts on the chart's day boundary, so under zi23 the 23:00 hour already belongs to the next day (23:30 on the eve of 秋分 reads 秋分日 子时; wave3c CD-6). On landscape the colophon sits on the left mount.
 - Three DOM map pins float over their world positions: Work at the cabin roof (4, 5, −63), Grove at the platform (0, 0.5, −150), Start at the meadow (0, 2, 20). They are real links, projected every frame, hidden when outside the window. Tapping one fog-dives there. The finale doubles as a map.
 - The link rows from E1 stay visible (the right mount on landscape, zone B on portrait), with "Walk again" (fog-dive to the top), "Still version", and the footer from content.md §5.
 
@@ -997,7 +999,7 @@ Everything above is prerendered at build time (`stack.md` §10), so crawlers and
 
 2. **The heavens turn to your hour (608–715 jvh).** The mist thickens until there's nothing, one guqin note rings, and the fog lifts on a dark stone board in a clearing. A brush line inks the Luo Shu path through the nine palaces. Then the stone rings grind round, detent by detent, from their home positions to the visitor's own double-hour, and the lit glyphs lift off the rings and settle into their palaces. A cinnabar plate and a red brush circle mark the 值符 and 值使. South is at the top, as in the books, and it is true south; the lantern glints beyond the fire palace. On a phone, "Follow compass" turns the whole dial with your body.
 
-3. **The painting signs itself (935–1000 jvh).** At the signpost the camera rises in a slow orbit and turns north, the fog thins, mist belts slide in, and the whole walk flattens into one picture: the lantern at the bottom, the grove's rings, a speck of cyan at the cabin, the forest edge, the far ridges. A colophon writes itself, dated for this visit in the traditional calendar, and the red 林 seal stamps the corner. Lim is 林. Two trees make a forest. The cabin and grove below are links, so the finale is also a map.
+3. **The painting signs itself (935–1000 jvh).** At the signpost the camera rises in a slow orbit and turns north, the fog thins, mist belts slide in, and the whole walk flattens into one picture: the lantern at the bottom, the grove's rings, a speck of cyan at the cabin, the forest edge, the far ridges. A colophon writes itself, dated for this visit in the traditional calendar, and the red 林 seal stamps the corner. The cabin and grove below are links, so the finale is also a map.
 
 ---
 
@@ -1039,7 +1041,7 @@ Each needs the owner's yes. Until then, ship content.md's version.
 | Nav labels | "Cabin · work", "Grove · Qimen", "Lantern · links" | "Work", "Grove", "Contact" with 木屋, 九宫, 石灯 above | Clients scan for Work and Contact |
 | Cabin bridge line | none | "In old landscape paintings there's always a hut, and in the hut there's always a scholar at a desk. This one writes software." | Ties the sci-fi cabin to the painting |
 | Featured work | Six panels | Four scrolls plus an "Also" list | Keeps the hall under 100 jvh of scrolls. Owner picks the four and clears screenshots |
-| Colophon | none | Dated inscription signed 林, English line "林 is Lim. Two trees make a forest." | Signature moment 3 |
+| Colophon | none | Dated inscription signed 林, with an English line | Signature moment 3 |
 | Name seal | Chinese name unknown | `resources/resume-zh.pdf` gives [owner's Chinese name]. The 林 seal ships regardless; [name seal] and [given name] in the colophon only with a yes | |
 
 ### 18.2 Decisions still open (from all docs)

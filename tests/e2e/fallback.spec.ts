@@ -72,7 +72,7 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('html')).toHaveAttribute('data-mode', 'static')
     await expect(page.getByRole('heading', { level: 1, name: 'CY Lim' })).toBeVisible()
     for (const { id } of ARRIVALS) await expect(page.locator(`section#${id} h1, section#${id} h2`).first()).toBeAttached()
-    for (const href of ['https://github.com/cylim', 'https://x.com/seewhy', 'https://www.linkedin.com/in/cylim226']) {
+    for (const href of ['https://github.com/cylim', 'https://x.com/seewhy', 'https://www.linkedin.com/in/cylim226', 'https://t.me/cyants']) {
       await expect(page.locator(`a[rel~="me"][href="${href}"]`).first()).toBeAttached()
     }
     const html = await page.content()

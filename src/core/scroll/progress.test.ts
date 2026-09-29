@@ -31,7 +31,8 @@ function domAnchors(vh: number, stretch: Partial<Record<string, number>> = {}): 
       anchors.push({ y, jvh: b.jvh[0] })
       y += (b.jvh[1] - b.jvh[0]) * vh * (stretch[b.id] ?? 1)
     }
-    y = top + SECTION_SPANS[id].heightSvh * vh + (y - top - (SECTION_SPANS[id].jvh[1] - SECTION_SPANS[id].jvh[0]) * vh)
+    // The last section adds the final viewport.
+    if (id === SECTION_IDS[SECTION_IDS.length - 1]) y += 100 * vh
   }
   // The document is J + 100 svh tall; the scroll range ends one viewport before the bottom.
   return { anchors, maxScroll: y - 100 * vh }

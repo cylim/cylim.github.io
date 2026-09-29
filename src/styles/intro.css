@@ -1,8 +1,8 @@
 /* --------------------------------------------------------------- first-load loading screen (#intro)
    index.html's head script sets html[data-intro] on a plain first load of the walk; src/dom/intro.ts
    drives the ink line from the stage phase and lifts the screen (data-intro="out", then removed).
-   It covers the page (the header lives inside #root's stacking context) but takes no pointer
-   events, so a tap on the nav still lands, and any tap, key, wheel or touch lifts it. */
+   It covers the page (the header lives inside #root's stacking context) until the forest is ready,
+   but takes no pointer events, so a tap on the nav still lands. */
 
 #intro {
   display: none;

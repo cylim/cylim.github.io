@@ -1,18 +1,24 @@
-import { journey, type JourneyState } from '../core/store/journey'
+import { journey, visibleSections, type JourneyState } from '../core/store/journey'
 import { motion } from '../theme/tokens'
 
 /**
  * First-load loading screen (index.html #intro, src/styles/intro.css). The head script raises it on a
- * plain first load of the walk; this fills its ink line from the real stage phase and lifts it once the
- * forest is live, the benchmark sends the visitor to the album, or `motion.intro.max` passes. Any tap,
- * key, wheel or touch lifts it at once: it is atmosphere, never a gate.
+ * plain first load of the walk; this claims it (data-intro="app", so the head script's failsafe
+ * stands down), fills its ink line from the real stage phase and lifts it once the forest is live
+ * and every section the camera can see is ready, the benchmark sends the visitor to the album, or the
+ * context is lost. It is a gate: past it, the trees and the scene around the camera are drawn.
+ * `motion.intro.max` is only a guard against a load that hangs.
  */
 
 const SEEN_KEY = 'cy.introSeen'
-const INPUTS = ['pointerdown', 'keydown', 'wheel', 'touchstart'] as const
+
+type IntroState = Pick<JourneyState, 'mode' | 'stage' | 'u' | 'ready'>
+
+/** Every section the stage shows at this position has loaded and compiled. */
+const scenesReady = (s: IntroState) => visibleSections(s.u).every((id) => s.ready[id] === true)
 
 /** How full the ink line is for a stage phase. */
-export function introProgress(s: Pick<JourneyState, 'mode' | 'stage'>): number {
+export function introProgress(s: IntroState): number {
   if (s.mode === 'static') return 1
   switch (s.stage) {
     case 'none':
@@ -21,14 +27,16 @@ export function introProgress(s: Pick<JourneyState, 'mode' | 'stage'>): number {
       return 0.45
     case 'benchmark':
       return 0.8
+    case 'live':
+      return scenesReady(s) ? 1 : 0.9
     default:
       return 1
   }
 }
 
-/** The forest is showing (or never will): time to lift. */
-export function introDone(s: Pick<JourneyState, 'mode' | 'stage'>): boolean {
-  return s.mode === 'static' || s.stage === 'live' || s.stage === 'lost'
+/** The forest and the scenes in view are showing (or never will): time to lift. */
+export function introDone(s: IntroState): boolean {
+  return s.mode === 'static' || s.stage === 'lost' || (s.stage === 'live' && scenesReady(s))
 }
 
 /**
@@ -39,6 +47,7 @@ export function introDone(s: Pick<JourneyState, 'mode' | 'stage'>): boolean {
 export function startIntro(html: HTMLElement = document.documentElement, now: () => number = () => performance.now()): () => void {
   const el = document.getElementById('intro')
   if (!el || !html.hasAttribute('data-intro')) return () => {}
+  html.setAttribute('data-intro', 'app')
 
   let firstInTab = true
   try {
@@ -55,7 +64,7 @@ export function startIntro(html: HTMLElement = document.documentElement, now: ()
   const lift = () => {
     if (lifted) return
     lifted = true
-    detach()
+    unsubscribe()
     el.style.setProperty('--p', '1')
     html.setAttribute('data-intro', 'out')
     timers.push(setTimeout(() => html.removeAttribute('data-intro'), motion.intro.out))
@@ -73,17 +82,11 @@ export function startIntro(html: HTMLElement = document.documentElement, now: ()
     if (introDone(s)) liftAfterMin()
   }
   const unsubscribe = journey.subscribe(sync)
-  for (const type of INPUTS) addEventListener(type, lift, { capture: true, passive: true })
   timers.push(setTimeout(lift, Math.max(0, motion.intro.max - now())))
   sync(journey.getState())
 
-  function detach() {
-    unsubscribe()
-    for (const type of INPUTS) removeEventListener(type, lift, { capture: true })
-  }
-
   return () => {
-    detach()
+    unsubscribe()
     for (const t of timers) clearTimeout(t)
     html.removeAttribute('data-intro')
   }

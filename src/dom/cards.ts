@@ -1,4 +1,4 @@
-import { J, MARKS, beatSpanById, holdOf, type BeatId } from '../core/world/beats'
+import { J, MARKS, beatSpanById, holdOf, scrollSvhBetween, type BeatId } from '../core/world/beats'
 import { features } from '../content/features'
 
 /**
@@ -6,8 +6,9 @@ import { features } from '../content/features'
  * opacity function the card driver runs on every scroll frame.
  *
  * Layout model: a card sits in a sticky frame one viewport tall, inside a track that runs from its
- * beat's start for `trackJvh + 100` svh. The frame therefore pins exactly while the scroll is inside
- * [beat start, beat start + trackJvh]; the card's opacity window (`show` plus fades) sits inside that.
+ * beat's start for `trackSvh + 100` svh (holds scroll longer than they read in jvh: beats.ts
+ * HOLD_STRETCH). The frame therefore pins exactly while the scroll is inside [beat start, beat start
+ * + trackJvh]; the card's opacity window (`show` plus fades) sits inside that.
  */
 
 export type CardZone = 'L' | 'R' | 'pane' | 'panel' | 'mount'
@@ -58,10 +59,16 @@ export const CARDS: readonly CardSpec[] = features.grove ? ALL_CARDS : ALL_CARDS
 
 export const cardByBeat = (id: BeatId): CardSpec | undefined => CARDS.find((c) => c.beat === id)
 
-/** Pinned length of the card's frame in jvh (= svh). */
+/** Pinned length of the card's frame in jvh. */
 export function trackJvh(spec: CardSpec): number {
   const b = beatSpanById(spec.beat)
   return spec.trackJvh ?? b.jvh[1] - b.jvh[0]
+}
+
+/** Pinned length of the card's frame in scroll svh: the DOM track's height less the one viewport. */
+export function trackSvh(spec: CardSpec): number {
+  const start = beatSpanById(spec.beat).jvh[0]
+  return scrollSvhBetween(start, start + trackJvh(spec))
 }
 
 const smooth = (t: number) => t * t * (3 - 2 * t)

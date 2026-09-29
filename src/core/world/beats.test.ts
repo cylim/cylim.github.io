@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BEAT_SPANS, beatSpanAt, holdOf, inHold, stillJvh } from './beats'
+import { BEAT_SPANS, HOLD_STRETCH, beatSpanAt, holdOf, inHold, scrollSvh, scrollSvhBetween, stillJvh } from './beats'
 import { BEATS, beatAt } from './journey'
 
 describe('beats.ts, the boot share of the beat table', () => {
@@ -20,5 +20,16 @@ describe('beats.ts, the boot share of the beat table', () => {
     expect(inHold(560)).toBe(false)
     expect(stillJvh('C3')).toBe(301)
     expect(stillJvh('G3')).toBe((742 + 833) / 2)
+  })
+
+  it('scrolls holds HOLD_STRETCH times longer than the rest of the walk', () => {
+    expect(HOLD_STRETCH).toBeGreaterThan(1)
+    expect(scrollSvh(0)).toBe(0)
+    // I3 holds 488–524: the beat's lead-in scrolls 1:1, the hold stretches.
+    expect(scrollSvhBetween(480, 488)).toBe(8)
+    expect(scrollSvhBetween(488, 524)).toBe(36 * HOLD_STRETCH)
+    expect(scrollSvhBetween(530, 560)).toBe(30)
+    // Still one scroll position per journey position.
+    for (let jvh = 1; jvh <= 1000; jvh += 7) expect(scrollSvh(jvh)).toBeGreaterThan(scrollSvh(jvh - 1))
   })
 })

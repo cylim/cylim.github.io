@@ -32,6 +32,7 @@
     <link rel="me" href="https://github.com/cylim" />
     <link rel="me" href="https://x.com/seewhy" />
     <link rel="me" href="https://www.linkedin.com/in/cylim226" />
+    <link rel="me" href="https://t.me/cyants" />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
@@ -75,7 +76,7 @@
         "address": { "@type": "PostalAddress", "addressLocality": "Penang", "addressCountry": "MY" },
         "alumniOf": { "@type": "CollegeOrUniversity", "name": "University of Wollongong" },
         "knowsLanguage": ["English", "Chinese", "Cantonese", "Malay", "Japanese"],
-        "sameAs": ["https://github.com/cylim", "https://x.com/seewhy", "https://www.linkedin.com/in/cylim226"]
+        "sameAs": ["https://github.com/cylim", "https://x.com/seewhy", "https://www.linkedin.com/in/cylim226", "https://t.me/cyants"]
       }
     </script>
 
@@ -90,7 +91,8 @@
       up here, before the section top can paint. src/dom/bindings.ts takes the veil over and clears
       data-veil once the app runs; if it never does, the timeout lifts it so the page is never covered.
       A plain first load of the walk gets the loading screen (#intro) instead, lifted by
-      src/dom/intro.ts when the forest is ready; the same failsafe applies. Tests and stills skip it.
+      src/dom/intro.ts when the forest is ready. The same failsafe applies until intro.ts claims the
+      screen (data-intro="app"), so a page whose app never runs is not covered. Tests and stills skip it.
     -->
     <script data-cfasync="false">
       ;(function () {
@@ -121,7 +123,7 @@
         } else if (!r && !/[?&](e2e|still)=/.test(location.search)) {
           d.setAttribute('data-intro', '')
           setTimeout(function () {
-            d.removeAttribute('data-intro')
+            if (d.getAttribute('data-intro') === '') d.removeAttribute('data-intro')
           }, 8000)
         }
       })()

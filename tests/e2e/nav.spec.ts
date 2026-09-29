@@ -75,6 +75,7 @@ test('contact is social links only, each rel="me"', async ({ page }) => {
     ['GitHub', 'https://github.com/cylim'],
     ['X', 'https://x.com/seewhy'],
     ['LinkedIn', 'https://www.linkedin.com/in/cylim226'],
+    ['Telegram', 'https://t.me/cyants'],
   ] as const
   for (const [label, href] of expected) {
     const link = contact.locator(`a[href="${href}"]`).first()
