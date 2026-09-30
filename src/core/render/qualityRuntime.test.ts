@@ -127,40 +127,83 @@ const start = () => {
     }
     return calls
   }
-  return run
+  return { run, runtime }
 }
 
+interface Mark {
+  verdict: string
+  gaveUp: boolean
+  samples: number[]
+}
+
+const marks = () => performance.getEntriesByName('cy.benchmark').map((m) => (m as PerformanceMark).detail as Mark)
+
 describe('quality runtime: the hidden benchmark (design.md §13.2)', () => {
+  let warn: ReturnType<typeof vi.spyOn>
+
   beforeEach(() => {
     journey.setState({ tier: 'low', reducedMotion: false })
-    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    performance.clearMarks('cy.benchmark')
+    warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
   })
 
-  it('switches to the album only after a second slow run on low', () => {
-    const run = start()
+  it('switches to the album only after a second slow run on low, and warns then', () => {
+    const { run } = start()
     // One run is 8 warmup frames and 60 measured ones.
     expect(run(() => 30, 69).slow).toBe(0)
+    expect(warn).not.toHaveBeenCalled()
     expect(run(() => 30, 69).slow).toBe(1)
+    expect(warn).toHaveBeenCalledOnce()
   })
 
   it('keeps the walk when a cold first run is slow and the retry is fast', () => {
-    const run = start()
+    const { run } = start()
     run(() => 30, 69)
     expect(run(() => 16, 75)).toEqual({ slow: 0, live: 1 })
+    expect(warn).not.toHaveBeenCalled()
   })
 
-  it('leaves hitches out of the median', () => {
-    // Every other frame stalls for 400 ms (a chunk parse, a tab switch); the rest are fast.
-    expect(start()((i) => (i % 2 ? 400 : 16), 300)).toEqual({ slow: 0, live: 1 })
+  it('leaves stalls out of the samples', () => {
+    const { run } = start()
+    // A chunk parse or texture upload: four 400 ms stalls early in the run.
+    expect(run((i) => (i > 10 && i < 20 && i % 2 ? 400 : 16), 100)).toEqual({ slow: 0, live: 1 })
+    const [mark] = marks()
+    expect(mark?.samples).toHaveLength(60)
+    expect(Math.max(...(mark?.samples ?? []))).toBeLessThan(250)
   })
 
-  it('waits while the tab is hidden and measures once it is visible', () => {
+  it('still reaches a verdict when every frame is a stall', () => {
+    const { run } = start()
+    // Under 4 fps: nothing is kept as a sample, so each run gives up after 3 s on every frame.
+    expect(run(() => 400, 60).slow).toBe(1)
+    expect(marks().map((m) => [m.verdict, m.gaveUp])).toEqual([
+      ['static', true],
+      ['static', true],
+    ])
+  })
+
+  it('waits while hidden frames arrive and measures once the tab is visible', () => {
     const doc = { visibilityState: 'hidden' }
     vi.stubGlobal('document', doc)
-    const run = start()
+    const { run } = start()
     // A background tab: throttled frames that would read as far too slow.
     expect(run(() => 100, 300)).toEqual({ slow: 0, live: 0 })
     doc.visibilityState = 'visible'
+    expect(run(() => 16, 75)).toEqual({ slow: 0, live: 1 })
+  })
+
+  it('drops an interrupted run when the tab hides with its frames paused', () => {
+    const doc = { visibilityState: 'visible' }
+    vi.stubGlobal('document', doc)
+    const { run, runtime } = start()
+    // The first run is slow; the retry is 40 slow samples in when the tab hides.
+    run(() => 30, 69)
+    run(() => 30, 48)
+    doc.visibilityState = 'hidden'
+    runtime.visibilityChanged()
+    doc.visibilityState = 'visible'
+    runtime.visibilityChanged()
+    // Kept, those 40 samples would outvote the 20 fast ones that finish the run.
     expect(run(() => 16, 75)).toEqual({ slow: 0, live: 1 })
   })
 })

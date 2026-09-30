@@ -53,12 +53,18 @@ const HITCH_MS = 250
  * parsing and texture uploads can starve a single run on a device that is fine a second later.
  */
 const SLOW_CONFIRMS = 1
+/**
+ * A run that has not gathered its frames by now is decided on every frame it saw, hitches included,
+ * so a device that only ever hitches still reaches a verdict instead of staying hidden.
+ */
+const MEASURE_GIVE_UP_MS = 3000
 /** §13.3 low-tier frame cap decision window. */
 const CAP_WINDOW_MS = 5000
 
 type Phase =
   | { kind: 'warmup'; frames: number }
-  | { kind: 'measure'; samples: number[] }
+  /** `samples` leaves hitches out; `frames` keeps them for a run that gives up. */
+  | { kind: 'measure'; since: number; samples: number[]; frames: number[] }
   | { kind: 'await'; since: number; streak: number }
   | { kind: 'live' }
   | { kind: 'done' }
@@ -188,6 +194,16 @@ export class QualityRuntime {
     this.hooks.onLive()
   }
 
+  /**
+   * `visibilitychange`: a hidden tab may pause frames altogether, so the per-frame check in `frame()`
+   * never sees it. Whatever the interrupted run gathered is discarded.
+   */
+  visibilityChanged(): void {
+    if (document.visibilityState === 'hidden' && (this.phase.kind === 'warmup' || this.phase.kind === 'measure')) {
+      this.phase = { kind: 'warmup', frames: 0 }
+    }
+  }
+
   /** Call once per rendered frame. */
   frame(state: RootState): void {
     // A backstop for dprWatch: not every environment reports a resolution change as an event.
@@ -221,25 +237,29 @@ export class QualityRuntime {
         }
         phase.frames++
         if (phase.frames >= WARMUP_FRAMES) {
-          this.phase = this.startup === 'benchmark' ? { kind: 'measure', samples: [] } : { kind: 'await', since: now, streak: 0 }
+          this.phase = this.startup === 'benchmark' ? { kind: 'measure', since: now, samples: [], frames: [] } : { kind: 'await', since: now, streak: 0 }
         }
         return
       }
 
       case 'measure': {
+        if (dt <= 0) return
+        phase.frames.push(dt)
         // Same rule as the runtime monitor: a hitch is a stall elsewhere, not a frame's cost.
-        if (dt <= 0 || dt > HITCH_MS) return
-        phase.samples.push(dt)
-        if (phase.samples.length < BENCHMARK.frames) return
-        const medianMs = median(phase.samples)
+        if (dt <= HITCH_MS) phase.samples.push(dt)
+        const full = phase.samples.length >= BENCHMARK.frames
+        if (!full && now - phase.since <= MEASURE_GIVE_UP_MS) return
+        const samples = full ? phase.samples : phase.frames
+        const medianMs = median(samples)
         const verdict = this.pinned ? 'keep' : benchmarkVerdict(s.tier, medianMs)
-        recordBenchmark({ tier: s.tier, dpr: this.dpr, medianMs, verdict, samples: phase.samples })
+        const run = recordBenchmark({ tier: s.tier, dpr: this.dpr, medianMs, verdict, gaveUp: !full, samples })
         if (verdict === 'static' && this.slowConfirms < SLOW_CONFIRMS) {
           this.slowConfirms++
           this.phase = { kind: 'warmup', frames: 0 }
           return
         }
         if (verdict === 'static') {
+          console.warn('The forest benchmark ran slowly, so the still version is showing', run)
           this.phase = { kind: 'done' }
           return this.hooks.onSlow()
         }
@@ -328,6 +348,8 @@ interface BenchmarkRun {
   dpr: number
   medianMs: number
   verdict: string
+  /** Decided at MEASURE_GIVE_UP_MS on every frame, hitches included. */
+  gaveUp: boolean
   samples: readonly number[]
 }
 
@@ -335,12 +357,12 @@ interface BenchmarkRun {
  * Each benchmark run leaves a `cy.benchmark` performance mark, so a visitor who got the album can
  * show why: `performance.getEntriesByName('cy.benchmark').map((m) => m.detail)` in the console.
  */
-function recordBenchmark(run: BenchmarkRun): void {
+function recordBenchmark(run: BenchmarkRun): BenchmarkRun {
   const detail = { ...run, medianMs: Math.round(run.medianMs * 10) / 10, samples: run.samples.map((ms) => Math.round(ms * 10) / 10) }
   try {
     performance.mark('cy.benchmark', { detail })
   } catch {
     // Marks with detail are missing in some older browsers; the log is only a diagnostic.
   }
-  if (run.verdict === 'static') console.warn('The forest benchmark ran slowly', detail)
+  return detail
 }
