@@ -42,6 +42,12 @@ export function QualityController({ startup, dpr, setDpr, setPostTier, onReveal,
     return () => removeEventListener(CY_EVENT.quality, onQuality)
   }, [runtime])
 
+  useEffect(() => {
+    const onVisibility = () => runtime.visibilityChanged()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [runtime])
+
   // A new devicePixelRatio resizes the canvas, which clears it: draw again even if the stage was idle.
   useEffect(
     () =>
