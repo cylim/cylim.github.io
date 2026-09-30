@@ -48,6 +48,11 @@ const MAX_RERUNS = 2
 const AWAIT_GIVE_UP_MS = 3000
 /** Frame times above this are hitches or tab switches, not GPU load. */
 const HITCH_MS = 250
+/**
+ * A too-slow verdict on low is measured once more before the album: on a cold first visit, chunk
+ * parsing and texture uploads can starve a single run on a device that is fine a second later.
+ */
+const SLOW_CONFIRMS = 1
 /** §13.3 low-tier frame cap decision window. */
 const CAP_WINDOW_MS = 5000
 
@@ -68,6 +73,9 @@ export class QualityRuntime {
   private phase: Phase = { kind: 'warmup', frames: 0 }
   private prev = -1
   private reruns = 0
+  private slowConfirms = 0
+  /** The one-time benchmark setup (renderer string, stage 'benchmark') ran. */
+  private started = false
   /** A pinned tier (?tier=, a saved Quality choice) is never corrected, by the benchmark or at runtime. */
   private pinned = pinnedTier() !== null
   private readonly monitor = new PerfMonitor()
@@ -193,9 +201,17 @@ export class QualityRuntime {
     // Under frameloop 'demand' the benchmark and the reveal still need a steady run of frames.
     if (state.frameloop === 'demand' && phase.kind !== 'live' && phase.kind !== 'done') state.invalidate()
 
+    // A hidden tab gets throttled or paused frames, which measure the browser, not the GPU (a tab
+    // opened in the background used to land on the album). Start over once it is visible again.
+    if ((phase.kind === 'warmup' || phase.kind === 'measure') && document.visibilityState === 'hidden') {
+      this.phase = { kind: 'warmup', frames: 0 }
+      return
+    }
+
     switch (phase.kind) {
       case 'warmup': {
-        if (phase.frames === 0 && this.reruns === 0) {
+        if (!this.started) {
+          this.started = true
           this.renderer = rendererString(state.gl.getContext())
           if (this.startup === 'e2e') return this.reveal('instant', now)
           if (this.startup === 'benchmark') {
@@ -211,9 +227,18 @@ export class QualityRuntime {
       }
 
       case 'measure': {
+        // Same rule as the runtime monitor: a hitch is a stall elsewhere, not a frame's cost.
+        if (dt <= 0 || dt > HITCH_MS) return
         phase.samples.push(dt)
         if (phase.samples.length < BENCHMARK.frames) return
-        const verdict = this.pinned ? 'keep' : benchmarkVerdict(s.tier, median(phase.samples))
+        const medianMs = median(phase.samples)
+        const verdict = this.pinned ? 'keep' : benchmarkVerdict(s.tier, medianMs)
+        recordBenchmark({ tier: s.tier, dpr: this.dpr, medianMs, verdict, samples: phase.samples })
+        if (verdict === 'static' && this.slowConfirms < SLOW_CONFIRMS) {
+          this.slowConfirms++
+          this.phase = { kind: 'warmup', frames: 0 }
+          return
+        }
         if (verdict === 'static') {
           this.phase = { kind: 'done' }
           return this.hooks.onSlow()
@@ -296,4 +321,26 @@ export class QualityRuntime {
     if (next.tier !== level.tier) this.pending = { tier: next.tier, since: now }
     this.monitor.reset()
   }
+}
+
+interface BenchmarkRun {
+  tier: Tier
+  dpr: number
+  medianMs: number
+  verdict: string
+  samples: readonly number[]
+}
+
+/**
+ * Each benchmark run leaves a `cy.benchmark` performance mark, so a visitor who got the album can
+ * show why: `performance.getEntriesByName('cy.benchmark').map((m) => m.detail)` in the console.
+ */
+function recordBenchmark(run: BenchmarkRun): void {
+  const detail = { ...run, medianMs: Math.round(run.medianMs * 10) / 10, samples: run.samples.map((ms) => Math.round(ms * 10) / 10) }
+  try {
+    performance.mark('cy.benchmark', { detail })
+  } catch {
+    // Marks with detail are missing in some older browsers; the log is only a diagnostic.
+  }
+  if (run.verdict === 'static') console.warn('The forest benchmark ran slowly', detail)
 }
